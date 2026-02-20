@@ -19,6 +19,7 @@ export const createAuth = (ctx: GenericCtx) => {
       "http://localhost:19006",
       "http://localhost:3000",
       "https://eazy-english.vercel.app",
+      "https://app.eazy-english.uz",
     ],
     database: authComponent.adapter(ctx),
     // Enable email/password authentication
