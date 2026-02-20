@@ -12,7 +12,6 @@ node_modules/
 .env.*.local
 
 # Convex
-convex/_generated/
 .convex/
 
 # macOS
