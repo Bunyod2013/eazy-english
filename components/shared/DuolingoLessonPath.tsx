@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Lesson } from '@/types';
 import { 
@@ -28,7 +28,8 @@ export const DuolingoLessonPath: React.FC<DuolingoLessonPathProps> = ({
   onLessonPress,
 }) => {
   const { colors, isDark } = useTheme();
-  const screenWidth = Dimensions.get('window').width;
+  const [containerWidth, setContainerWidth] = useState(Dimensions.get('window').width);
+  const screenWidth = containerWidth;
   const BUTTON_SIZE = 75;
   const VERTICAL_SPACING = 110;
   const START_Y = 30;
@@ -59,10 +60,11 @@ export const DuolingoLessonPath: React.FC<DuolingoLessonPathProps> = ({
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={{ flex: 1, backgroundColor: colors.bg.secondary }}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 150 }}
+      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
     >
       <View style={{ height: lessons.length * VERTICAL_SPACING + 200, position: 'relative' }}>
         
