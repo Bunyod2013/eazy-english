@@ -18,6 +18,7 @@ export const createAuth = (ctx: GenericCtx) => {
       "http://localhost:8082",
       "http://localhost:19006",
       "http://localhost:3000",
+      "https://eazy-english.vercel.app",
     ],
     database: authComponent.adapter(ctx),
     // Enable email/password authentication
@@ -44,6 +45,6 @@ export const createAuth = (ctx: GenericCtx) => {
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
+    return authComponent.getAuthUser(ctx as any);
   },
 });
