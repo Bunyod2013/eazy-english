@@ -22,7 +22,7 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({ children }) =>
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '100%',
+    alignSelf: 'stretch',
     alignItems: 'center',
   },
   inner: {
