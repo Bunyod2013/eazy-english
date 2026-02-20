@@ -22,7 +22,11 @@ function getPlugins() {
   return plugins;
 }
 
-export const authClient = createAuthClient({
-  baseURL: process.env.EXPO_PUBLIC_CONVEX_SITE_URL,
-  plugins: getPlugins(),
-});
+const baseURL = process.env.EXPO_PUBLIC_CONVEX_SITE_URL || "";
+
+export const authClient = baseURL
+  ? createAuthClient({
+      baseURL,
+      plugins: getPlugins(),
+    })
+  : null;

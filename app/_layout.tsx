@@ -64,11 +64,17 @@ export default function RootLayout() {
     initialize();
   }, []);
 
-  if (!convex) {
+  if (!convex || !authClient) {
+    const missing = [
+      !convexUrl && 'EXPO_PUBLIC_CONVEX_URL',
+      !authClient && 'EXPO_PUBLIC_CONVEX_SITE_URL',
+    ].filter(Boolean).join(', ');
     return (
       <SafeAreaProvider>
         <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-          <View><Text style={{ color: 'red', fontSize: 16, textAlign: 'center', padding: 20 }}>Configuration error: EXPO_PUBLIC_CONVEX_URL is not set</Text></View>
+          <Text style={{ color: 'red', fontSize: 16, textAlign: 'center', padding: 20 }}>
+            Configuration error: {missing} not set
+          </Text>
         </View>
       </SafeAreaProvider>
     );
