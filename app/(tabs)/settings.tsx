@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, ScrollView, Switch, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Switch, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { authClient } from '@/lib/auth-client';
-import { Card } from '@/components/ui';
+import { Card, ConfirmModal } from '@/components/ui';
 import { Mascot } from '@/components/shared';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useUserStore } from '@/store/userStore';
@@ -16,43 +16,27 @@ export default function SettingsScreen() {
   const { user, clearUser } = useUserStore();
   const { colors, isDark } = useTheme();
   const router = useRouter();
+  const [signOutModalVisible, setSignOutModalVisible] = useState(false);
 
   if (!user) {
     return null;
   }
 
   const handleSignOut = () => {
-    Alert.alert(
-      'Chiqish',
-      'Haqiqatan ham chiqmoqchimisiz?',
-      [
-        {
-          text: 'Bekor qilish',
-          style: 'cancel',
-        },
-        {
-          text: 'Chiqish',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              // Sign out from Better Auth
-              await authClient.signOut();
-              
-              // Clear local user data
-              await clearUser();
-              
-              // Navigate to login
-              router.replace('/auth/login');
-            } catch (error) {
-              console.error('Sign out error:', error);
-              // Still navigate to login even if there's an error
-              await clearUser();
-              router.replace('/auth/login');
-            }
-          },
-        },
-      ]
-    );
+    setSignOutModalVisible(true);
+  };
+
+  const confirmSignOut = async () => {
+    setSignOutModalVisible(false);
+    try {
+      await authClient.signOut();
+      await clearUser();
+      router.replace('/auth/login');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      await clearUser();
+      router.replace('/auth/login');
+    }
   };
 
   return (
@@ -394,6 +378,17 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <ConfirmModal
+        visible={signOutModalVisible}
+        onClose={() => setSignOutModalVisible(false)}
+        onConfirm={confirmSignOut}
+        title="Chiqish"
+        message="Haqiqatan ham chiqmoqchimisiz?"
+        confirmText="Chiqish"
+        cancelText="Bekor qilish"
+        variant="danger"
+      />
     </SafeAreaView>
   );
 }

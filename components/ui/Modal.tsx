@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import { useTheme } from '@/utils/theme';
 
 interface ModalProps {
   visible: boolean;
@@ -26,12 +27,15 @@ export const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
 }) => {
   const { width } = Dimensions.get('window');
-  
-  const sizeStyles = {
+  const { colors, isDark } = useTheme();
+
+  const sizeWidth = {
     small: width * 0.7,
     medium: width * 0.85,
     large: width * 0.95,
-  };
+  }[size];
+
+  const modalWidth = Math.min(sizeWidth, 480);
 
   return (
     <RNModal
@@ -40,25 +44,53 @@ export const Modal: React.FC<ModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View className="flex-1 justify-center items-center bg-black/50 px-4">
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        padding: 16,
+      }}>
         <View
-          className="bg-white rounded-3xl p-6 max-h-[80%]"
-          style={{ width: sizeStyles[size] }}
+          style={{
+            backgroundColor: colors.bg.card,
+            borderRadius: 24,
+            padding: 24,
+            maxHeight: '80%',
+            width: modalWidth,
+          }}
         >
           {/* Header */}
           {(title || showCloseButton) && (
-            <View className="flex-row justify-between items-center mb-4">
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
+            }}>
               {title && (
-                <Text className="text-2xl font-bold text-gray-800 flex-1">
+                <Text style={{
+                  fontSize: 24,
+                  fontWeight: '700',
+                  color: colors.text.primary,
+                  flex: 1,
+                }}>
                   {title}
                 </Text>
               )}
               {showCloseButton && (
                 <TouchableOpacity
                   onPress={onClose}
-                  className="w-8 h-8 rounded-full bg-gray-200 items-center justify-center"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: isDark ? colors.bg.elevated : colors.bg.secondary,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <Text className="text-gray-600 text-lg">✕</Text>
+                  <Text style={{ color: colors.text.secondary, fontSize: 18 }}>✕</Text>
                 </TouchableOpacity>
               )}
             </View>
