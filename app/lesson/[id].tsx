@@ -1,0 +1,616 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Animated, Alert } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { CheckIcon, XIcon, LionIcon, SoundIcon, LightBulbIcon, CloseIcon, TargetIcon, StarIcon } from '@/components/icons';
+import Svg, { Path } from 'react-native-svg';
+import { useLessonStore } from '@/store/lessonStore';
+import { useUserStore } from '@/store/userStore';
+import { useProgressStore } from '@/store/progressStore';
+import { useSettingsStore } from '@/store/settingsStore';
+import { Question, QuestionAnswer } from '@/types';
+import { calculateLessonXP } from '@/utils/xp';
+import { triggerSuccess, triggerError } from '@/utils/haptics';
+import { useTheme } from '@/utils/theme';
+
+// Question Components
+import { VocabularyQuestion } from '@/features/lessons/VocabularyQuestion';
+import { MultipleChoiceQuestion } from '@/features/lessons/MultipleChoiceQuestion';
+import { TranslationQuestion } from '@/features/lessons/TranslationQuestion';
+import { FillBlankQuestion } from '@/features/lessons/FillBlankQuestion';
+import { WordBankQuestion } from '@/features/lessons/WordBankQuestion';
+import { ListeningQuestion } from '@/features/lessons/ListeningQuestion';
+import { ListeningDiscriminationQuestion } from '@/features/lessons/ListeningDiscriminationQuestion'; // ✅ NEW
+import { ImageChoiceQuestion } from '@/features/lessons/ImageChoiceQuestion'; // ✅ NEW
+import { SpeakingQuestion } from '@/features/lessons/SpeakingQuestion'; // ✅ NEW
+
+export default function LessonScreen() {
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
+  const lessonId = id as string;
+
+  const { getLessonById, startLesson, currentSession, answerQuestion, completeSession } = useLessonStore();
+  const { user, addXP } = useUserStore();
+  const { completeLesson } = useProgressStore();
+  const { settings } = useSettingsStore();
+
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [showHint, setShowHint] = useState(false);
+
+  const { colors, isDark } = useTheme();
+  const lesson = getLessonById(lessonId);
+
+  useEffect(() => {
+    if (lesson && !currentSession) {
+      startLesson(lessonId);
+      setStartTime(Date.now());
+    }
+  }, []);
+
+  if (!lesson || !currentSession || !user) {
+    return null;
+  }
+
+  const currentQuestion = lesson.questions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex) / lesson.questions.length) * 100;
+
+  const checkAnswer = (answer: string) => {
+    const correct = Array.isArray(currentQuestion.correctAnswer)
+      ? currentQuestion.correctAnswer.some(a => a.toLowerCase() === answer.toLowerCase())
+      : currentQuestion.correctAnswer.toLowerCase() === answer.toLowerCase();
+
+    setIsCorrect(correct);
+    setShowFeedback(true);
+
+    if (settings.vibrationEnabled) {
+      correct ? triggerSuccess() : triggerError();
+    }
+
+    // Record answer
+    const timeTaken = (Date.now() - startTime) / 1000;
+    const questionAnswer: QuestionAnswer = {
+      questionId: currentQuestion.id,
+      userAnswer: answer,
+      isCorrect: correct,
+      timeTaken,
+    };
+
+    answerQuestion(questionAnswer);
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < lesson.questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedAnswer('');
+      setShowFeedback(false);
+      setStartTime(Date.now());
+    } else {
+      // Lesson complete
+      finishLesson();
+    }
+  };
+
+  const finishLesson = async () => {
+    const session = completeSession();
+    if (!session) {
+      router.replace('/(tabs)/home');
+      return;
+    }
+
+    // Calculate results
+    const correctAnswers = session.answers.filter(a => a.isCorrect).length;
+    const accuracy = (correctAnswers / session.answers.length) * 100;
+    const totalTime = session.answers.reduce((sum, a) => sum + a.timeTaken, 0);
+    
+    const xpEarned = calculateLessonXP(lesson.xpReward, accuracy, totalTime);
+
+    // Save progress
+    await completeLesson({
+      lessonId: lesson.id,
+      completedAt: new Date().toISOString(),
+      xpEarned,
+      accuracy,
+      timeTaken: totalTime,
+    });
+
+    // Add XP
+    await addXP(xpEarned);
+
+    // Show alert with results
+    Alert.alert(
+      'Ajoyib!',
+      `Dars tugallandi!\n\nEneriya ball: +${xpEarned}\nTo'g'rilik: ${Math.round(accuracy)}%\nTo'g'ri javoblar: ${correctAnswers}/${session.answers.length}`,
+      [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/(tabs)/home')
+        }
+      ]
+    );
+  };
+
+  const handleExit = () => {
+    router.back();
+  };
+
+  const renderQuestion = () => {
+    const prompt = settings.explanationLanguage === 'uz' ? currentQuestion.promptUz : currentQuestion.prompt;
+
+    switch (currentQuestion.type) {
+      case 'vocabulary':
+        return (
+          <VocabularyQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+      
+      case 'multiple_choice':
+        return (
+          <MultipleChoiceQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+      
+      case 'translation':
+        return (
+          <TranslationQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+      
+      case 'fill_blank':
+        return (
+          <FillBlankQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+      
+      case 'word_bank':
+        return (
+          <WordBankQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+
+      case 'listening_discrimination':
+        return (
+          <ListeningDiscriminationQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+
+      case 'image_choice':
+        return (
+          <ImageChoiceQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+
+      case 'speaking':
+        return (
+          <SpeakingQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+      
+      case 'listening':
+        return (
+          <ListeningQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+      
+      default:
+        return <Text>Question type not supported yet</Text>;
+    }
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
+      {/* Top Bar - Gamified */}
+      <View style={{ 
+        paddingHorizontal: 16, 
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border.primary,
+      }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          {/* Close Button */}
+          <TouchableOpacity
+            onPress={handleExit}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: colors.bg.card,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderWidth: 1,
+              borderColor: colors.border.primary,
+            }}
+          >
+            <CloseIcon size={22} color={colors.text.secondary} />
+          </TouchableOpacity>
+
+          {/* Progress Bar */}
+          <View style={{ flex: 1, marginHorizontal: 12 }}>
+            <View style={{
+              height: 12,
+              backgroundColor: colors.border.primary,
+              borderRadius: 10,
+              overflow: 'hidden',
+            }}>
+              <View style={{
+                height: '100%',
+                width: `${progress}%`,
+                backgroundColor: colors.green.primary,
+                borderRadius: 10,
+              }} />
+            </View>
+          </View>
+
+          {/* Lives/Hearts */}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#fee2e2',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: '#fecaca',
+          }}>
+            <Svg width={20} height={20} viewBox="0 0 24 24">
+              <Path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#ef4444" />
+            </Svg>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#dc2626', marginLeft: 6 }}>
+              {currentSession.hearts}
+            </Text>
+          </View>
+        </View>
+
+        {/* Question Counter */}
+        <Text style={{ fontSize: 12, color: colors.text.tertiary, textAlign: 'center', marginTop: 4 }}>
+          Savol {currentQuestionIndex + 1} / {lesson.questions.length}
+        </Text>
+      </View>
+
+      {/* Question Card - Gamified */}
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1, padding: 16 }}
+      >
+        {/* Question Header Card - compact for new word, full for others */}
+        <View style={{
+          backgroundColor: colors.stats.lessons.bg,
+          borderRadius: currentQuestion.isNewWord ? 16 : 20,
+          padding: currentQuestion.isNewWord ? 12 : 20,
+          marginBottom: currentQuestion.isNewWord ? 16 : 24,
+          borderWidth: 2,
+          borderColor: colors.stats.lessons.border,
+          shadowColor: colors.stats.lessons.text,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+          elevation: 4,
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{
+              width: currentQuestion.isNewWord ? 40 : 48,
+              height: currentQuestion.isNewWord ? 40 : 48,
+              backgroundColor: colors.stats.lessons.text,
+              borderRadius: currentQuestion.isNewWord ? 20 : 24,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 12,
+            }}>
+              <LionIcon size={currentQuestion.isNewWord ? 24 : 32} color="#ffffff" />
+            </View>
+            <View style={{ flex: 1 }}>
+              {/* NEW WORD Badge */}
+              {currentQuestion.isNewWord ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View style={{
+                    backgroundColor: colors.stats.xp.bg,
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                    borderRadius: 6,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 4,
+                    borderWidth: 1,
+                    borderColor: colors.stats.xp.border,
+                  }}>
+                    <TargetIcon size={12} color={colors.stats.xp.text} />
+                    <Text style={{
+                      fontSize: 9,
+                      fontWeight: '800',
+                      color: colors.stats.xp.text,
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.5,
+                    }}>
+                      YANGI SO'Z
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 11, color: colors.text.tertiary, fontWeight: '600' }}>
+                    {currentQuestion.type.toUpperCase()}
+                  </Text>
+                </View>
+              ) : (
+                <>
+                  <Text style={{ fontSize: 12, color: colors.text.tertiary, fontWeight: '600' }}>
+                    {currentQuestion.type.toUpperCase()}
+                  </Text>
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.text.primary, marginTop: 2 }}>
+                    {lesson.titleUz}
+                  </Text>
+                </>
+              )}
+            </View>
+
+            {/* Sound/Help Buttons */}
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              <TouchableOpacity
+                style={{
+                  width: currentQuestion.isNewWord ? 32 : 36,
+                  height: currentQuestion.isNewWord ? 32 : 36,
+                  borderRadius: currentQuestion.isNewWord ? 16 : 18,
+                  backgroundColor: colors.bg.card,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: colors.border.primary,
+                }}
+              >
+                <SoundIcon size={currentQuestion.isNewWord ? 18 : 20} />
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                onPress={() => setShowHint(!showHint)}
+                style={{
+                  width: currentQuestion.isNewWord ? 32 : 36,
+                  height: currentQuestion.isNewWord ? 32 : 36,
+                  borderRadius: currentQuestion.isNewWord ? 16 : 18,
+                  backgroundColor: showHint ? colors.stats.xp.bg : colors.bg.card,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: showHint ? colors.stats.xp.border : colors.border.primary,
+                }}
+              >
+                <LightBulbIcon size={currentQuestion.isNewWord ? 18 : 20} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Question Text - only for non-new-word (word & translation not shown in new word header) */}
+          {!currentQuestion.isNewWord && (
+          <Text style={{ 
+            fontSize: 24, 
+            fontWeight: 'bold', 
+            color: colors.text.primary,
+            lineHeight: 32,
+            marginTop: 12,
+            marginBottom: 8,
+          }}>
+            {settings.explanationLanguage === 'uz' ? currentQuestion.promptUz : currentQuestion.prompt}
+          </Text>
+          )}
+
+          {/* Hint Card */}
+          {showHint && currentQuestion.explanation && (
+            <View style={{
+              backgroundColor: colors.stats.xp.bg,
+              borderRadius: 12,
+              padding: 12,
+              marginTop: 12,
+              borderWidth: 1,
+              borderColor: colors.stats.xp.border,
+            }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <LightBulbIcon size={20} color={colors.stats.xp.text} />
+                <Text style={{ 
+                  fontSize: 13, 
+                  color: colors.text.secondary,
+                  marginLeft: 8,
+                  flex: 1,
+                  lineHeight: 18,
+                }}>
+                  {settings.explanationLanguage === 'uz' ? currentQuestion.explanationUz : currentQuestion.explanation}
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        {/* Render Question Content */}
+        {renderQuestion()}
+      </ScrollView>
+
+      {/* Bottom Action Bar - Gamified */}
+      <View style={{ 
+        padding: 16,
+        borderTopWidth: 1,
+        borderTopColor: colors.border.primary,
+        backgroundColor: colors.bg.elevated,
+      }}>
+        {showFeedback ? (
+          <View>
+            {/* Feedback Card - Gamified */}
+            <View style={{
+              backgroundColor: isCorrect ? colors.stats.accuracy.bg : '#fee2e2',
+              borderRadius: 16,
+              padding: 16,
+              marginBottom: 16,
+              borderWidth: 2,
+              borderColor: isCorrect ? colors.stats.accuracy.border : '#fecaca',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: isCorrect ? colors.green.primary : '#dc2626',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 12,
+              }}>
+                {isCorrect ? (
+                  <CheckIcon size={28} color="#ffffff" />
+                ) : (
+                  <XIcon size={28} color="#ffffff" />
+                )}
+              </View>
+              
+              <View style={{ flex: 1 }}>
+                <Text style={{ 
+                  fontSize: 18, 
+                  fontWeight: 'bold', 
+                  color: isCorrect ? colors.green.primary : '#dc2626',
+                  marginBottom: 4,
+                }}>
+                  {isCorrect ? "Ajoyib! To'g'ri!" : "Noto'g'ri"}
+                </Text>
+                {!isCorrect && (
+                  <Text style={{ fontSize: 14, color: colors.text.secondary }}>
+                    To'g'ri javob: {currentQuestion.correctAnswer}
+                  </Text>
+                )}
+                {isCorrect && (
+                  <Text style={{ fontSize: 14, color: colors.text.secondary }}>
+                    +{lesson.xpReward || 10} XP
+                  </Text>
+                )}
+              </View>
+            </View>
+            
+            {/* Next Button - Large Gamified */}
+            <TouchableOpacity
+              onPress={handleNext}
+              style={{
+                backgroundColor: colors.green.primary,
+                borderRadius: 16,
+                padding: 18,
+                alignItems: 'center',
+                borderBottomWidth: 4,
+                borderBottomColor: colors.green.dark,
+                shadowColor: colors.green.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 6,
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ffffff' }}>
+                {currentQuestionIndex < lesson.questions.length - 1 ? 'KEYINGI' : 'TUGATISH'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            {/* Skip Button */}
+            <TouchableOpacity
+              onPress={handleNext}
+              style={{
+                backgroundColor: colors.bg.card,
+                borderRadius: 16,
+                padding: 18,
+                borderWidth: 2,
+                borderColor: colors.border.primary,
+                minWidth: 80,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text.tertiary }}>
+                O'TKAZIB
+              </Text>
+            </TouchableOpacity>
+
+            {/* Check Button - Large */}
+            <TouchableOpacity
+              onPress={() => checkAnswer(selectedAnswer)}
+              disabled={!selectedAnswer}
+              style={{
+                flex: 1,
+                backgroundColor: selectedAnswer ? colors.green.primary : colors.border.primary,
+                borderRadius: 16,
+                padding: 18,
+                alignItems: 'center',
+                borderBottomWidth: selectedAnswer ? 4 : 0,
+                borderBottomColor: colors.green.dark,
+                shadowColor: selectedAnswer ? colors.green.primary : 'transparent',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: selectedAnswer ? 6 : 0,
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ffffff' }}>
+                TEKSHIRISH
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </SafeAreaView>
+  );
+}

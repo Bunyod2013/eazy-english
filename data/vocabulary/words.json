@@ -1,0 +1,187 @@
+{
+  "categories": [
+    {
+      "id": "basics",
+      "name": "Basics",
+      "nameUz": "Asoslar",
+      "icon": "📚",
+      "description": "Essential everyday words",
+      "descriptionUz": "Kundalik zarur so'zlar",
+      "level": 1
+    },
+    {
+      "id": "numbers",
+      "name": "Numbers", 
+      "nameUz": "Raqamlar",
+      "icon": "🔢",
+      "description": "Numbers and counting",
+      "descriptionUz": "Raqamlar va sanash",
+      "level": 1
+    },
+    {
+      "id": "colors",
+      "name": "Colors",
+      "nameUz": "Ranglar",
+      "icon": "🎨",
+      "description": "Colors and shades",
+      "descriptionUz": "Ranglar",
+      "level": 1
+    },
+    {
+      "id": "family",
+      "name": "Family",
+      "nameUz": "Oila",
+      "icon": "👨‍👩‍👧‍👦",
+      "description": "Family members",
+      "descriptionUz": "Oila a'zolari",
+      "level": 1
+    },
+    {
+      "id": "body",
+      "name": "Body",
+      "nameUz": "Tana",
+      "icon": "🫀",
+      "description": "Body parts",
+      "descriptionUz": "Tana a'zolari",
+      "level": 2
+    },
+    {
+      "id": "food",
+      "name": "Food",
+      "nameUz": "Ovqat",
+      "icon": "🍔",
+      "description": "Food and meals",
+      "descriptionUz": "Ovqatlar",
+      "level": 2
+    },
+    {
+      "id": "drinks",
+      "name": "Drinks",
+      "nameUz": "Ichimliklar",
+      "icon": "☕",
+      "description": "Beverages",
+      "descriptionUz": "Ichimliklar",
+      "level": 2
+    },
+    {
+      "id": "animals",
+      "name": "Animals",
+      "nameUz": "Hayvonlar",
+      "icon": "🦁",
+      "description": "Animals and pets",
+      "descriptionUz": "Hayvonlar",
+      "level": 2
+    },
+    {
+      "id": "clothes",
+      "name": "Clothes",
+      "nameUz": "Kiyim",
+      "icon": "👕",
+      "description": "Clothing items",
+      "descriptionUz": "Kiyim-kechak",
+      "level": 2
+    },
+    {
+      "id": "house",
+      "name": "House",
+      "nameUz": "Uy",
+      "icon": "🏠",
+      "description": "House and rooms",
+      "descriptionUz": "Uy va xonalar",
+      "level": 2
+    },
+    {
+      "id": "furniture",
+      "name": "Furniture",
+      "nameUz": "Mebel",
+      "icon": "🪑",
+      "description": "Furniture items",
+      "descriptionUz": "Mebel buyumlari",
+      "level": 2
+    },
+    {
+      "id": "work",
+      "name": "Work",
+      "nameUz": "Ish",
+      "icon": "💼",
+      "description": "Work and office",
+      "descriptionUz": "Ish va ofis",
+      "level": 3
+    },
+    {
+      "id": "school",
+      "name": "School",
+      "nameUz": "Maktab",
+      "icon": "🏫",
+      "description": "School and education",
+      "descriptionUz": "Maktab va ta'lim",
+      "level": 3
+    },
+    {
+      "id": "time",
+      "name": "Time",
+      "nameUz": "Vaqt",
+      "icon": "⏰",
+      "description": "Time and dates",
+      "descriptionUz": "Vaqt va sanalar",
+      "level": 3
+    },
+    {
+      "id": "weather",
+      "name": "Weather",
+      "nameUz": "Ob-havo",
+      "icon": "🌤️",
+      "description": "Weather conditions",
+      "descriptionUz": "Ob-havo holati",
+      "level": 3
+    },
+    {
+      "id": "travel",
+      "name": "Travel",
+      "nameUz": "Sayohat",
+      "icon": "✈️",
+      "description": "Travel and tourism",
+      "descriptionUz": "Sayohat va turizm",
+      "level": 3
+    },
+    {
+      "id": "transport",
+      "name": "Transport",
+      "nameUz": "Transport",
+      "icon": "🚗",
+      "description": "Transportation",
+      "descriptionUz": "Transport vositalari",
+      "level": 3
+    },
+    {
+      "id": "shopping",
+      "name": "Shopping",
+      "nameUz": "Xarid",
+      "icon": "🛍️",
+      "description": "Shopping and stores",
+      "descriptionUz": "Xarid va do'konlar",
+      "level": 4
+    },
+    {
+      "id": "restaurant",
+      "name": "Restaurant",
+      "nameUz": "Restoran",
+      "icon": "🍽️",
+      "description": "Restaurant and dining",
+      "descriptionUz": "Restoran va ovqatlanish",
+      "level": 4
+    },
+    {
+      "id": "health",
+      "name": "Health",
+      "nameUz": "Salomatlik",
+      "icon": "🏥",
+      "description": "Health and medicine",
+      "descriptionUz": "Salomatlik va tibbiyot",
+      "level": 4
+    }
+  ],
+  "words": [
+    
+  ]
+}
