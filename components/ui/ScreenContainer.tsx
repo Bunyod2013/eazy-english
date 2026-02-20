@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
   inner: {
     width: '100%',
     maxWidth: 1200,
-    marginLeft: 'auto' as any,
-    marginRight: 'auto' as any,
+    marginRight: 200,
   },
 });

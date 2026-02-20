@@ -155,16 +155,12 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 }
 
 const styles = StyleSheet.create({
-  // Desktop sidebar
+  // Desktop sidebar — no absolute positioning, sits in normal flow
   sidebar: {
-    position: 'absolute' as const,
-    left: 0,
-    top: 0,
-    bottom: 0,
     width: 240,
     paddingTop: 32,
     paddingHorizontal: 12,
-    zIndex: 10,
+    height: '100%' as any,
   },
   appName: {
     fontSize: 24,

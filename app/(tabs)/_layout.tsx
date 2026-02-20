@@ -1,19 +1,16 @@
 import { Tabs } from 'expo-router';
-import { HomeIcon, PeopleIcon, SettingsIcon, TrophyIcon } from '@/components/icons';
 import { CustomTabBar } from '@/components/navigation/CustomTabBar';
 import { useIsDesktop } from '@/utils/useIsDesktop';
-import { useTheme } from '@/utils/theme';
 
 export default function TabLayout() {
   const isDesktop = useIsDesktop();
-  const { colors } = useTheme();
 
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
-      sceneContainerStyle={{ marginLeft: isDesktop ? 240 : 0, overflow: 'hidden' as any }}
       screenOptions={{
         headerShown: false,
+        tabBarPosition: isDesktop ? 'left' : 'bottom',
       }}
     >
       <Tabs.Screen
