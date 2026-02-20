@@ -23,7 +23,6 @@
     "@better-auth/expo": "1.4.9",
     "@convex-dev/auth": "^0.0.90",
     "@convex-dev/better-auth": "0.10.10",
-    "@esbuild/darwin-arm64": "^0.27.3",
     "@expo/cli": "^54.0.23",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@tailwindcss/forms": "^0.5.11",
