@@ -34,7 +34,7 @@ export default function LessonScreen() {
   const { id } = useLocalSearchParams();
   const lessonId = id as string;
 
-  const { getLessonById, startLesson, currentSession, answerQuestion, completeSession } = useLessonStore();
+  const { lessons, getLessonById, startLesson, currentSession, answerQuestion, completeSession } = useLessonStore();
   const { user, addXP } = useUserStore();
   const { completeLesson } = useProgressStore();
   const { settings } = useSettingsStore();
@@ -679,20 +679,27 @@ export default function LessonScreen() {
           </View>
         )}
       </View>
-      {completionData && (
-        <LessonCompletionModal
-          visible={showCompletion}
-          onClose={() => router.replace('/(tabs)/home')}
-          xpEarned={completionData.xpEarned}
-          correctAnswers={completionData.correctAnswers}
-          totalQuestions={completionData.totalQuestions}
-          lessonTitle={lesson.title}
-          lessonTitleUz={lesson.titleUz}
-          isLevelUp={completionData.isLevelUp}
-          newLevel={completionData.newLevel}
-          currentStreak={user.currentStreak}
-        />
-      )}
+      {completionData && (() => {
+        const currentIndex = lessons.findIndex(l => l.id === lessonId);
+        const nextLesson = currentIndex >= 0 && currentIndex < lessons.length - 1
+          ? lessons[currentIndex + 1]
+          : null;
+        return (
+          <LessonCompletionModal
+            visible={showCompletion}
+            onClose={() => router.replace('/(tabs)/home')}
+            onNextLesson={nextLesson ? () => router.replace(`/lesson/${nextLesson.id}`) : undefined}
+            xpEarned={completionData.xpEarned}
+            correctAnswers={completionData.correctAnswers}
+            totalQuestions={completionData.totalQuestions}
+            lessonTitle={lesson.title}
+            lessonTitleUz={lesson.titleUz}
+            isLevelUp={completionData.isLevelUp}
+            newLevel={completionData.newLevel}
+            currentStreak={user.currentStreak}
+          />
+        );
+      })()}
     </SafeAreaView>
   );
 }

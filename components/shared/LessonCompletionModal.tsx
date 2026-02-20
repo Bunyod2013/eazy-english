@@ -9,6 +9,7 @@ import { useTheme } from '@/utils/theme';
 interface LessonCompletionModalProps {
   visible: boolean;
   onClose: () => void;
+  onNextLesson?: () => void;
   onReview?: () => void;
   xpEarned: number;
   correctAnswers: number;
@@ -24,6 +25,7 @@ interface LessonCompletionModalProps {
 export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
   visible,
   onClose,
+  onNextLesson,
   onReview,
   xpEarned,
   correctAnswers,
@@ -511,31 +513,63 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
 
         {/* Action Buttons - Gamified */}
         <View style={{ gap: 12, marginTop: 8 }}>
+          {onNextLesson && (
+            <TouchableOpacity
+              onPress={onNextLesson}
+              activeOpacity={0.8}
+              style={{
+                backgroundColor: colors.green.primary,
+                borderRadius: 16,
+                padding: 20,
+                alignItems: 'center',
+                borderBottomWidth: 5,
+                borderBottomColor: colors.green.dark,
+                shadowColor: colors.green.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 12,
+                elevation: 8,
+              }}
+            >
+              <Text style={{
+                fontSize: 18,
+                fontWeight: 'bold',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                letterSpacing: 1,
+              }}>
+                KEYINGI DARS
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             onPress={onClose}
             activeOpacity={0.8}
             style={{
-              backgroundColor: colors.green.primary,
+              backgroundColor: onNextLesson ? colors.bg.card : colors.green.primary,
               borderRadius: 16,
-              padding: 20,
+              padding: onNextLesson ? 18 : 20,
               alignItems: 'center',
-              borderBottomWidth: 5,
-              borderBottomColor: colors.green.dark,
-              shadowColor: colors.green.primary,
+              borderWidth: onNextLesson ? 2 : 0,
+              borderColor: colors.border.primary,
+              borderBottomWidth: onNextLesson ? 2 : 5,
+              borderBottomColor: onNextLesson ? colors.border.primary : colors.green.dark,
+              shadowColor: onNextLesson ? 'transparent' : colors.green.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.3,
               shadowRadius: 12,
-              elevation: 8,
+              elevation: onNextLesson ? 0 : 8,
             }}
           >
-            <Text style={{ 
-              fontSize: 18, 
-              fontWeight: 'bold', 
-              color: '#ffffff',
+            <Text style={{
+              fontSize: onNextLesson ? 16 : 18,
+              fontWeight: 'bold',
+              color: onNextLesson ? colors.text.primary : '#ffffff',
               textTransform: 'uppercase',
               letterSpacing: 1,
             }}>
-              DAVOM ETISH
+              BOSH SAHIFA
             </Text>
           </TouchableOpacity>
 
@@ -552,9 +586,9 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
                 borderColor: colors.border.primary,
               }}
             >
-              <Text style={{ 
-                fontSize: 16, 
-                fontWeight: '700', 
+              <Text style={{
+                fontSize: 16,
+                fontWeight: '700',
                 color: colors.text.primary,
               }}>
                 Qayta Ko'rib Chiqish
