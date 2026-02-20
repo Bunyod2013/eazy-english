@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUserStore } from '@/store/userStore';
 import { TrophyIcon, FireIcon, DiamondIcon, StarIcon, LionIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
-import { ScreenContainer } from '@/components/ui';
 
 // Mock data - replace with real data later
 const generateLeaderboardData = (currentUserXP: number, currentUserName: string) => {
@@ -54,7 +53,7 @@ export default function LeaderboardScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <ScreenContainer>
+
         {/* Header */}
         <View style={{ padding: 16, paddingTop: 24 }}>
           <View style={{ alignItems: 'center', marginBottom: 16 }}>
@@ -460,7 +459,7 @@ export default function LeaderboardScreen() {
             })}
           </View>
         </View>
-        </ScreenContainer>
+
       </ScrollView>
     </SafeAreaView>
   );
