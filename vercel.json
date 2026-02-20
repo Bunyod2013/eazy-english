@@ -1,5 +1,5 @@
 {
-  "buildCommand": "echo CONVEX_URL=$EXPO_PUBLIC_CONVEX_URL && npx expo export -p web",
+  "buildCommand": "echo \"EXPO_PUBLIC_CONVEX_URL=$EXPO_PUBLIC_CONVEX_URL\" > .env.local && echo \"EXPO_PUBLIC_CONVEX_SITE_URL=$EXPO_PUBLIC_CONVEX_SITE_URL\" >> .env.local && echo \"EXPO_PUBLIC_WEB_CLIENT_ID=$EXPO_PUBLIC_WEB_CLIENT_ID\" >> .env.local && npx expo export -p web",
   "outputDirectory": "dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

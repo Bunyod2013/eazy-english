@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Platform, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
 import { authClient } from '@/lib/auth-client';
@@ -14,9 +14,13 @@ import { Loader } from '@/components/ui';
 import { useTheme } from '@/utils/theme';
 import '../global.css';
 
-const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL as string, {
-  unsavedChangesWarning: false,
-});
+const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
+if (!convexUrl) {
+  console.error('EXPO_PUBLIC_CONVEX_URL is not set!');
+}
+const convex = convexUrl
+  ? new ConvexReactClient(convexUrl, { unsavedChangesWarning: false })
+  : null;
 
 export default function RootLayout() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -59,6 +63,16 @@ export default function RootLayout() {
 
     initialize();
   }, []);
+
+  if (!convex) {
+    return (
+      <SafeAreaProvider>
+        <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+          <View><Text style={{ color: 'red', fontSize: 16, textAlign: 'center', padding: 20 }}>Configuration error: EXPO_PUBLIC_CONVEX_URL is not set</Text></View>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
 
   if (!isInitialized || userLoading) {
     return (
