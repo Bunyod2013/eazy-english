@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Animated, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CheckIcon, XIcon, LionIcon, SoundIcon, LightBulbIcon, CloseIcon, TargetIcon, StarIcon } from '@/components/icons';
@@ -9,9 +9,10 @@ import { useUserStore } from '@/store/userStore';
 import { useProgressStore } from '@/store/progressStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { Question, QuestionAnswer } from '@/types';
-import { calculateLessonXP } from '@/utils/xp';
+import { calculateLessonXP, calculateLevelFromXP } from '@/utils/xp';
 import { triggerSuccess, triggerError } from '@/utils/haptics';
 import { useTheme } from '@/utils/theme';
+import { LessonCompletionModal } from '@/components/shared/LessonCompletionModal';
 
 // Question Components
 import { VocabularyQuestion } from '@/features/lessons/VocabularyQuestion';
@@ -44,6 +45,14 @@ export default function LessonScreen() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [startTime, setStartTime] = useState(Date.now());
   const [showHint, setShowHint] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [completionData, setCompletionData] = useState<{
+    xpEarned: number;
+    correctAnswers: number;
+    totalQuestions: number;
+    isLevelUp: boolean;
+    newLevel: number;
+  } | null>(null);
 
   const { colors, isDark } = useTheme();
   const lesson = getLessonById(lessonId);
@@ -121,20 +130,23 @@ export default function LessonScreen() {
       timeTaken: totalTime,
     });
 
+    // Detect level-up before adding XP
+    const levelBefore = calculateLevelFromXP(user.totalXP);
+    const levelAfter = calculateLevelFromXP(user.totalXP + xpEarned);
+    const isLevelUp = levelAfter > levelBefore;
+
     // Add XP
     await addXP(xpEarned);
 
-    // Show alert with results
-    Alert.alert(
-      'Ajoyib!',
-      `Dars tugallandi!\n\nEneriya ball: +${xpEarned}\nTo'g'rilik: ${Math.round(accuracy)}%\nTo'g'ri javoblar: ${correctAnswers}/${session.answers.length}`,
-      [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/(tabs)/home')
-        }
-      ]
-    );
+    // Show gamified completion modal
+    setCompletionData({
+      xpEarned,
+      correctAnswers,
+      totalQuestions: session.answers.length,
+      isLevelUp,
+      newLevel: levelAfter,
+    });
+    setShowCompletion(true);
   };
 
   const handleExit = () => {
@@ -667,6 +679,20 @@ export default function LessonScreen() {
           </View>
         )}
       </View>
+      {completionData && (
+        <LessonCompletionModal
+          visible={showCompletion}
+          onClose={() => router.replace('/(tabs)/home')}
+          xpEarned={completionData.xpEarned}
+          correctAnswers={completionData.correctAnswers}
+          totalQuestions={completionData.totalQuestions}
+          lessonTitle={lesson.title}
+          lessonTitleUz={lesson.titleUz}
+          isLevelUp={completionData.isLevelUp}
+          newLevel={completionData.newLevel}
+          currentStreak={user.currentStreak}
+        />
+      )}
     </SafeAreaView>
   );
 }
