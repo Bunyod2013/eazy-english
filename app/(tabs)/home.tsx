@@ -9,6 +9,7 @@ import { useLessonStore } from '@/store/lessonStore';
 import { getStreakStatus } from '@/utils/date';
 import { LionIcon, FireIcon, DiamondIcon, TargetIcon, BookIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
+import { ScreenContainer } from '@/components/ui';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -49,6 +50,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
+      <ScreenContainer>
       {/* Top Bar - Stats on Right + Daily Goal */}
       <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -221,6 +223,7 @@ export default function HomeScreen() {
           </Text>
         </View>
       )}
+      </ScreenContainer>
     </SafeAreaView>
   );
 }

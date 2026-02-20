@@ -10,6 +10,7 @@ import { triggerSuccess } from '@/utils/haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FireIcon, StarIcon, BookIcon, TargetIcon, TrophyIcon, DiamondIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
+import { ScreenContainer } from '@/components/ui';
 
 export default function ProfileScreen() {
   const { user, resetUser } = useUserStore();
@@ -46,6 +47,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        <ScreenContainer>
         {/* Top Stats Bar - Same as Learn */}
         <View style={{ padding: 16 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -347,6 +349,7 @@ export default function ProfileScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        </ScreenContainer>
       </ScrollView>
 
       {/* Reset Confirmation Modal */}

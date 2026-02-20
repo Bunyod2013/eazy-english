@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Switch, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { authClient } from '@/lib/auth-client';
-import { Card, ConfirmModal } from '@/components/ui';
+import { Card, ConfirmModal, ScreenContainer } from '@/components/ui';
 import { Mascot } from '@/components/shared';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useUserStore } from '@/store/userStore';
@@ -42,6 +42,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.secondary }}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        <ScreenContainer>
         {/* Header - Hero Card */}
         <View style={{ padding: 16, paddingTop: 24 }}>
           <View style={{
@@ -377,6 +378,7 @@ export default function SettingsScreen() {
             </View>
           </TouchableOpacity>
         </View>
+        </ScreenContainer>
       </ScrollView>
 
       <ConfirmModal
