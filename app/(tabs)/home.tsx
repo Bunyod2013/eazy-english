@@ -50,8 +50,8 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
-      <ScreenContainer>
       {/* Top Bar - Stats on Right + Daily Goal */}
+      <ScreenContainer>
       <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Daily Goal - Left Side in Div */}
@@ -203,6 +203,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       </View>
+      </ScreenContainer>
 
       {/* Lesson Path - Duolingo Style */}
       {lessons.length > 0 ? (
@@ -223,7 +224,6 @@ export default function HomeScreen() {
           </Text>
         </View>
       )}
-      </ScreenContainer>
     </SafeAreaView>
   );
 }
