@@ -14,19 +14,15 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({ children }) =>
   }
 
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.inner}>{children}</View>
-    </View>
+    <View style={styles.inner}>{children}</View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    alignSelf: 'stretch',
-    alignItems: 'center',
-  },
   inner: {
     width: '100%',
     maxWidth: 1200,
+    marginLeft: 'auto' as any,
+    marginRight: 'auto' as any,
   },
 });
