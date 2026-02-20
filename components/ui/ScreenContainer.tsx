@@ -26,6 +26,6 @@ const styles = StyleSheet.create({
   },
   inner: {
     width: '100%',
-    maxWidth: 960,
+    maxWidth: 1200,
   },
 });
