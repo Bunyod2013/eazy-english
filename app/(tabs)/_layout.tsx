@@ -11,7 +11,7 @@ export default function TabLayout() {
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
-      sceneContainerStyle={{ marginLeft: isDesktop ? 240 : 0 }}
+      sceneContainerStyle={{ marginLeft: isDesktop ? 240 : 0, overflow: 'hidden' as any }}
       screenOptions={{
         headerShown: false,
       }}
