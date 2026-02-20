@@ -34,5 +34,8 @@
     "experiments": {
       "typedRoutes": true
     }
+  },
+  "web": {
+    "output": "static"
   }
 }
