@@ -5,6 +5,7 @@ import { Mascot } from './Mascot';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StarIcon, TrophyIcon, FireIcon, CheckIcon, LionIcon, TargetIcon, BookIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
+import { playCelebrationSound } from '@/utils/audio';
 
 interface LessonCompletionModalProps {
   visible: boolean;
@@ -53,6 +54,107 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
     Array.from({ length: 5 }, () => new Animated.Value(0))
   ).current;
 
+  const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+
+  // Firework particles: 2 groups (left + right), 8 particles each
+  const FIREWORK_COLORS = ['#fbbf24', '#f59e0b', '#22c55e', '#ef4444', '#3b82f6', '#ec4899', '#f97316', '#a855f7'];
+  const fireworkAnims = useRef(
+    Array.from({ length: 2 }, (_, groupIdx) =>
+      Array.from({ length: 8 }, (_, i) => {
+        const angle = (i / 8) * Math.PI * 2; // spread evenly in a circle
+        return {
+          translateX: new Animated.Value(0),
+          translateY: new Animated.Value(0),
+          opacity: new Animated.Value(0),
+          scale: new Animated.Value(0),
+          // Pre-computed direction for burst
+          targetX: Math.cos(angle) * (80 + Math.random() * 60),
+          targetY: Math.sin(angle) * (80 + Math.random() * 60) - 40, // bias upward
+          color: FIREWORK_COLORS[(groupIdx * 8 + i) % FIREWORK_COLORS.length],
+        };
+      })
+    )
+  ).current;
+
+  // Launch position: trail going upward before burst
+  const fireworkTrails = useRef(
+    Array.from({ length: 2 }, () => ({
+      translateY: new Animated.Value(0),
+      opacity: new Animated.Value(0),
+    }))
+  ).current;
+
+  const launchFireworkGroup = (groupIdx: number) => {
+    const particles = fireworkAnims[groupIdx];
+    const trail = fireworkTrails[groupIdx];
+
+    // Trail: shoot upward from bottom edge
+    trail.translateY.setValue(0);
+    trail.opacity.setValue(1);
+
+    Animated.sequence([
+      // Trail shoots up
+      Animated.parallel([
+        Animated.timing(trail.translateY, {
+          toValue: -180,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(trail.opacity, {
+          toValue: 0.6,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Trail fades at burst point
+      Animated.timing(trail.opacity, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Particles burst after trail reaches top
+    setTimeout(() => {
+      particles.forEach((p) => {
+        p.translateX.setValue(0);
+        p.translateY.setValue(0);
+        p.opacity.setValue(1);
+        p.scale.setValue(1);
+
+        Animated.parallel([
+          Animated.timing(p.translateX, {
+            toValue: p.targetX,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(p.translateY, {
+            toValue: p.targetY,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.sequence([
+            Animated.timing(p.scale, {
+              toValue: 1.4,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(p.scale, {
+              toValue: 0,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+          ]),
+          Animated.timing(p.opacity, {
+            toValue: 0,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      });
+    }, 300);
+  };
+
   useEffect(() => {
     if (visible) {
       // Trophy pop animation
@@ -93,6 +195,26 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
           }),
         ]).start();
       });
+
+      // Celebration haptic sequence at 300ms
+      const hapticTimer = setTimeout(() => {
+        playCelebrationSound();
+      }, 300);
+
+      // Fireworks at 500ms (left) and 800ms (right)
+      const firework1Timer = setTimeout(() => {
+        launchFireworkGroup(0);
+      }, 500);
+
+      const firework2Timer = setTimeout(() => {
+        launchFireworkGroup(1);
+      }, 800);
+
+      return () => {
+        clearTimeout(hapticTimer);
+        clearTimeout(firework1Timer);
+        clearTimeout(firework2Timer);
+      };
     } else {
       // Reset animations
       trophyScale.setValue(0);
@@ -100,6 +222,19 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
       confettiAnims.forEach(anim => {
         anim.translateY.setValue(-100);
         anim.opacity.setValue(1);
+      });
+      // Reset firework animations
+      fireworkAnims.forEach(group => {
+        group.forEach(p => {
+          p.translateX.setValue(0);
+          p.translateY.setValue(0);
+          p.opacity.setValue(0);
+          p.scale.setValue(0);
+        });
+      });
+      fireworkTrails.forEach(trail => {
+        trail.translateY.setValue(0);
+        trail.opacity.setValue(0);
       });
     }
   }, [visible]);
@@ -132,16 +267,67 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
             transform: [
               { translateY: anim.translateY },
               { translateX: anim.translateX },
-              { 
+              {
                 rotate: anim.rotate.interpolate({
                   inputRange: [0, 360],
                   outputRange: ['0deg', '360deg'],
-                }) 
+                })
               },
             ],
           }}
         />
       ))}
+
+      {/* Firework Animations */}
+      {fireworkAnims.map((group, groupIdx) => {
+        // Left group originates from bottom-left, right from bottom-right
+        const originX = groupIdx === 0 ? SCREEN_W * 0.15 : SCREEN_W * 0.85;
+        const originY = SCREEN_H * 0.7;
+
+        return (
+          <View key={`firework-group-${groupIdx}`} pointerEvents="none">
+            {/* Trail */}
+            <Animated.View
+              style={{
+                position: 'absolute',
+                left: originX - 3,
+                top: originY,
+                width: 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: '#fbbf24',
+                zIndex: 1001,
+                opacity: fireworkTrails[groupIdx].opacity,
+                transform: [
+                  { translateY: fireworkTrails[groupIdx].translateY },
+                ],
+              }}
+            />
+            {/* Burst particles */}
+            {group.map((particle, pIdx) => (
+              <Animated.View
+                key={`fw-${groupIdx}-${pIdx}`}
+                style={{
+                  position: 'absolute',
+                  left: originX - 5,
+                  top: originY - 180,
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: particle.color,
+                  zIndex: 1001,
+                  opacity: particle.opacity,
+                  transform: [
+                    { translateX: particle.translateX },
+                    { translateY: particle.translateY },
+                    { scale: particle.scale },
+                  ],
+                }}
+              />
+            ))}
+          </View>
+        );
+      })}
 
       <ScrollView 
         style={{ flex: 1, backgroundColor: colors.bg.primary }}

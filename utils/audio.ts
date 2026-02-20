@@ -1,6 +1,7 @@
 import { Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio';
 import * as Speech from 'expo-speech';
+import * as Haptics from 'expo-haptics';
 import { getAudioAsset, hasAudioAsset } from './audioAssets';
 
 /**
@@ -110,6 +111,44 @@ export const playErrorSound = async (): Promise<void> => {
     });
   } catch (error) {
     console.log('[Audio] Error sound not available');
+  }
+};
+
+/**
+ * Play celebration sound - rapid haptic "tititititirit" sequence
+ * Combines rapid haptic feedback with a short speech celebration
+ */
+export const playCelebrationSound = async (): Promise<void> => {
+  try {
+    // Rapid haptic sequence for "tititititirit" feel
+    const hapticPattern = [
+      { delay: 0, style: Haptics.ImpactFeedbackStyle.Light },
+      { delay: 60, style: Haptics.ImpactFeedbackStyle.Light },
+      { delay: 60, style: Haptics.ImpactFeedbackStyle.Medium },
+      { delay: 60, style: Haptics.ImpactFeedbackStyle.Light },
+      { delay: 60, style: Haptics.ImpactFeedbackStyle.Light },
+      { delay: 60, style: Haptics.ImpactFeedbackStyle.Medium },
+      { delay: 60, style: Haptics.ImpactFeedbackStyle.Light },
+      { delay: 80, style: Haptics.ImpactFeedbackStyle.Heavy },
+      { delay: 100, style: Haptics.ImpactFeedbackStyle.Heavy },
+    ];
+
+    let elapsed = 0;
+    for (const step of hapticPattern) {
+      elapsed += step.delay;
+      setTimeout(() => {
+        Haptics.impactAsync(step.style).catch(() => {});
+      }, elapsed);
+    }
+
+    // Final success notification haptic after the rapid sequence
+    setTimeout(() => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    }, elapsed + 150);
+
+    console.log('[Audio] Celebration haptic sequence triggered');
+  } catch (error) {
+    console.log('[Audio] Celebration sound not available:', error);
   }
 };
 
