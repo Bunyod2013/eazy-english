@@ -72,20 +72,27 @@ export interface Question {
   explanation?: string; // English explanation
   explanationUz?: string; // Uzbek explanation
   audioSlow?: string; // slower audio file path
-  targetPhrase?: string; // ✅ NEW: For speaking practice
+  targetPhrase?: string; // For speaking practice
+  pairs?: { en: string; uz: string }[]; // For matching
+  statement?: string; // For true_false
+  isTrue?: boolean; // For true_false
+  dialogue?: string[]; // For conversation
 }
 
-export type QuestionType = 
+export type QuestionType =
   | 'vocabulary' // Learn new word with image
   | 'translation' // Translate word/sentence
   | 'multiple_choice' // Select correct answer
   | 'fill_blank' // Fill in the blank
   | 'listening' // Listen and select/type
   | 'word_bank' // Build sentence from words
-  | 'listening_discrimination' // ✅ NEW: Distinguish similar sounds (mall/mail)
-  | 'image_choice' // ✅ NEW: Select correct image
-  | 'speaking' // ✅ ENHANCED: Repeat after Falstaff
-  | 'matching'; // Match pairs
+  | 'listening_discrimination' // Distinguish similar sounds (mall/mail)
+  | 'image_choice' // Select correct image
+  | 'speaking' // Repeat after Falstaff
+  | 'matching' // Match pairs (tap the pairs)
+  | 'true_false' // True or false statement
+  | 'conversation' // Dialogue response
+  | 'fill_blank_choice'; // Fill blank with tap options
 
 // User Progress Types
 export interface UserProgress {

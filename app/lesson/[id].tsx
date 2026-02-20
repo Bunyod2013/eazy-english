@@ -22,7 +22,11 @@ import { WordBankQuestion } from '@/features/lessons/WordBankQuestion';
 import { ListeningQuestion } from '@/features/lessons/ListeningQuestion';
 import { ListeningDiscriminationQuestion } from '@/features/lessons/ListeningDiscriminationQuestion'; // ✅ NEW
 import { ImageChoiceQuestion } from '@/features/lessons/ImageChoiceQuestion'; // ✅ NEW
-import { SpeakingQuestion } from '@/features/lessons/SpeakingQuestion'; // ✅ NEW
+import { SpeakingQuestion } from '@/features/lessons/SpeakingQuestion';
+import { MatchingQuestion } from '@/features/lessons/MatchingQuestion';
+import { TrueFalseQuestion } from '@/features/lessons/TrueFalseQuestion';
+import { ConversationQuestion } from '@/features/lessons/ConversationQuestion';
+import { FillBlankChoiceQuestion } from '@/features/lessons/FillBlankChoiceQuestion';
 
 export default function LessonScreen() {
   const router = useRouter();
@@ -257,7 +261,59 @@ export default function LessonScreen() {
             isCorrect={isCorrect}
           />
         );
-      
+
+      case 'matching':
+        return (
+          <MatchingQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+
+      case 'true_false':
+        return (
+          <TrueFalseQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+
+      case 'conversation':
+        return (
+          <ConversationQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+
+      case 'fill_blank_choice':
+        return (
+          <FillBlankChoiceQuestion
+            question={currentQuestion}
+            prompt={prompt}
+            onAnswer={checkAnswer}
+            selectedAnswer={selectedAnswer}
+            setSelectedAnswer={setSelectedAnswer}
+            showFeedback={showFeedback}
+            isCorrect={isCorrect}
+          />
+        );
+
       default:
         return <Text>Question type not supported yet</Text>;
     }
