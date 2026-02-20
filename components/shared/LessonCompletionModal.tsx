@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Animated, Dimensions, ScrollView } from '
 import { Modal } from '@/components/ui';
 import { Mascot } from './Mascot';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StarIcon, TrophyIcon, FireIcon, CheckIcon, LionIcon } from '@/components/icons';
+import { StarIcon, TrophyIcon, FireIcon, CheckIcon, LionIcon, TargetIcon, BookIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 interface LessonCompletionModalProps {
@@ -123,10 +123,10 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
           key={index}
           style={{
             position: 'absolute',
-            width: 12,
-            height: 12,
+            width: index % 3 === 0 ? 14 : 10,
+            height: index % 3 === 0 ? 14 : 10,
             backgroundColor: confettiColors[index % confettiColors.length],
-            borderRadius: 6,
+            borderRadius: index % 2 === 0 ? 7 : 2,
             zIndex: 1000,
             opacity: anim.opacity,
             transform: [
@@ -172,9 +172,15 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
             shadowRadius: 16,
             elevation: 12,
           }}>
-            <Text style={{ fontSize: 80 }}>
-              {isPerfect ? '🏆' : accuracy >= 80 ? '🌟' : accuracy >= 60 ? '⭐' : '📚'}
-            </Text>
+            {isPerfect ? (
+              <TrophyIcon size={64} color="#fbbf24" />
+            ) : accuracy >= 80 ? (
+              <StarIcon size={64} color="#fbbf24" />
+            ) : accuracy >= 60 ? (
+              <StarIcon size={64} color="#a3a3a3" />
+            ) : (
+              <BookIcon size={64} color="#6366f1" />
+            )}
           </View>
           
           <Text style={{ 
@@ -290,9 +296,7 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
                 shadowRadius: 8,
                 elevation: isEarned ? 6 : 1,
               }}>
-                <Text style={{ fontSize: 32 }}>
-                  {isEarned ? '⭐' : '☆'}
-                </Text>
+                <StarIcon size={32} color={isEarned ? '#fbbf24' : colors.text.tertiary} />
               </View>
             );
           })}
@@ -363,7 +367,7 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
                   </View>
                 )}
               </View>
-              <Text style={{ fontSize: 72 }}>⭐</Text>
+              <StarIcon size={64} color={colors.stats.xp.text} />
             </View>
           </Animated.View>
 
@@ -396,7 +400,7 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
               shadowRadius: 6,
               elevation: 4,
             }}>
-              <Text style={{ fontSize: 52 }}>🎯</Text>
+              <TargetIcon size={48} color={colors.stats.accuracy.text} />
               <Text style={{ 
                 fontSize: 32, 
                 fontWeight: 'bold', 
@@ -501,7 +505,7 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
                       color: colors.text.tertiary,
                       marginTop: 2,
                     }}>
-                      Ajoyib! Davom eting! 🔥
+                      Ajoyib! Davom eting!
                     </Text>
                   </View>
                 </View>
