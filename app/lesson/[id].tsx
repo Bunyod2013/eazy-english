@@ -64,7 +64,35 @@ export default function LessonScreen() {
     }
   }, []);
 
-  if (!lesson || !currentSession || !user) {
+  if (!lesson || !user) {
+    return null;
+  }
+
+  // After lesson completes, session is null — show only the completion modal
+  if (!currentSession) {
+    if (showCompletion && completionData) {
+      const currentIndex = lessons.findIndex(l => l.id === lessonId);
+      const nextLesson = currentIndex >= 0 && currentIndex < lessons.length - 1
+        ? lessons[currentIndex + 1]
+        : null;
+      return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
+          <LessonCompletionModal
+            visible={showCompletion}
+            onClose={() => router.replace('/(tabs)/home')}
+            onNextLesson={nextLesson ? () => router.replace(`/lesson/${nextLesson.id}`) : undefined}
+            xpEarned={completionData.xpEarned}
+            correctAnswers={completionData.correctAnswers}
+            totalQuestions={completionData.totalQuestions}
+            lessonTitle={lesson.title}
+            lessonTitleUz={lesson.titleUz}
+            isLevelUp={completionData.isLevelUp}
+            newLevel={completionData.newLevel}
+            currentStreak={user.currentStreak}
+          />
+        </SafeAreaView>
+      );
+    }
     return null;
   }
 
@@ -679,27 +707,6 @@ export default function LessonScreen() {
           </View>
         )}
       </View>
-      {completionData && (() => {
-        const currentIndex = lessons.findIndex(l => l.id === lessonId);
-        const nextLesson = currentIndex >= 0 && currentIndex < lessons.length - 1
-          ? lessons[currentIndex + 1]
-          : null;
-        return (
-          <LessonCompletionModal
-            visible={showCompletion}
-            onClose={() => router.replace('/(tabs)/home')}
-            onNextLesson={nextLesson ? () => router.replace(`/lesson/${nextLesson.id}`) : undefined}
-            xpEarned={completionData.xpEarned}
-            correctAnswers={completionData.correctAnswers}
-            totalQuestions={completionData.totalQuestions}
-            lessonTitle={lesson.title}
-            lessonTitleUz={lesson.titleUz}
-            isLevelUp={completionData.isLevelUp}
-            newLevel={completionData.newLevel}
-            currentStreak={user.currentStreak}
-          />
-        );
-      })()}
     </SafeAreaView>
   );
 }
