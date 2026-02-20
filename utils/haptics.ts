@@ -1,40 +1,49 @@
-import * as Haptics from 'expo-haptics';
+import { Platform } from 'react-native';
 
-export const triggerSuccess = () => {
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-};
+const noop = () => {};
 
-export const triggerError = () => {
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-};
+function getHaptics() {
+  if (Platform.OS === 'web') return null;
+  return require('expo-haptics') as typeof import('expo-haptics');
+}
 
-export const triggerWarning = () => {
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-};
+const Haptics = getHaptics();
 
-export const triggerSelection = () => {
-  Haptics.selectionAsync();
-};
+export const triggerSuccess = Haptics
+  ? () => { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); }
+  : noop;
 
-export const triggerImpact = (style: 'light' | 'medium' | 'heavy' = 'medium') => {
-  const impactStyle = {
-    light: Haptics.ImpactFeedbackStyle.Light,
-    medium: Haptics.ImpactFeedbackStyle.Medium,
-    heavy: Haptics.ImpactFeedbackStyle.Heavy,
-  }[style];
-  
-  Haptics.impactAsync(impactStyle);
-};
+export const triggerError = Haptics
+  ? () => { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); }
+  : noop;
 
-// Alias for light impact (commonly used in buttons)
-export const triggerLight = () => {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-};
+export const triggerWarning = Haptics
+  ? () => { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); }
+  : noop;
 
-export const triggerMedium = () => {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-};
+export const triggerSelection = Haptics
+  ? () => { Haptics.selectionAsync(); }
+  : noop;
 
-export const triggerHeavy = () => {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-};
+export const triggerImpact = Haptics
+  ? (style: 'light' | 'medium' | 'heavy' = 'medium') => {
+      const impactStyle = {
+        light: Haptics.ImpactFeedbackStyle.Light,
+        medium: Haptics.ImpactFeedbackStyle.Medium,
+        heavy: Haptics.ImpactFeedbackStyle.Heavy,
+      }[style];
+      Haptics.impactAsync(impactStyle);
+    }
+  : noop;
+
+export const triggerLight = Haptics
+  ? () => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }
+  : noop;
+
+export const triggerMedium = Haptics
+  ? () => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); }
+  : noop;
+
+export const triggerHeavy = Haptics
+  ? () => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); }
+  : noop;

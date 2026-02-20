@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { View } from 'react-native';
-import { Audio } from 'expo-av';
+import { Platform, View } from 'react-native';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
 import { authClient } from '@/lib/auth-client';
@@ -30,16 +29,18 @@ export default function RootLayout() {
   useEffect(() => {
     const initialize = async () => {
       try {
-        // ✅ CRITICAL: Configure audio mode FIRST!
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: true,        // ← THE FIX!
-          allowsRecordingIOS: false,
-          staysActiveInBackground: false,
-          interruptionModeIOS: 1,
-          shouldDuckAndroid: true,
-        });
-        console.log('✅ [App] Audio mode configured at startup');
-        
+        // Configure audio mode (native only - not available on web)
+        if (Platform.OS !== 'web') {
+          const { Audio } = require('expo-av');
+          await Audio.setAudioModeAsync({
+            playsInSilentModeIOS: true,
+            allowsRecordingIOS: false,
+            staysActiveInBackground: false,
+            interruptionModeIOS: 1,
+            shouldDuckAndroid: true,
+          });
+        }
+
         // Load all stores
         await Promise.all([
           loadUser(),
