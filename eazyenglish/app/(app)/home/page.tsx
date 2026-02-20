@@ -153,7 +153,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="flex flex-col gap-2.5 pb-8">
-            {lessons.slice(0, 30).map((lesson) => {
+            {lessons.map((lesson) => {
               const status = getStatus(lesson.id, lesson.requiredXP);
               const emoji =
                 CATEGORY_EMOJI[lesson.category] || "📖";

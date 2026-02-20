@@ -69,7 +69,7 @@ export const DuolingoLessonPath: React.FC<DuolingoLessonPathProps> = ({
       <View style={{ height: lessons.length * VERTICAL_SPACING + 200, position: 'relative' }}>
         
         {/* Lesson Buttons */}
-        {lessons.slice(0, 100).map((lesson, index) => {
+        {lessons.map((lesson, index) => {
           const isCompleted = completedLessons.includes(lesson.id);
           const isUnlocked = index === 0 || completedLessons.includes(lessons[index - 1]?.id);
           const isNext = !isCompleted && isUnlocked;
@@ -216,7 +216,7 @@ export const DuolingoLessonPath: React.FC<DuolingoLessonPathProps> = ({
         })}
         
         {/* Treasure Chests - Gamified Every 3 lessons */}
-        {lessons.slice(0, 100).map((lesson, index) => {
+        {lessons.map((lesson, index) => {
           if ((index + 1) % 3 === 0 && index < lessons.length - 1) {
             const isUnlocked = completedLessons.includes(lesson.id);
             const position = getPositionForIndex(index);
