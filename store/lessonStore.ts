@@ -1,23 +1,25 @@
 import { create } from 'zustand';
-import { Lesson, LessonSession, QuestionAnswer } from '@/types';
+import { Lesson, LessonSession, QuestionAnswer, LearningPurpose, SkillLevel } from '@/types';
 import { allLessons } from '@/data/lessons/generateLessons';
 import { COMPREHENSIVE_LESSONS } from '@/data/lessons/comprehensiveLessons';
 import { DUOLINGO_STYLE_LESSONS } from '@/data/lessons/duolingoStyleLessons';
 import { LESSONS_500_PLUS } from '@/data/lessons/generate500Lessons';
+import { generatePurposeLessons } from '@/data/lessons/generatePurposeLessons';
 
 // Lesson mode selection
-// '500plus' - 500+ Progressive lessons (RECOMMENDED!) ✅
+// 'purpose' - Purpose-based personalized lessons (NEW DEFAULT!) ✅
+// '500plus' - 500+ Progressive lessons (fallback)
 // 'duolingo' - Duolingo-style lessons with vocabulary, listening, word bank
 // 'comprehensive' - 500+ vocabulary-integrated lessons
 // 'basic' - Original basic lessons
-const LESSON_MODE: '500plus' | 'duolingo' | 'comprehensive' | 'basic' = '500plus'; // ✅ 500+ darslar!
+const LESSON_MODE: 'purpose' | '500plus' | 'duolingo' | 'comprehensive' | 'basic' = 'purpose'; // ✅ Maqsadli darslar!
 
 interface LessonState {
   lessons: Lesson[];
   currentSession: LessonSession | null;
   
   // Actions
-  loadLessons: () => void;
+  loadLessons: (purposes?: LearningPurpose[], skillLevel?: SkillLevel) => void;
   getLessonById: (id: string) => Lesson | undefined;
   startLesson: (lessonId: string) => void;
   answerQuestion: (answer: QuestionAnswer) => void;
@@ -30,17 +32,19 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   lessons: [],
   currentSession: null,
   
-  loadLessons: () => {
+  loadLessons: (purposes, skillLevel) => {
     let lessonsToUse: Lesson[] = allLessons;
-    
-    if (LESSON_MODE === '500plus') {
-      lessonsToUse = LESSONS_500_PLUS; // ✅ 500+ darslar!
+
+    if (LESSON_MODE === 'purpose' && purposes && purposes.length > 0 && skillLevel) {
+      lessonsToUse = generatePurposeLessons(purposes, skillLevel);
+    } else if (LESSON_MODE === '500plus' || (LESSON_MODE === 'purpose' && (!purposes || purposes.length === 0))) {
+      lessonsToUse = LESSONS_500_PLUS; // Fallback
     } else if (LESSON_MODE === 'duolingo') {
       lessonsToUse = DUOLINGO_STYLE_LESSONS;
     } else if (LESSON_MODE === 'comprehensive') {
       lessonsToUse = COMPREHENSIVE_LESSONS;
     }
-    
+
     set({ lessons: lessonsToUse });
   },
   

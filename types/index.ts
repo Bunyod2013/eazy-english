@@ -1,9 +1,12 @@
 // User Types
+export type LearningPurpose = 'work' | 'study' | 'travel' | 'startup' | 'friends' | 'movies' | 'music' | 'games' | 'general';
+
 export interface User {
   id: string;
   username: string;
   preferredLanguage: 'uz' | 'en';
   skillLevel: SkillLevel;
+  learningPurpose: LearningPurpose[];
   totalXP: number;
   currentStreak: number;
   longestStreak: number;

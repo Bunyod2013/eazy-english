@@ -14,7 +14,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user, updateStreak } = useUserStore();
   const { progress, loadProgress } = useProgressStore();
-  const { lessons } = useLessonStore();
+  const { lessons, loadLessons } = useLessonStore();
   const { colors, isDark } = useTheme();
 
   useEffect(() => {
@@ -27,11 +27,14 @@ export default function HomeScreen() {
     }
   }, [user]);
 
-  // Reload progress when screen comes into focus (after completing a lesson)
+  // Reload progress and lessons when screen comes into focus (after completing a lesson)
   useFocusEffect(
     React.useCallback(() => {
       if (user) {
         loadProgress(user.id);
+        if (user.learningPurpose && user.learningPurpose.length > 0) {
+          loadLessons(user.learningPurpose, user.skillLevel);
+        }
       }
     }, [user])
   );

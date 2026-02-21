@@ -508,21 +508,18 @@ export const getLessonsByLevelRange = (minLevel: number, maxLevel: number): Less
 // Comprehensive lessons (500+) with integrated vocabulary - use for full curriculum
 export { COMPREHENSIVE_LESSONS, LESSONS_BY_LEVEL } from './comprehensiveLessons';
 
-// 500+ Generated Lessons (NEW - RECOMMENDED!)
+// 500+ Generated Lessons
 export { LESSONS_500_PLUS, LESSONS_BY_CEFR } from './generate500Lessons';
 
 // Duolingo-style lessons with vocabulary, listening, word bank, etc.
-export { 
-  DUOLINGO_STYLE_LESSONS, 
+export {
+  DUOLINGO_STYLE_LESSONS,
   getDuolingoStyleLessons,
-  getDuolingoLessonById 
+  getDuolingoLessonById
 } from './duolingoStyleLessons';
 
-// Default export - use 500+ lessons
-export { LESSONS_500_PLUS as default } from './generate500Lessons';
+// Purpose-based personalized lesson generator (NEW DEFAULT!)
+export { generatePurposeLessons } from './generatePurposeLessons';
 
-// 500+ Progressive Lessons (YANGI - Pedagogically correct)
-export { LESSONS_500_PLUS, LESSONS_BY_CEFR } from './generate500Lessons';
-
-// DEFAULT EXPORT - Use 500+ lessons
+// Default export - use 500+ lessons as fallback
 export { LESSONS_500_PLUS as default } from './generate500Lessons';

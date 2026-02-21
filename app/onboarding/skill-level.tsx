@@ -43,6 +43,7 @@ export default function SkillLevelScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const language = (params.language as string) || 'uz';
+  const purposes = (params.purposes as string) || 'general';
   const { colors, isDark } = useTheme();
   const [selected, setSelected] = useState<SkillLevel>('beginner');
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -217,7 +218,7 @@ export default function SkillLevelScreen() {
           activeOpacity={0.8}
           onPress={() => router.push({
             pathname: '/onboarding/daily-goal',
-            params: { language, skillLevel: selected },
+            params: { language, skillLevel: selected, purposes },
           })}
           style={{
             backgroundColor: colors.green.primary,

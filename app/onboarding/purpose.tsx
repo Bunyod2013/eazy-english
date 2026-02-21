@@ -160,7 +160,7 @@ export default function PurposeScreen() {
         <TouchableOpacity
           activeOpacity={0.8}
           disabled={selected.length === 0}
-          onPress={() => router.push('/onboarding/language')}
+          onPress={() => router.push({ pathname: '/onboarding/language', params: { purposes: selected.join(',') } })}
           style={{
             backgroundColor: selected.length > 0 ? colors.green.primary : isDark ? '#333' : '#e0e0e0',
             borderRadius: 18,

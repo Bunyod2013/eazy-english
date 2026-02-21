@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlagUzIcon, FlagEnIcon, FlagRuIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
@@ -15,6 +15,8 @@ const LANGUAGES = [
 
 export default function LanguageScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const purposes = (params.purposes as string) || 'general';
   const { colors, isDark } = useTheme();
   const [selected, setSelected] = useState<Language>('uz');
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -174,7 +176,7 @@ export default function LanguageScreen() {
       }}>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => router.push({ pathname: '/onboarding/skill-level', params: { language: selected } })}
+          onPress={() => router.push({ pathname: '/onboarding/skill-level', params: { language: selected, purposes } })}
           style={{
             backgroundColor: colors.green.primary,
             borderRadius: 18,

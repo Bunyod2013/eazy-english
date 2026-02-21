@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User } from '@/types';
+import { User, LearningPurpose } from '@/types';
 import { saveUser, getUser, clearAllData } from '@/utils/storage';
 import { getTodayDateString } from '@/utils/date';
 
@@ -9,7 +9,7 @@ interface UserState {
   
   // Actions
   loadUser: () => Promise<void>;
-  createUser: (username: string, language: 'uz' | 'en', skillLevel: User['skillLevel']) => Promise<void>;
+  createUser: (username: string, language: 'uz' | 'en', skillLevel: User['skillLevel'], purposes?: string[]) => Promise<void>;
   updateUser: (updates: Partial<User>) => Promise<void>;
   addXP: (xp: number) => Promise<void>;
   updateStreak: () => Promise<void>;
@@ -31,12 +31,13 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
   
-  createUser: async (username, language, skillLevel) => {
+  createUser: async (username, language, skillLevel, purposes) => {
     const newUser: User = {
       id: Date.now().toString(),
       username,
       preferredLanguage: language,
       skillLevel,
+      learningPurpose: (purposes || ['general']) as LearningPurpose[],
       totalXP: 0,
       currentStreak: 0,
       longestStreak: 0,

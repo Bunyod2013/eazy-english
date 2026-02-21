@@ -45,6 +45,7 @@ export default function DailyGoalScreen() {
   const params = useLocalSearchParams();
   const language = (params.language as string) || 'uz';
   const skillLevel = (params.skillLevel as string) || 'beginner';
+  const purposes = (params.purposes as string) || 'general';
   const { colors, isDark } = useTheme();
   const [selected, setSelected] = useState(20);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -218,7 +219,7 @@ export default function DailyGoalScreen() {
           activeOpacity={0.8}
           onPress={() => router.push({
             pathname: '/onboarding/username',
-            params: { language, skillLevel, dailyGoal: selected.toString() },
+            params: { language, skillLevel, dailyGoal: selected.toString(), purposes },
           })}
           style={{
             backgroundColor: colors.green.primary,

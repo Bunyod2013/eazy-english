@@ -14,6 +14,7 @@ export default function UsernameScreen() {
   const language = (params.language as string) || 'uz';
   const skillLevel = (params.skillLevel as 'beginner' | 'elementary' | 'intermediate') || 'beginner';
   const dailyGoal = parseInt(params.dailyGoal as string) || 20;
+  const purposes = ((params.purposes as string) || 'general').split(',');
   const { colors, isDark } = useTheme();
 
   const [username, setUsername] = useState('');
@@ -31,7 +32,7 @@ export default function UsernameScreen() {
     if (!username.trim()) return;
     setIsLoading(true);
     try {
-      await createUser(username.trim(), language, skillLevel);
+      await createUser(username.trim(), language, skillLevel, purposes);
       await initializeProgress(Date.now().toString());
       router.replace('/(tabs)/home');
     } catch (error) {

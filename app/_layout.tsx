@@ -24,7 +24,7 @@ const convex = convexUrl
 
 export default function RootLayout() {
   const [isInitialized, setIsInitialized] = useState(false);
-  const { loadUser, isLoading: userLoading } = useUserStore();
+  const { loadUser, isLoading: userLoading, user } = useUserStore();
   const { loadProgress } = useProgressStore();
   const { loadSettings } = useSettingsStore();
   const { loadLessons } = useLessonStore();
@@ -51,7 +51,7 @@ export default function RootLayout() {
           loadSettings(),
         ]);
         
-        // Load lessons from local data
+        // Load lessons from local data (will reload with user data below)
         loadLessons();
         
         setIsInitialized(true);
@@ -63,6 +63,13 @@ export default function RootLayout() {
 
     initialize();
   }, []);
+
+  // Reload lessons when user data becomes available (with purpose/level)
+  useEffect(() => {
+    if (user && user.learningPurpose && user.learningPurpose.length > 0) {
+      loadLessons(user.learningPurpose, user.skillLevel);
+    }
+  }, [user?.id]);
 
   if (!convex || !authClient) {
     const missing = [
