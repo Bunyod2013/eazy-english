@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Animated, Image, Easing } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TurtleIcon, BookIcon, TargetIcon } from '@/components/icons';
+import { LightBulbIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 const CUBBY = require('@/assets/characters/character4.png');
@@ -9,9 +11,9 @@ const CUBBY = require('@/assets/characters/character4.png');
 type SkillLevel = 'beginner' | 'elementary' | 'intermediate';
 
 const LEVELS = [
-  { level: 'beginner' as SkillLevel, emoji: '🌱', title: "Boshlang'ich", sub: 'Beginner', desc: "Men hozirgina boshlayman. ABC dan boshlaymiz!", color: '#22c55e', bgColor: '#f0fdf4', borderColor: '#bbf7d0' },
-  { level: 'elementary' as SkillLevel, emoji: '📖', title: 'Elementar', sub: 'Elementary', desc: "Bir necha oddiy so'z va iboralarni bilaman", color: '#3b82f6', bgColor: '#eff6ff', borderColor: '#bfdbfe' },
-  { level: 'intermediate' as SkillLevel, emoji: '🚀', title: "O'rta daraja", sub: 'Intermediate', desc: "Oddiy jumlalar tuza olaman va suhbatlarni tushunaman", color: '#8b5cf6', bgColor: '#f3e8ff', borderColor: '#e9d5ff' },
+  { level: 'beginner' as SkillLevel, icon: TurtleIcon, title: "Boshlang'ich", sub: 'Beginner', desc: "Men hozirgina boshlayman. ABC dan boshlaymiz!", color: '#22c55e', bgColor: '#f0fdf4', borderColor: '#bbf7d0' },
+  { level: 'elementary' as SkillLevel, icon: BookIcon, title: 'Elementar', sub: 'Elementary', desc: "Bir necha oddiy so'z va iboralarni bilaman", color: '#3b82f6', bgColor: '#eff6ff', borderColor: '#bfdbfe' },
+  { level: 'intermediate' as SkillLevel, icon: TargetIcon, title: "O'rta daraja", sub: 'Intermediate', desc: "Oddiy jumlalar tuza olaman va suhbatlarni tushunaman", color: '#8b5cf6', bgColor: '#f3e8ff', borderColor: '#e9d5ff' },
 ];
 
 export default function SkillLevelScreen() {
@@ -73,6 +75,7 @@ export default function SkillLevelScreen() {
         <View style={{ gap: 14 }}>
           {LEVELS.map((item, i) => {
             const isSelected = selected === item.level;
+            const IconComponent = item.icon;
             return (
               <Animated.View key={item.level} style={{
                 opacity: cardAnims[i],
@@ -97,7 +100,7 @@ export default function SkillLevelScreen() {
                       backgroundColor: isDark ? `${item.color}20` : item.bgColor,
                       borderWidth: 1, borderColor: isDark ? `${item.color}30` : item.borderColor,
                     }}>
-                      <Text style={{ fontSize: 28 }}>{item.emoji}</Text>
+                      <IconComponent size={28} color={item.color} />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 19, fontWeight: '700', color: colors.text.primary, letterSpacing: -0.3 }}>{item.title}</Text>
@@ -125,7 +128,9 @@ export default function SkillLevelScreen() {
           borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center',
           borderWidth: 1, borderColor: isDark ? 'rgba(251,191,36,0.2)' : '#fde68a',
         }}>
-          <Text style={{ fontSize: 20, marginRight: 12 }}>💡</Text>
+          <View style={{ marginRight: 12 }}>
+            <LightBulbIcon size={24} color="#ffc800" />
+          </View>
           <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
             Ishonchingiz komil bo'lmasa, boshlang'ich darajadan boshlang. Tez rivojlanasiz!
           </Text>

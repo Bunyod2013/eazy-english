@@ -4,11 +4,21 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUserStore } from '@/store/userStore';
 import { useProgressStore } from '@/store/progressStore';
+import { LionIcon, StarIcon, DiamondIcon, TrophyIcon, SparkleIcon, HeartIcon, CatIcon, TurtleIcon, WorldIcon, TargetIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 const JAKE = require('@/assets/characters/character5.png');
 
-const AVATARS = ['🦁', '🐻', '🦊', '🐼', '🐸', '🦉', '🐱', '🐶'];
+const AVATARS = [
+  { id: 'lion', icon: LionIcon, color: '#f59e0b' },
+  { id: 'star', icon: StarIcon, color: '#ffc800' },
+  { id: 'diamond', icon: DiamondIcon, color: '#1cb0f6' },
+  { id: 'trophy', icon: TrophyIcon, color: '#ffc800' },
+  { id: 'sparkle', icon: SparkleIcon, color: '#8b5cf6' },
+  { id: 'heart', icon: HeartIcon, color: '#ef4444' },
+  { id: 'cat', icon: CatIcon, color: '#f59e0b' },
+  { id: 'turtle', icon: TurtleIcon, color: '#10b981' },
+];
 
 export default function UsernameScreen() {
   const router = useRouter();
@@ -20,7 +30,7 @@ export default function UsernameScreen() {
   const { colors, isDark } = useTheme();
 
   const [username, setUsername] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('🦁');
+  const [selectedAvatar, setSelectedAvatar] = useState('lion');
   const [isLoading, setIsLoading] = useState(false);
   const { createUser } = useUserStore();
   const { initializeProgress } = useProgressStore();
@@ -57,6 +67,8 @@ export default function UsernameScreen() {
   };
 
   const canContinue = username.trim().length >= 2;
+  const activeAvatar = AVATARS.find(a => a.id === selectedAvatar) || AVATARS[0];
+  const ActiveIcon = activeAvatar.icon;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.secondary }}>
@@ -94,28 +106,29 @@ export default function UsernameScreen() {
             <View style={{ alignItems: 'center', marginBottom: 20 }}>
               <View style={{
                 width: 88, height: 88, borderRadius: 30,
-                backgroundColor: colors.green.bg, borderWidth: 3, borderColor: colors.green.primary,
+                backgroundColor: colors.green.bg, borderWidth: 3, borderColor: activeAvatar.color,
                 alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-                shadowColor: colors.green.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4,
+                shadowColor: activeAvatar.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4,
               }}>
-                <Text style={{ fontSize: 44 }}>{selectedAvatar}</Text>
+                <ActiveIcon size={48} color={activeAvatar.color} />
               </View>
             </View>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
               {AVATARS.map((avatar) => {
-                const isActive = selectedAvatar === avatar;
+                const isActive = selectedAvatar === avatar.id;
+                const AvatarIcon = avatar.icon;
                 return (
                   <TouchableOpacity
-                    key={avatar}
+                    key={avatar.id}
                     activeOpacity={0.7}
-                    onPress={() => setSelectedAvatar(avatar)}
+                    onPress={() => setSelectedAvatar(avatar.id)}
                     style={{
                       width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
                       backgroundColor: isActive ? colors.green.bg : isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
-                      borderWidth: 2, borderColor: isActive ? colors.green.primary : 'transparent',
+                      borderWidth: 2, borderColor: isActive ? avatar.color : 'transparent',
                     }}
                   >
-                    <Text style={{ fontSize: 28 }}>{avatar}</Text>
+                    <AvatarIcon size={28} color={avatar.color} />
                   </TouchableOpacity>
                 );
               })}
@@ -129,7 +142,7 @@ export default function UsernameScreen() {
             </Text>
             <View style={{
               backgroundColor: colors.bg.card, borderRadius: 18, borderWidth: 2, overflow: 'hidden',
-              borderColor: username.length > 0 ? colors.green.primary : isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb',
+              borderColor: username.length > 0 ? '#2563eb' : isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb',
             }}>
               <TextInput
                 value={username}
@@ -154,19 +167,24 @@ export default function UsernameScreen() {
               Sozlamalar
             </Text>
             {[
-              { label: 'Til', value: language === 'uz' ? "O'zbekcha" : language === 'ru' ? 'Русский' : 'English', emoji: '🌍' },
-              { label: 'Daraja', value: skillLevel === 'beginner' ? "Boshlang'ich" : skillLevel === 'elementary' ? 'Elementar' : "O'rta", emoji: '📊' },
-              { label: 'Kunlik maqsad', value: `${dailyGoal} XP`, emoji: '🎯' },
-            ].map((item, i) => (
-              <View key={i} style={{
-                flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-                borderTopWidth: i > 0 ? 1 : 0, borderTopColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-              }}>
-                <Text style={{ fontSize: 18, marginRight: 12 }}>{item.emoji}</Text>
-                <Text style={{ fontSize: 15, color: colors.text.secondary, flex: 1 }}>{item.label}</Text>
-                <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text.primary }}>{item.value}</Text>
-              </View>
-            ))}
+              { label: 'Til', value: language === 'uz' ? "O'zbekcha" : language === 'ru' ? 'Русский' : 'English', icon: WorldIcon, iconColor: '#3b82f6' },
+              { label: 'Daraja', value: skillLevel === 'beginner' ? "Boshlang'ich" : skillLevel === 'elementary' ? 'Elementar' : "O'rta", icon: TargetIcon, iconColor: '#8b5cf6' },
+              { label: 'Kunlik maqsad', value: `${dailyGoal} XP`, icon: DiamondIcon, iconColor: '#f59e0b' },
+            ].map((item, i) => {
+              const ItemIcon = item.icon;
+              return (
+                <View key={i} style={{
+                  flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
+                  borderTopWidth: i > 0 ? 1 : 0, borderTopColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                }}>
+                  <View style={{ marginRight: 12 }}>
+                    <ItemIcon size={20} color={item.iconColor} />
+                  </View>
+                  <Text style={{ fontSize: 15, color: colors.text.secondary, flex: 1 }}>{item.label}</Text>
+                  <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text.primary }}>{item.value}</Text>
+                </View>
+              );
+            })}
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>

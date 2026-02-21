@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Animated, Image, Easing } from 'react-nat
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlagUzIcon, FlagEnIcon, FlagRuIcon } from '@/components/icons';
+import { LightBulbIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 const MUSICIANS = require('@/assets/characters/character2.png');
@@ -129,7 +130,9 @@ export default function LanguageScreen() {
           flexDirection: 'row', alignItems: 'center',
           borderWidth: 1, borderColor: colors.blue.border,
         }}>
-          <Text style={{ fontSize: 20, marginRight: 12 }}>💡</Text>
+          <View style={{ marginRight: 12 }}>
+            <LightBulbIcon size={24} color="#ffc800" />
+          </View>
           <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
             O'zbekchani tanlasangiz, darslar sizga tanish tilda tushuntiriladi
           </Text>

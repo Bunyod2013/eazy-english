@@ -2,15 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated, Image, Easing } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TurtleIcon, WalkIcon, FireIcon, LionIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 const HOOK = require('@/assets/characters/character3.png');
 
 const GOALS = [
-  { xp: 10, emoji: '🐢', title: 'Oson', sub: 'Kuniga 5 daqiqa', desc: 'Sekin lekin izchil', color: '#22c55e' },
-  { xp: 20, emoji: '🐇', title: 'Normal', sub: 'Kuniga 10 daqiqa', desc: 'Ko\'pchilik uchun mos', color: '#3b82f6', recommended: true },
-  { xp: 30, emoji: '🦊', title: 'Jiddiy', sub: 'Kuniga 15 daqiqa', desc: 'Tez rivojlanish', color: '#f59e0b' },
-  { xp: 50, emoji: '🦁', title: 'Qattiq', sub: 'Kuniga 20+ daqiqa', desc: 'Maksimal natija', color: '#ef4444' },
+  { xp: 10, icon: TurtleIcon, iconColor: '#22c55e', title: 'Oson', sub: 'Kuniga 5 daqiqa', desc: 'Sekin lekin izchil', color: '#22c55e' },
+  { xp: 20, icon: WalkIcon, iconColor: '#3b82f6', title: 'Normal', sub: 'Kuniga 10 daqiqa', desc: 'Ko\'pchilik uchun mos', color: '#3b82f6', recommended: true },
+  { xp: 30, icon: FireIcon, iconColor: '#f59e0b', title: 'Jiddiy', sub: 'Kuniga 15 daqiqa', desc: 'Tez rivojlanish', color: '#f59e0b' },
+  { xp: 50, icon: LionIcon, iconColor: '#ef4444', title: 'Qattiq', sub: 'Kuniga 20+ daqiqa', desc: 'Maksimal natija', color: '#ef4444' },
 ];
 
 export default function DailyGoalScreen() {
@@ -73,6 +74,7 @@ export default function DailyGoalScreen() {
         <View style={{ gap: 12 }}>
           {GOALS.map((goal, i) => {
             const isSelected = selected === goal.xp;
+            const IconComponent = goal.icon;
             return (
               <Animated.View key={goal.xp} style={{
                 opacity: cardAnims[i],
@@ -95,7 +97,7 @@ export default function DailyGoalScreen() {
                     width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 14,
                     backgroundColor: isDark ? `${goal.color}20` : `${goal.color}12`,
                   }}>
-                    <Text style={{ fontSize: 28 }}>{goal.emoji}</Text>
+                    <IconComponent size={28} color={goal.iconColor} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -128,7 +130,9 @@ export default function DailyGoalScreen() {
           flexDirection: 'row', alignItems: 'center',
           borderWidth: 1, borderColor: colors.stats.streak.border,
         }}>
-          <Text style={{ fontSize: 20, marginRight: 12 }}>🔥</Text>
+          <View style={{ marginRight: 12 }}>
+            <FireIcon size={24} color="#ff9600" />
+          </View>
           <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
             Har kuni maqsadga erishsangiz, streak (ketma-ketlik) oshadi va bonus XP olasiz!
           </Text>

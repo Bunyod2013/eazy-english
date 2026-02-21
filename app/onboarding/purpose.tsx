@@ -2,20 +2,21 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Animated, Image, Easing } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TreasureIcon, StudyIcon, WorldIcon, SparkleIcon, PeopleIcon, VideoIcon, MusicIcon, DiamondIcon, StarIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 const IZZY = require('@/assets/characters/character1.png');
 
 const PURPOSES = [
-  { id: 'work', emoji: '💼', label: 'Ish uchun', sub: 'Career & business' },
-  { id: 'study', emoji: '📚', label: "O'qish uchun", sub: 'Education' },
-  { id: 'travel', emoji: '✈️', label: 'Sayohat', sub: 'Travel the world' },
-  { id: 'startup', emoji: '🚀', label: 'Startup', sub: 'Tech & business' },
-  { id: 'friends', emoji: '👥', label: "Do'stlar", sub: 'Social connections' },
-  { id: 'movies', emoji: '🎬', label: 'Kino & serial', sub: 'Entertainment' },
-  { id: 'music', emoji: '🎵', label: 'Musiqa', sub: 'Songs & lyrics' },
-  { id: 'games', emoji: '🎮', label: "O'yinlar", sub: 'Gaming & esports' },
-  { id: 'general', emoji: '🌟', label: 'Umumiy bilim', sub: 'General knowledge' },
+  { id: 'work', icon: TreasureIcon, iconColor: '#d97706', label: 'Ish uchun', sub: 'Career & business' },
+  { id: 'study', icon: StudyIcon, iconColor: '#3b82f6', label: "O'qish uchun", sub: 'Education' },
+  { id: 'travel', icon: WorldIcon, iconColor: '#10b981', label: 'Sayohat', sub: 'Travel the world' },
+  { id: 'startup', icon: SparkleIcon, iconColor: '#8b5cf6', label: 'Startup', sub: 'Tech & business' },
+  { id: 'friends', icon: PeopleIcon, iconColor: '#3b82f6', label: "Do'stlar", sub: 'Social connections' },
+  { id: 'movies', icon: VideoIcon, iconColor: '#ef4444', label: 'Kino & serial', sub: 'Entertainment' },
+  { id: 'music', icon: MusicIcon, iconColor: '#8b5cf6', label: 'Musiqa', sub: 'Songs & lyrics' },
+  { id: 'games', icon: DiamondIcon, iconColor: '#06b6d4', label: "O'yinlar", sub: 'Gaming & esports' },
+  { id: 'general', icon: StarIcon, iconColor: '#f59e0b', label: 'Umumiy bilim', sub: 'General knowledge' },
 ];
 
 export default function PurposeScreen() {
@@ -81,6 +82,7 @@ export default function PurposeScreen() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 24, gap: 10 }}>
           {PURPOSES.map((purpose, i) => {
             const isSelected = selected.includes(purpose.id);
+            const IconComponent = purpose.icon;
             return (
               <Animated.View
                 key={purpose.id}
@@ -105,7 +107,7 @@ export default function PurposeScreen() {
                       width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
                       backgroundColor: isSelected ? `${colors.green.primary}20` : isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
                     }}>
-                      <Text style={{ fontSize: 24 }}>{purpose.emoji}</Text>
+                      <IconComponent size={24} color={purpose.iconColor} />
                     </View>
                     {isSelected && (
                       <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: colors.green.primary, alignItems: 'center', justifyContent: 'center' }}>
