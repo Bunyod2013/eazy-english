@@ -262,11 +262,6 @@ export default function LoginScreen() {
               { scale: mascotScale },
               { translateY: mascotBounce },
             ],
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.15,
-            shadowRadius: 20,
-            elevation: 10,
           }}>
             <Image
               source={CHARACTERS.jake}
@@ -308,6 +303,9 @@ export default function LoginScreen() {
           marginBottom: 24,
           opacity: buttonsOpacity,
           transform: [{ translateY: buttonsTranslateY }],
+          maxWidth: 400,
+          alignSelf: 'center',
+          width: '100%',
         }}>
           {/* Google Sign In */}
           <TouchableOpacity
