@@ -15,11 +15,13 @@ let currentSound: Sound | null = null;
 const SOUND_EFFECTS = {
   correct: require('@/assets/sounds/correct.mp3'),
   incorrect: require('@/assets/sounds/incorrect.mp3'),
+  levelComplete: require('@/assets/sounds/level-complete.mp3'),
 };
 
 // Pre-loaded sounds for instant playback
 let correctSound: Sound | null = null;
 let incorrectSound: Sound | null = null;
+let levelCompleteSound: Sound | null = null;
 let soundLoading = false;
 
 /** Pre-load sounds at app start for instant playback */
@@ -38,6 +40,12 @@ export const preloadSounds = async (): Promise<void> => {
       loads.push(
         Audio.Sound.createAsync(SOUND_EFFECTS.incorrect, { volume: 0.6 })
           .then(({ sound }) => { incorrectSound = sound; })
+      );
+    }
+    if (!levelCompleteSound) {
+      loads.push(
+        Audio.Sound.createAsync(SOUND_EFFECTS.levelComplete, { volume: 0.7 })
+          .then(({ sound }) => { levelCompleteSound = sound; })
       );
     }
     await Promise.all(loads);
@@ -107,9 +115,7 @@ export const stopAudio = async (): Promise<void> => {
 /** Play correct/success sound - fire and forget, no await blocking */
 export const playCorrectSound = (): void => {
   if (correctSound) {
-    correctSound.setPositionAsync(0).then(() => {
-      correctSound?.playAsync();
-    }).catch(() => {
+    correctSound.replayAsync().catch(() => {
       correctSound = null;
       preloadSounds();
     });
@@ -123,15 +129,27 @@ export const playCorrectSound = (): void => {
 /** Play incorrect/error sound - fire and forget, no await blocking */
 export const playIncorrectSound = (): void => {
   if (incorrectSound) {
-    incorrectSound.setPositionAsync(0).then(() => {
-      incorrectSound?.playAsync();
-    }).catch(() => {
+    incorrectSound.replayAsync().catch(() => {
       incorrectSound = null;
       preloadSounds();
     });
   } else {
     Audio.Sound.createAsync(SOUND_EFFECTS.incorrect, { shouldPlay: true, volume: 0.6 })
       .then(({ sound }) => { incorrectSound = sound; })
+      .catch(() => {});
+  }
+};
+
+/** Play level complete sound - fire and forget, no await blocking */
+export const playLevelCompleteSound = (): void => {
+  if (levelCompleteSound) {
+    levelCompleteSound.replayAsync().catch(() => {
+      levelCompleteSound = null;
+      preloadSounds();
+    });
+  } else {
+    Audio.Sound.createAsync(SOUND_EFFECTS.levelComplete, { shouldPlay: true, volume: 0.7 })
+      .then(({ sound }) => { levelCompleteSound = sound; })
       .catch(() => {});
   }
 };

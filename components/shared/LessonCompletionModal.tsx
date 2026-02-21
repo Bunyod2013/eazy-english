@@ -5,7 +5,7 @@ import { Mascot } from './Mascot';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StarIcon, TrophyIcon, FireIcon, CheckIcon, LionIcon, TargetIcon, BookIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
-import { playCelebrationSound } from '@/utils/audio';
+import { playCelebrationSound, playLevelCompleteSound } from '@/utils/audio';
 
 interface LessonCompletionModalProps {
   visible: boolean;
@@ -196,7 +196,8 @@ export const LessonCompletionModal: React.FC<LessonCompletionModalProps> = ({
         ]).start();
       });
 
-      // Celebration haptic sequence at 300ms
+      // Level complete sound + celebration haptic
+      playLevelCompleteSound();
       const hapticTimer = setTimeout(() => {
         playCelebrationSound();
       }, 300);
