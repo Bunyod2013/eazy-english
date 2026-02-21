@@ -189,13 +189,6 @@ export const VocabularyQuestion: React.FC<VocabularyQuestionProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* Explanation */}
-      <Text style={{
-        fontSize: 14, color: colors.text.secondary,
-        textAlign: 'center', lineHeight: 20,
-      }}>
-        {question.promptUz || prompt}
-      </Text>
     </View>
   );
 };
