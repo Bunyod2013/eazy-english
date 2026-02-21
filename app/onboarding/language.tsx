@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Animated, Image, Easing } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlagUzIcon, FlagEnIcon, FlagRuIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
+
+const MUSICIANS = require('@/assets/characters/character2.png');
 
 type Language = 'uz' | 'ru' | 'en';
 
@@ -20,13 +22,25 @@ export default function LanguageScreen() {
   const { colors, isDark } = useTheme();
   const [selected, setSelected] = useState<Language>('uz');
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const charScale = useRef(new Animated.Value(0)).current;
+  const charBounce = useRef(new Animated.Value(0)).current;
   const cardAnims = useRef(LANGUAGES.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
+    Animated.spring(charScale, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }).start();
     Animated.stagger(100, cardAnims.map(a =>
       Animated.spring(a, { toValue: 1, useNativeDriver: true, damping: 14 })
     )).start();
+
+    const floatAnim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(charBounce, { toValue: -4, duration: 2200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(charBounce, { toValue: 4, duration: 2200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    );
+    floatAnim.start();
+    return () => floatAnim.stop();
   }, []);
 
   return (
@@ -40,21 +54,20 @@ export default function LanguageScreen() {
       </View>
 
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
-        {/* Header */}
-        <Animated.View style={{ opacity: fadeAnim, marginTop: 8, marginBottom: 32 }}>
-          <Text style={{
-            fontSize: 30,
-            fontWeight: '800',
-            color: colors.text.primary,
-            letterSpacing: -0.5,
-            marginBottom: 8,
-          }}>
-            Qaysi tilda{'\n'}o'rganmoqchisiz?
-          </Text>
-          <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
-            Tushuntirishlar shu tilda bo'ladi
-          </Text>
-        </Animated.View>
+        {/* Header + Character */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 32 }}>
+          <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
+            <Text style={{ fontSize: 30, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 8 }}>
+              Qaysi tilda{'\n'}o'rganmoqchisiz?
+            </Text>
+            <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
+              Tushuntirishlar shu tilda bo'ladi
+            </Text>
+          </Animated.View>
+          <Animated.View style={{ transform: [{ scale: charScale }, { translateY: charBounce }], marginLeft: 8 }}>
+            <Image source={MUSICIANS} style={{ width: 85, height: 80 }} resizeMode="contain" />
+          </Animated.View>
+        </View>
 
         {/* Language Cards */}
         <View style={{ gap: 12 }}>
@@ -62,86 +75,46 @@ export default function LanguageScreen() {
             const isSelected = selected === lang.code;
             const FlagComponent = lang.flag;
             return (
-              <Animated.View
-                key={lang.code}
-                style={{
-                  opacity: cardAnims[i],
-                  transform: [{
-                    translateY: cardAnims[i].interpolate({ inputRange: [0, 1], outputRange: [24, 0] }),
-                  }],
-                }}
-              >
+              <Animated.View key={lang.code} style={{
+                opacity: cardAnims[i],
+                transform: [{ translateY: cardAnims[i].interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
+              }}>
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => setSelected(lang.code)}
                   style={{
                     backgroundColor: isSelected ? colors.green.bg : colors.bg.card,
-                    borderRadius: 22,
-                    padding: 20,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    borderWidth: 2,
-                    borderColor: isSelected ? colors.green.primary : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                    borderRadius: 22, padding: 20, flexDirection: 'row', alignItems: 'center',
+                    borderWidth: 2, borderColor: isSelected ? colors.green.primary : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
                     shadowColor: isSelected ? colors.green.primary : '#000',
                     shadowOffset: { width: 0, height: isSelected ? 4 : 2 },
-                    shadowOpacity: isSelected ? 0.15 : 0.04,
-                    shadowRadius: isSelected ? 12 : 4,
+                    shadowOpacity: isSelected ? 0.15 : 0.04, shadowRadius: isSelected ? 12 : 4,
                     elevation: isSelected ? 4 : 1,
                   }}
                 >
                   <View style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 18,
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: 16,
-                    overflow: 'hidden',
+                    width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginRight: 16,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7', overflow: 'hidden',
                   }}>
                     <FlagComponent size={40} />
                   </View>
-
                   <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Text style={{
-                        fontSize: 19,
-                        fontWeight: '700',
-                        color: colors.text.primary,
-                        letterSpacing: -0.3,
-                      }}>
-                        {lang.name}
-                      </Text>
+                      <Text style={{ fontSize: 19, fontWeight: '700', color: colors.text.primary, letterSpacing: -0.3 }}>{lang.name}</Text>
                       {lang.recommended && (
-                        <View style={{
-                          backgroundColor: colors.green.primary,
-                          paddingHorizontal: 8,
-                          paddingVertical: 3,
-                          borderRadius: 8,
-                        }}>
+                        <View style={{ backgroundColor: colors.green.primary, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }}>
                           <Text style={{ fontSize: 11, fontWeight: '700', color: '#fff' }}>Tavsiya</Text>
                         </View>
                       )}
                     </View>
-                    <Text style={{ fontSize: 14, color: colors.text.secondary, marginTop: 3 }}>
-                      {lang.sub}
-                    </Text>
+                    <Text style={{ fontSize: 14, color: colors.text.secondary, marginTop: 3 }}>{lang.sub}</Text>
                   </View>
-
-                  {/* Radio indicator */}
                   <View style={{
-                    width: 26,
-                    height: 26,
-                    borderRadius: 13,
-                    borderWidth: 2,
+                    width: 26, height: 26, borderRadius: 13, borderWidth: 2, alignItems: 'center', justifyContent: 'center',
                     borderColor: isSelected ? colors.green.primary : isDark ? 'rgba(255,255,255,0.2)' : '#d4d4d4',
                     backgroundColor: isSelected ? colors.green.primary : 'transparent',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                   }}>
-                    {isSelected && (
-                      <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#fff' }} />
-                    )}
+                    {isSelected && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#fff' }} />}
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -151,15 +124,10 @@ export default function LanguageScreen() {
 
         {/* Tip */}
         <Animated.View style={{
-          opacity: fadeAnim,
-          marginTop: 24,
-          backgroundColor: colors.blue.bg,
-          borderRadius: 16,
-          padding: 16,
-          flexDirection: 'row',
-          alignItems: 'center',
-          borderWidth: 1,
-          borderColor: colors.blue.border,
+          opacity: fadeAnim, marginTop: 24,
+          backgroundColor: colors.blue.bg, borderRadius: 16, padding: 16,
+          flexDirection: 'row', alignItems: 'center',
+          borderWidth: 1, borderColor: colors.blue.border,
         }}>
           <Text style={{ fontSize: 20, marginRight: 12 }}>💡</Text>
           <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
@@ -169,29 +137,16 @@ export default function LanguageScreen() {
       </View>
 
       {/* Bottom Button */}
-      <View style={{
-        paddingHorizontal: 24,
-        paddingBottom: 40,
-        paddingTop: 16,
-      }}>
+      <View style={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 16 }}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => router.push({ pathname: '/onboarding/skill-level', params: { language: selected, purposes } })}
           style={{
-            backgroundColor: colors.green.primary,
-            borderRadius: 18,
-            paddingVertical: 17,
-            alignItems: 'center',
-            shadowColor: colors.green.primary,
-            shadowOffset: { width: 0, height: 6 },
-            shadowOpacity: 0.3,
-            shadowRadius: 12,
-            elevation: 6,
+            backgroundColor: colors.green.primary, borderRadius: 18, paddingVertical: 17, alignItems: 'center',
+            shadowColor: colors.green.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
           }}
         >
-          <Text style={{ fontSize: 17, fontWeight: '700', color: '#fff' }}>
-            Davom etish
-          </Text>
+          <Text style={{ fontSize: 17, fontWeight: '700', color: '#fff' }}>Davom etish</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

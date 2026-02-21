@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Animated, Image, Easing } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/utils/theme';
+
+const IZZY = require('@/assets/characters/character1.png');
 
 const PURPOSES = [
   { id: 'work', emoji: '💼', label: 'Ish uchun', sub: 'Career & business' },
@@ -21,13 +23,25 @@ export default function PurposeScreen() {
   const { colors, isDark } = useTheme();
   const [selected, setSelected] = useState<string[]>([]);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const charBounce = useRef(new Animated.Value(0)).current;
+  const charScale = useRef(new Animated.Value(0)).current;
   const cardAnims = useRef(PURPOSES.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
+    Animated.spring(charScale, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }).start();
     Animated.stagger(50, cardAnims.map(a =>
       Animated.spring(a, { toValue: 1, useNativeDriver: true, damping: 14 })
     )).start();
+
+    const floatAnim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(charBounce, { toValue: -5, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(charBounce, { toValue: 5, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    );
+    floatAnim.start();
+    return () => floatAnim.stop();
   }, []);
 
   const toggle = (id: string) => {
@@ -48,30 +62,23 @@ export default function PurposeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 120 }}
       >
-        {/* Header */}
-        <Animated.View style={{ opacity: fadeAnim, marginBottom: 8, marginTop: 8 }}>
-          <Text style={{
-            fontSize: 30,
-            fontWeight: '800',
-            color: colors.text.primary,
-            letterSpacing: -0.5,
-            marginBottom: 8,
-          }}>
-            Nima uchun ingliz tili{'\n'}o'rganmoqchisiz?
-          </Text>
-          <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
-            Bir nechta variantni tanlashingiz mumkin
-          </Text>
-        </Animated.View>
+        {/* Character + Header */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, marginTop: 8 }}>
+          <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
+            <Text style={{ fontSize: 30, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 8 }}>
+              Nima uchun ingliz tili{'\n'}o'rganmoqchisiz?
+            </Text>
+            <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
+              Bir nechta variantni tanlashingiz mumkin
+            </Text>
+          </Animated.View>
+          <Animated.View style={{ transform: [{ scale: charScale }, { translateY: charBounce }], marginLeft: 8 }}>
+            <Image source={IZZY} style={{ width: 80, height: 105 }} resizeMode="contain" />
+          </Animated.View>
+        </View>
 
-        {/* Purpose Grid - 2 columns */}
-        <View style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          marginTop: 24,
-          gap: 10,
-        }}>
+        {/* Purpose Grid */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 24, gap: 10 }}>
           {PURPOSES.map((purpose, i) => {
             const isSelected = selected.includes(purpose.id);
             return (
@@ -79,9 +86,7 @@ export default function PurposeScreen() {
                 key={purpose.id}
                 style={{
                   opacity: cardAnims[i],
-                  transform: [{
-                    translateY: cardAnims[i].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }),
-                  }],
+                  transform: [{ translateY: cardAnims[i].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }],
                   width: '48%',
                 }}
               >
@@ -90,52 +95,27 @@ export default function PurposeScreen() {
                   onPress={() => toggle(purpose.id)}
                   style={{
                     backgroundColor: isSelected ? colors.green.bg : colors.bg.card,
-                    borderRadius: 20,
-                    padding: 16,
-                    borderWidth: 2,
+                    borderRadius: 20, padding: 16, borderWidth: 2, minHeight: 110,
                     borderColor: isSelected ? colors.green.primary : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-                    minHeight: 110,
                     justifyContent: 'space-between',
                   }}
                 >
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 14,
-                      backgroundColor: isSelected
-                        ? `${colors.green.primary}20`
-                        : isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
+                      backgroundColor: isSelected ? `${colors.green.primary}20` : isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
                     }}>
                       <Text style={{ fontSize: 24 }}>{purpose.emoji}</Text>
                     </View>
                     {isSelected && (
-                      <View style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 12,
-                        backgroundColor: colors.green.primary,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
+                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: colors.green.primary, alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>✓</Text>
                       </View>
                     )}
                   </View>
                   <View style={{ marginTop: 12 }}>
-                    <Text style={{
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: colors.text.primary,
-                      letterSpacing: -0.2,
-                    }}>
-                      {purpose.label}
-                    </Text>
-                    <Text style={{ fontSize: 12, color: colors.text.tertiary, marginTop: 2 }}>
-                      {purpose.sub}
-                    </Text>
+                    <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text.primary, letterSpacing: -0.2 }}>{purpose.label}</Text>
+                    <Text style={{ fontSize: 12, color: colors.text.tertiary, marginTop: 2 }}>{purpose.sub}</Text>
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -146,16 +126,10 @@ export default function PurposeScreen() {
 
       {/* Fixed Bottom Button */}
       <View style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        paddingHorizontal: 24,
-        paddingBottom: 40,
-        paddingTop: 16,
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        paddingHorizontal: 24, paddingBottom: 40, paddingTop: 16,
         backgroundColor: colors.bg.secondary,
-        borderTopWidth: 1,
-        borderTopColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+        borderTopWidth: 1, borderTopColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
       }}>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -163,21 +137,13 @@ export default function PurposeScreen() {
           onPress={() => router.push({ pathname: '/onboarding/language', params: { purposes: selected.join(',') } })}
           style={{
             backgroundColor: selected.length > 0 ? colors.green.primary : isDark ? '#333' : '#e0e0e0',
-            borderRadius: 18,
-            paddingVertical: 17,
-            alignItems: 'center',
+            borderRadius: 18, paddingVertical: 17, alignItems: 'center',
             shadowColor: selected.length > 0 ? colors.green.primary : 'transparent',
-            shadowOffset: { width: 0, height: 6 },
-            shadowOpacity: 0.3,
-            shadowRadius: 12,
+            shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12,
             elevation: selected.length > 0 ? 6 : 0,
           }}
         >
-          <Text style={{
-            fontSize: 17,
-            fontWeight: '700',
-            color: selected.length > 0 ? '#fff' : colors.text.tertiary,
-          }}>
+          <Text style={{ fontSize: 17, fontWeight: '700', color: selected.length > 0 ? '#fff' : colors.text.tertiary }}>
             Davom etish {selected.length > 0 ? `(${selected.length})` : ''}
           </Text>
         </TouchableOpacity>
