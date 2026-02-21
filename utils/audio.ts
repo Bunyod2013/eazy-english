@@ -27,20 +27,20 @@ export const preloadSounds = async (): Promise<void> => {
   if (soundLoading) return;
   soundLoading = true;
   try {
+    const loads: Promise<void>[] = [];
     if (!correctSound) {
-      const { sound } = await Audio.Sound.createAsync(
-        SOUND_EFFECTS.correct,
-        { volume: 0.6 }
+      loads.push(
+        Audio.Sound.createAsync(SOUND_EFFECTS.correct, { volume: 0.6 })
+          .then(({ sound }) => { correctSound = sound; })
       );
-      correctSound = sound;
     }
     if (!incorrectSound) {
-      const { sound } = await Audio.Sound.createAsync(
-        SOUND_EFFECTS.incorrect,
-        { volume: 0.6 }
+      loads.push(
+        Audio.Sound.createAsync(SOUND_EFFECTS.incorrect, { volume: 0.6 })
+          .then(({ sound }) => { incorrectSound = sound; })
       );
-      incorrectSound = sound;
     }
+    await Promise.all(loads);
   } catch (e) {
     console.log('[Audio] Failed to preload sounds');
   }
