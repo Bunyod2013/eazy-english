@@ -16,8 +16,25 @@ const SOUND_EFFECTS = {
   correct: require('@/assets/sounds/correct.mp3'),
 };
 
-// Cache for loaded sounds
-let soundCache: { [key: string]: Sound } = {};
+// Pre-loaded sound for instant playback
+let correctSound: Sound | null = null;
+let soundLoading = false;
+
+/** Pre-load correct sound at app start for instant playback */
+export const preloadSounds = async (): Promise<void> => {
+  if (soundLoading || correctSound) return;
+  soundLoading = true;
+  try {
+    const { sound } = await Audio.Sound.createAsync(
+      SOUND_EFFECTS.correct,
+      { volume: 0.6 }
+    );
+    correctSound = sound;
+  } catch (e) {
+    console.log('[Audio] Failed to preload sounds');
+  }
+  soundLoading = false;
+};
 
 /**
  * Play audio file or text-to-speech
@@ -76,34 +93,25 @@ export const stopAudio = async (): Promise<void> => {
   }
 };
 
-/**
- * Play a sound effect by key
- */
-const playSoundEffect = async (key: keyof typeof SOUND_EFFECTS, volume: number = 0.6): Promise<void> => {
-  try {
-    // Unload cached sound if exists
-    if (soundCache[key]) {
-      try { await soundCache[key].unloadAsync(); } catch {}
-    }
-    const { sound } = await Audio.Sound.createAsync(
-      SOUND_EFFECTS[key],
-      { shouldPlay: true, volume }
-    );
-    soundCache[key] = sound;
-    sound.setOnPlaybackStatusUpdate((status) => {
-      if (status.isLoaded && status.didJustFinish) {
-        sound.unloadAsync().catch(() => {});
-        delete soundCache[key];
-      }
-    });
-  } catch (error) {
-    console.log(`[Audio] ${key} sound not available`);
-  }
-};
-
-/** Play correct/success sound */
+/** Play correct/success sound - instant, no delay */
 export const playCorrectSound = async (): Promise<void> => {
-  await playSoundEffect('correct', 0.6);
+  try {
+    if (correctSound) {
+      await correctSound.setPositionAsync(0);
+      await correctSound.playAsync();
+    } else {
+      // Fallback: load and play
+      const { sound } = await Audio.Sound.createAsync(
+        SOUND_EFFECTS.correct,
+        { shouldPlay: true, volume: 0.6 }
+      );
+      correctSound = sound;
+    }
+  } catch {
+    // Reload if sound got corrupted
+    correctSound = null;
+    preloadSounds();
+  }
 };
 
 /**

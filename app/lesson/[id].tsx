@@ -12,7 +12,7 @@ import { Question, QuestionAnswer } from '@/types';
 import { calculateLessonXP, calculateLevelFromXP } from '@/utils/xp';
 import { triggerSuccess, triggerError, triggerImpact } from '@/utils/haptics';
 import { useTheme } from '@/utils/theme';
-import { playCorrectSound } from '@/utils/audio';
+import { playCorrectSound, preloadSounds } from '@/utils/audio';
 import { LessonCompletionModal } from '@/components/shared/LessonCompletionModal';
 
 // Question Components
@@ -67,6 +67,7 @@ export default function LessonScreen() {
   const lesson = getLessonById(lessonId);
 
   useEffect(() => {
+    preloadSounds();
     if (lesson && !currentSession) {
       startLesson(lessonId);
       setStartTime(Date.now());
