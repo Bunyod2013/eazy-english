@@ -53,7 +53,7 @@ export default function PurposeScreen() {
       {/* Progress Bar */}
       <View style={{ paddingHorizontal: 24, paddingTop: 12, paddingBottom: 8 }}>
         <View style={{ height: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: 3 }}>
-          <View style={{ width: '20%', height: '100%', backgroundColor: colors.green.primary, borderRadius: 3 }} />
+          <View style={{ width: '20%', height: '100%', backgroundColor: '#ec4899', borderRadius: 3 }} />
         </View>
         <Text style={{ fontSize: 13, color: colors.text.tertiary, textAlign: 'right', marginTop: 6 }}>1 / 5</Text>
       </View>
@@ -136,9 +136,10 @@ export default function PurposeScreen() {
           disabled={selected.length === 0}
           onPress={() => router.push({ pathname: '/onboarding/language', params: { purposes: selected.join(',') } })}
           style={{
-            backgroundColor: selected.length > 0 ? colors.green.primary : isDark ? '#333' : '#e0e0e0',
+            backgroundColor: selected.length > 0 ? '#ec4899' : isDark ? '#333' : '#e0e0e0',
             borderRadius: 18, paddingVertical: 17, alignItems: 'center',
-            shadowColor: selected.length > 0 ? colors.green.primary : 'transparent',
+            maxWidth: 440, alignSelf: 'center', width: '100%',
+            shadowColor: selected.length > 0 ? '#ec4899' : 'transparent',
             shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12,
             elevation: selected.length > 0 ? 6 : 0,
           }}

@@ -59,7 +59,7 @@ export default function WelcomeScreen() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.green.primary }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2563eb' }}>
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
         {/* Hero */}
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
@@ -125,7 +125,7 @@ export default function WelcomeScreen() {
               shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 16, elevation: 6,
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: '700', color: colors.green.primary, letterSpacing: -0.3 }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: '#2563eb', letterSpacing: -0.3 }}>
               Boshlash
             </Text>
           </TouchableOpacity>

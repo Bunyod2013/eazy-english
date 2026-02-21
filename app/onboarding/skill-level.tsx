@@ -48,7 +48,7 @@ export default function SkillLevelScreen() {
       {/* Progress Bar */}
       <View style={{ paddingHorizontal: 24, paddingTop: 12, paddingBottom: 8 }}>
         <View style={{ height: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: 3 }}>
-          <View style={{ width: '60%', height: '100%', backgroundColor: colors.green.primary, borderRadius: 3 }} />
+          <View style={{ width: '60%', height: '100%', backgroundColor: '#3b82f6', borderRadius: 3 }} />
         </View>
         <Text style={{ fontSize: 13, color: colors.text.tertiary, textAlign: 'right', marginTop: 6 }}>3 / 5</Text>
       </View>
@@ -143,8 +143,9 @@ export default function SkillLevelScreen() {
           activeOpacity={0.8}
           onPress={() => router.push({ pathname: '/onboarding/daily-goal', params: { language, skillLevel: selected, purposes } })}
           style={{
-            backgroundColor: colors.green.primary, borderRadius: 18, paddingVertical: 17, alignItems: 'center',
-            shadowColor: colors.green.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+            backgroundColor: '#3b82f6', borderRadius: 18, paddingVertical: 17, alignItems: 'center',
+            maxWidth: 440, alignSelf: 'center', width: '100%',
+            shadowColor: '#3b82f6', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
           }}
         >
           <Text style={{ fontSize: 17, fontWeight: '700', color: '#fff' }}>Davom etish</Text>

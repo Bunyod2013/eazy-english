@@ -63,7 +63,7 @@ export default function UsernameScreen() {
       {/* Progress Bar */}
       <View style={{ paddingHorizontal: 24, paddingTop: 12, paddingBottom: 8 }}>
         <View style={{ height: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#f0f0f0', borderRadius: 3 }}>
-          <View style={{ width: '100%', height: '100%', backgroundColor: colors.green.primary, borderRadius: 3 }} />
+          <View style={{ width: '100%', height: '100%', backgroundColor: '#2563eb', borderRadius: 3 }} />
         </View>
         <Text style={{ fontSize: 13, color: colors.text.tertiary, textAlign: 'right', marginTop: 6 }}>5 / 5</Text>
       </View>
@@ -183,10 +183,11 @@ export default function UsernameScreen() {
           disabled={!canContinue || isLoading}
           onPress={handleComplete}
           style={{
-            backgroundColor: canContinue ? colors.green.primary : isDark ? '#333' : '#e0e0e0',
+            backgroundColor: canContinue ? '#2563eb' : isDark ? '#333' : '#e0e0e0',
             borderRadius: 18, paddingVertical: 17, alignItems: 'center',
             flexDirection: 'row', justifyContent: 'center', gap: 8,
-            shadowColor: canContinue ? colors.green.primary : 'transparent',
+            maxWidth: 440, alignSelf: 'center', width: '100%',
+            shadowColor: canContinue ? '#2563eb' : 'transparent',
             shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12,
             elevation: canContinue ? 6 : 0,
           }}
