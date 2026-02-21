@@ -485,14 +485,14 @@ export default function LessonScreen() {
             {/* Character */}
             <Image
               source={CHARACTERS[currentQuestionIndex % CHARACTERS.length]}
-              style={{ width: 64, height: 76 }}
+              style={{ width: 88, height: 104 }}
               resizeMode="contain"
             />
 
             {bubbleText ? (
               <>
                 {/* Bubble Tail */}
-                <Svg width={12} height={18} viewBox="0 0 12 18" style={{ marginLeft: 2, marginRight: -2, marginBottom: 18 }}>
+                <Svg width={12} height={18} viewBox="0 0 12 18" style={{ marginLeft: 2, marginRight: -2, marginBottom: 28 }}>
                   <Path d="M12 0 Q4 4 2 9 Q4 14 12 18" fill={isDark ? colors.bg.card : '#fff'} />
                 </Svg>
 

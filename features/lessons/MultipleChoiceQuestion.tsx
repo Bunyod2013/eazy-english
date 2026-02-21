@@ -27,7 +27,7 @@ export const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
   const { colors } = useTheme();
 
   return (
-    <View style={{ gap: 12 }}>
+    <View style={{ gap: 8 }}>
       {question.options?.map((option, index) => {
         const isSelected = selectedAnswer === option;
         const isCorrectAnswer = option === question.correctAnswer;
@@ -71,10 +71,10 @@ export const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
             <View
               style={{
                 backgroundColor,
-                borderRadius: 16,
+                borderRadius: 14,
                 borderWidth,
                 borderColor,
-                padding: 16,
+                padding: 12,
                 flexDirection: 'row',
                 alignItems: 'center',
                 shadowColor: borderColor,
@@ -82,15 +82,15 @@ export const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
                 shadowOpacity,
                 shadowRadius: 4,
                 elevation,
-                minHeight: 68,
+                minHeight: 48,
               }}
             >
               {/* Letter Badge */}
               <View
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
                   backgroundColor: showFeedback && isCorrectAnswer
                     ? colors.green.primary
                     : showFeedback && isSelected && !isCorrect
@@ -100,12 +100,12 @@ export const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
                     : colors.border.primary,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginRight: 12,
+                  marginRight: 10,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: 'bold',
                     color: isSelected || (showFeedback && (isCorrectAnswer || (isSelected && !isCorrect)))
                       ? '#ffffff'
@@ -120,7 +120,7 @@ export const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
               <Text
                 style={{
                   flex: 1,
-                  fontSize: 17,
+                  fontSize: 15,
                   fontWeight: '600',
                   color: showFeedback && isCorrectAnswer
                     ? colors.green.primary
@@ -137,31 +137,31 @@ export const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
               {showFeedback && isCorrectAnswer && (
                 <View
                   style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
                     backgroundColor: colors.green.primary,
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginLeft: 8,
                   }}
                 >
-                  <CheckIcon size={20} color="#ffffff" />
+                  <CheckIcon size={16} color="#ffffff" />
                 </View>
               )}
               {showFeedback && isSelected && !isCorrect && (
                 <View
                   style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
                     backgroundColor: '#dc2626',
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginLeft: 8,
                   }}
                 >
-                  <XIcon size={20} color="#ffffff" />
+                  <XIcon size={16} color="#ffffff" />
                 </View>
               )}
             </View>
