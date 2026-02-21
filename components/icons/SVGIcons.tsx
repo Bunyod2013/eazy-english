@@ -419,19 +419,37 @@ export const TreasureIcon: React.FC<IconProps> = ({ size = 24, color = '#d97706'
 // 🇺🇿 Uzbek Flag icon
 export const FlagUzIcon: React.FC<IconProps> = ({ size = 24, style }) => (
   <Svg width={size} height={size} viewBox="0 0 48 48" style={style}>
+    {/* Background with rounded corners */}
     <Rect x="4" y="4" width="40" height="40" rx="6" fill="#fff" />
-    <Rect x="4" y="4" width="40" height="13" rx="6" fill="#1eb2a6" />
-    <Rect x="4" y="4" width="40" height="10" fill="#1eb2a6" />
-    <Rect x="4" y="19" width="40" height="4" fill="#ce1126" />
-    <Rect x="4" y="34" width="40" height="14" rx="6" fill="#1eb2a6" />
-    <Rect x="4" y="37" width="40" height="11" fill="#1eb2a6" />
-    <Rect x="4" y="14" width="40" height="5" fill="#fff" />
-    <Rect x="4" y="29" width="40" height="5" fill="#fff" />
-    {/* Crescent */}
-    <Circle cx="18" cy="12" r="4" fill="#fff" />
-    <Circle cx="20" cy="12" r="3.2" fill="#1eb2a6" />
-    {/* Stars */}
-    <Path d="M24 9 L24.6 10.8 L26.5 10.8 L25 11.8 L25.6 13.6 L24 12.6 L22.4 13.6 L23 11.8 L21.5 10.8 L23.4 10.8 Z" fill="#fff" transform="scale(0.6) translate(16,5)" />
+    {/* Blue band (top) */}
+    <Path d="M10 4 H38 Q44 4 44 10 V17 H4 V10 Q4 4 10 4Z" fill="#0099B5" />
+    {/* Red divider */}
+    <Rect x="4" y="17" width="40" height="1.5" fill="#CE1126" />
+    {/* White band (middle) */}
+    <Rect x="4" y="18.5" width="40" height="11" fill="#fff" />
+    {/* Red divider */}
+    <Rect x="4" y="29.5" width="40" height="1.5" fill="#CE1126" />
+    {/* Green band (bottom) */}
+    <Path d="M4 31 H44 V38 Q44 44 38 44 H10 Q4 44 4 38Z" fill="#1EB53A" />
+    {/* Crescent moon */}
+    <Circle cx="14" cy="10.5" r="3.5" fill="#fff" />
+    <Circle cx="15.5" cy="10.5" r="2.8" fill="#0099B5" />
+    {/* 12 Stars - 3 rows */}
+    {/* Row 1: 3 stars */}
+    <Circle cx="20" cy="8" r="1" fill="#fff" />
+    <Circle cx="23" cy="8" r="1" fill="#fff" />
+    <Circle cx="26" cy="8" r="1" fill="#fff" />
+    {/* Row 2: 4 stars */}
+    <Circle cx="20" cy="11" r="1" fill="#fff" />
+    <Circle cx="23" cy="11" r="1" fill="#fff" />
+    <Circle cx="26" cy="11" r="1" fill="#fff" />
+    <Circle cx="29" cy="11" r="1" fill="#fff" />
+    {/* Row 3: 5 stars */}
+    <Circle cx="20" cy="14" r="1" fill="#fff" />
+    <Circle cx="23" cy="14" r="1" fill="#fff" />
+    <Circle cx="26" cy="14" r="1" fill="#fff" />
+    <Circle cx="29" cy="14" r="1" fill="#fff" />
+    <Circle cx="32" cy="14" r="1" fill="#fff" />
   </Svg>
 );
 
