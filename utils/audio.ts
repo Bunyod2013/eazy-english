@@ -14,7 +14,7 @@ let currentSound: Sound | null = null;
 // Sound effect assets
 const SOUND_EFFECTS = {
   click: require('@/assets/sounds/click.wav'),
-  correct: require('@/assets/sounds/correct.wav'),
+  correct: require('@/assets/sounds/correct.mp3'),
   incorrect: require('@/assets/sounds/incorrect.wav'),
   next: require('@/assets/sounds/next.wav'),
 };
