@@ -13,10 +13,7 @@ let currentSound: Sound | null = null;
 
 // Sound effect assets
 const SOUND_EFFECTS = {
-  click: require('@/assets/sounds/click.wav'),
   correct: require('@/assets/sounds/correct.mp3'),
-  incorrect: require('@/assets/sounds/incorrect.wav'),
-  next: require('@/assets/sounds/next.wav'),
 };
 
 // Cache for loaded sounds
@@ -104,24 +101,9 @@ const playSoundEffect = async (key: keyof typeof SOUND_EFFECTS, volume: number =
   }
 };
 
-/** Play button click sound */
-export const playClickSound = async (): Promise<void> => {
-  await playSoundEffect('click', 0.5);
-};
-
-/** Play success/correct sound */
-export const playSuccessSound = async (): Promise<void> => {
+/** Play correct/success sound */
+export const playCorrectSound = async (): Promise<void> => {
   await playSoundEffect('correct', 0.6);
-};
-
-/** Play error/incorrect sound */
-export const playErrorSound = async (): Promise<void> => {
-  await playSoundEffect('incorrect', 0.5);
-};
-
-/** Play next button sound */
-export const playNextSound = async (): Promise<void> => {
-  await playSoundEffect('next', 0.5);
 };
 
 /**

@@ -12,7 +12,7 @@ import { Question, QuestionAnswer } from '@/types';
 import { calculateLessonXP, calculateLevelFromXP } from '@/utils/xp';
 import { triggerSuccess, triggerError, triggerImpact } from '@/utils/haptics';
 import { useTheme } from '@/utils/theme';
-import { playClickSound, playSuccessSound, playErrorSound, playNextSound } from '@/utils/audio';
+import { playCorrectSound } from '@/utils/audio';
 import { LessonCompletionModal } from '@/components/shared/LessonCompletionModal';
 
 // Question Components
@@ -122,8 +122,8 @@ export default function LessonScreen() {
     if (settings.vibrationEnabled) {
       correct ? triggerSuccess() : triggerError();
     }
-    if (settings.soundEnabled) {
-      correct ? playSuccessSound() : playErrorSound();
+    if (settings.soundEnabled && correct) {
+      playCorrectSound();
     }
 
     // Record answer
@@ -139,7 +139,9 @@ export default function LessonScreen() {
   };
 
   const handleNext = () => {
-    if (settings.soundEnabled) playNextSound();
+    if (settings.soundEnabled && (currentQuestion.isNewWord || currentQuestion.type === 'vocabulary')) {
+      playCorrectSound();
+    }
     if (currentQuestionIndex < lesson.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer('');
@@ -716,7 +718,7 @@ export default function LessonScreen() {
 
             {/* Check Button - Large */}
             <TouchableOpacity
-              onPress={() => { if (settings.soundEnabled) playClickSound(); checkAnswer(selectedAnswer); }}
+              onPress={() => checkAnswer(selectedAnswer)}
               disabled={!selectedAnswer}
               style={{
                 flex: 1,
