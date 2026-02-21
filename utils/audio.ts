@@ -93,24 +93,19 @@ export const stopAudio = async (): Promise<void> => {
   }
 };
 
-/** Play correct/success sound - instant, no delay */
-export const playCorrectSound = async (): Promise<void> => {
-  try {
-    if (correctSound) {
-      await correctSound.setPositionAsync(0);
-      await correctSound.playAsync();
-    } else {
-      // Fallback: load and play
-      const { sound } = await Audio.Sound.createAsync(
-        SOUND_EFFECTS.correct,
-        { shouldPlay: true, volume: 0.6 }
-      );
-      correctSound = sound;
-    }
-  } catch {
-    // Reload if sound got corrupted
-    correctSound = null;
-    preloadSounds();
+/** Play correct/success sound - fire and forget, no await blocking */
+export const playCorrectSound = (): void => {
+  if (correctSound) {
+    correctSound.setPositionAsync(0).then(() => {
+      correctSound?.playAsync();
+    }).catch(() => {
+      correctSound = null;
+      preloadSounds();
+    });
+  } else {
+    Audio.Sound.createAsync(SOUND_EFFECTS.correct, { shouldPlay: true, volume: 0.6 })
+      .then(({ sound }) => { correctSound = sound; })
+      .catch(() => {});
   }
 };
 
