@@ -447,13 +447,13 @@ export default function LessonScreen() {
       >
         {/* Duolingo-style Character + Speech Bubble */}
         <View style={{ marginBottom: 16 }}>
-          {/* Prompt instruction - hidden for vocabulary/new word */}
-          {bubbleWord && currentQuestion.type !== 'vocabulary' && !currentQuestion.isNewWord && (
+          {/* Prompt instruction - only when there's a separate word in the bubble */}
+          {bubbleWord && (
             <Text style={{
               fontSize: 22,
               fontWeight: '800',
               color: colors.text.primary,
-              marginBottom: 12,
+              marginBottom: currentQuestion.isNewWord ? 4 : 12,
               lineHeight: 28,
             }}>
               {promptText}
@@ -461,7 +461,7 @@ export default function LessonScreen() {
           )}
 
           {/* NEW WORD Badge */}
-          {(currentQuestion.isNewWord || currentQuestion.type === 'vocabulary') && (
+          {currentQuestion.isNewWord && (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
               <View style={{
                 backgroundColor: colors.stats.xp.bg,
@@ -480,8 +480,8 @@ export default function LessonScreen() {
             </View>
           )}
 
-          {/* Character + Speech Bubble Row - hidden for new/vocabulary words */}
-          {!currentQuestion.isNewWord && currentQuestion.type !== 'vocabulary' && (
+          {/* Character + Speech Bubble Row - hidden for new words */}
+          {!currentQuestion.isNewWord && (
           <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
             {/* Character */}
             <Image
@@ -646,7 +646,7 @@ export default function LessonScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        ) : (currentQuestion.isNewWord || currentQuestion.type === 'vocabulary') ? (
+        ) : currentQuestion.isNewWord ? (
           <View style={{ flexDirection: 'row', gap: 12 }}>
             {/* Skip Button */}
             <TouchableOpacity
