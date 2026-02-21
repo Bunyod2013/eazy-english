@@ -644,6 +644,28 @@ export default function LessonScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+        ) : currentQuestion.isNewWord ? (
+          /* New Word - just a KEYINGI button, no check needed */
+          <TouchableOpacity
+            onPress={handleNext}
+            style={{
+              backgroundColor: colors.green.primary,
+              borderRadius: 16,
+              padding: 18,
+              alignItems: 'center',
+              borderBottomWidth: 4,
+              borderBottomColor: colors.green.dark,
+              shadowColor: colors.green.primary,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 6,
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ffffff' }}>
+              KEYINGI
+            </Text>
+          </TouchableOpacity>
         ) : (
           <View style={{ flexDirection: 'row', gap: 12 }}>
             {/* Skip Button */}
