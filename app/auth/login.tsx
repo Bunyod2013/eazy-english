@@ -1,11 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Animated, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Animated, ActivityIndicator, Alert, Image, Dimensions, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { authClient } from '@/lib/auth-client';
-import { LionIcon, WorldIcon, BookIcon, TrophyIcon, SparkleIcon } from '@/components/icons';
+import { SparkleIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Character images
+const CHARACTERS = {
+  jake: require('@/assets/characters/character5.png'),
+  izzy: require('@/assets/characters/character1.png'),
+  cubby: require('@/assets/characters/character4.png'),
+  hook: require('@/assets/characters/character3.png'),
+  musicians: require('@/assets/characters/character2.png'),
+};
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -13,72 +24,102 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<'google' | 'apple' | null>(null);
 
-  // Animations
-  const logoScale = useRef(new Animated.Value(0)).current;
+  // Main mascot animations
+  const mascotScale = useRef(new Animated.Value(0)).current;
+  const mascotBounce = useRef(new Animated.Value(0)).current;
+
+  // Side characters animations
+  const leftCharOpacity = useRef(new Animated.Value(0)).current;
+  const leftCharX = useRef(new Animated.Value(-60)).current;
+  const leftCharBounce = useRef(new Animated.Value(0)).current;
+
+  const rightCharOpacity = useRef(new Animated.Value(0)).current;
+  const rightCharX = useRef(new Animated.Value(60)).current;
+  const rightCharBounce = useRef(new Animated.Value(0)).current;
+
+  // Bottom characters
+  const bottomLeftOpacity = useRef(new Animated.Value(0)).current;
+  const bottomLeftY = useRef(new Animated.Value(40)).current;
+  const bottomLeftBounce = useRef(new Animated.Value(0)).current;
+
+  const bottomRightOpacity = useRef(new Animated.Value(0)).current;
+  const bottomRightY = useRef(new Animated.Value(40)).current;
+  const bottomRightBounce = useRef(new Animated.Value(0)).current;
+
+  // Content animations
   const titleOpacity = useRef(new Animated.Value(0)).current;
-  const titleTranslateY = useRef(new Animated.Value(20)).current;
-  const subtitleOpacity = useRef(new Animated.Value(0)).current;
-  const cardsOpacity = useRef(new Animated.Value(0)).current;
-  const cardsTranslateY = useRef(new Animated.Value(30)).current;
-  const featuresOpacity = useRef(new Animated.Value(0)).current;
+  const titleTranslateY = useRef(new Animated.Value(15)).current;
+  const buttonsOpacity = useRef(new Animated.Value(0)).current;
+  const buttonsTranslateY = useRef(new Animated.Value(20)).current;
   const footerOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Entrance sequence
     Animated.sequence([
-      // Logo bounces in
-      Animated.spring(logoScale, {
+      // 1. Main mascot bounces in
+      Animated.spring(mascotScale, {
         toValue: 1,
-        tension: 60,
-        friction: 8,
+        tension: 50,
+        friction: 7,
         useNativeDriver: true,
       }),
-      // Title fades in
+      // 2. Side characters slide in
       Animated.parallel([
-        Animated.timing(titleOpacity, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-        Animated.timing(titleTranslateY, {
-          toValue: 0,
-          duration: 400,
-          useNativeDriver: true,
-        }),
+        Animated.timing(leftCharOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.spring(leftCharX, { toValue: 0, tension: 40, friction: 8, useNativeDriver: true }),
+        Animated.timing(rightCharOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.spring(rightCharX, { toValue: 0, tension: 40, friction: 8, useNativeDriver: true }),
       ]),
-      // Subtitle
-      Animated.timing(subtitleOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      // Cards slide up
+      // 3. Bottom characters pop up
       Animated.parallel([
-        Animated.timing(cardsOpacity, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-        Animated.spring(cardsTranslateY, {
-          toValue: 0,
-          tension: 50,
-          friction: 10,
-          useNativeDriver: true,
-        }),
+        Animated.timing(bottomLeftOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(bottomLeftY, { toValue: 0, tension: 50, friction: 8, useNativeDriver: true }),
+        Animated.timing(bottomRightOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(bottomRightY, { toValue: 0, tension: 50, friction: 8, useNativeDriver: true }),
       ]),
-      // Features + footer
+      // 4. Title + buttons
       Animated.parallel([
-        Animated.timing(featuresOpacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(footerOpacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
+        Animated.timing(titleOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.timing(titleTranslateY, { toValue: 0, duration: 400, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(buttonsOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.spring(buttonsTranslateY, { toValue: 0, tension: 50, friction: 10, useNativeDriver: true }),
+        Animated.timing(footerOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
       ]),
     ]).start();
+
+    // Looping idle animations (Duolingo-style breathing/floating)
+    const createFloatLoop = (animValue: Animated.Value, toVal: number, duration: number) => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.timing(animValue, {
+            toValue: toVal,
+            duration,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: true,
+          }),
+          Animated.timing(animValue, {
+            toValue: -toVal,
+            duration,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: true,
+          }),
+        ])
+      );
+    };
+
+    // Start floating animations with different speeds for organic feel
+    const floatAnims = [
+      createFloatLoop(mascotBounce, -6, 1800),
+      createFloatLoop(leftCharBounce, -5, 2200),
+      createFloatLoop(rightCharBounce, -4, 2000),
+      createFloatLoop(bottomLeftBounce, -3, 1600),
+      createFloatLoop(bottomRightBounce, -5, 2400),
+    ];
+    floatAnims.forEach(a => a.start());
+
+    return () => floatAnims.forEach(a => a.stop());
   }, []);
 
   const handleGoogleAuth = async () => {
@@ -134,74 +175,139 @@ export default function LoginScreen() {
     router.replace('/onboarding/welcome');
   };
 
-  const features = [
-    { icon: <BookIcon size={18} color={colors.green.primary} />, text: 'Progress saqlanadi' },
-    { icon: <WorldIcon size={18} color={colors.blue.primary} />, text: 'Barcha qurilmalarda sync' },
-    { icon: <TrophyIcon size={18} color="#ffc800" />, text: 'Leaderboard & yutuqlar' },
-  ];
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.bg.primary : '#f8f9fb' }}>
       <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 24 }}>
 
-        {/* Logo Section */}
+        {/* Characters Scene */}
+        <View style={{ alignItems: 'center', marginBottom: 8, height: 220, justifyContent: 'center' }}>
+
+          {/* Left character - Izzy (peeking from left) */}
+          <Animated.View style={{
+            position: 'absolute',
+            left: -10,
+            bottom: 20,
+            opacity: leftCharOpacity,
+            transform: [
+              { translateX: leftCharX },
+              { translateY: leftCharBounce },
+              { rotate: '5deg' },
+            ],
+          }}>
+            <Image
+              source={CHARACTERS.izzy}
+              style={{ width: 75, height: 100 }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+
+          {/* Right character - Cubby (peeking from right) */}
+          <Animated.View style={{
+            position: 'absolute',
+            right: -10,
+            bottom: 20,
+            opacity: rightCharOpacity,
+            transform: [
+              { translateX: rightCharX },
+              { translateY: rightCharBounce },
+              { rotate: '-5deg' },
+            ],
+          }}>
+            <Image
+              source={CHARACTERS.cubby}
+              style={{ width: 70, height: 95 }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+
+          {/* Bottom-left - Hook (small, in background) */}
+          <Animated.View style={{
+            position: 'absolute',
+            left: 45,
+            bottom: 0,
+            opacity: bottomLeftOpacity,
+            transform: [
+              { translateY: Animated.add(bottomLeftY, bottomLeftBounce) },
+              { rotate: '3deg' },
+            ],
+          }}>
+            <Image
+              source={CHARACTERS.hook}
+              style={{ width: 45, height: 70, opacity: 0.7 }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+
+          {/* Bottom-right - Musicians (small, in background) */}
+          <Animated.View style={{
+            position: 'absolute',
+            right: 35,
+            bottom: 0,
+            opacity: bottomRightOpacity,
+            transform: [
+              { translateY: Animated.add(bottomRightY, bottomRightBounce) },
+              { rotate: '-3deg' },
+            ],
+          }}>
+            <Image
+              source={CHARACTERS.musicians}
+              style={{ width: 55, height: 65, opacity: 0.7 }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+
+          {/* Main Mascot - Jake (center, large) */}
+          <Animated.View style={{
+            transform: [
+              { scale: mascotScale },
+              { translateY: mascotBounce },
+            ],
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.15,
+            shadowRadius: 20,
+            elevation: 10,
+          }}>
+            <Image
+              source={CHARACTERS.jake}
+              style={{ width: 160, height: 190 }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        </View>
+
+        {/* Title */}
         <Animated.View style={{
           alignItems: 'center',
-          marginBottom: 40,
-          transform: [{ scale: logoScale }],
+          marginBottom: 32,
+          opacity: titleOpacity,
+          transform: [{ translateY: titleTranslateY }],
         }}>
-          {/* Logo Container with Glow */}
-          <View style={{
-            width: 100,
-            height: 100,
-            borderRadius: 32,
-            backgroundColor: colors.green.primary,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 20,
-            shadowColor: colors.green.primary,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.35,
-            shadowRadius: 20,
-            elevation: 12,
+          <Text style={{
+            fontSize: 34,
+            fontWeight: '800',
+            color: colors.text.primary,
+            letterSpacing: -1.2,
+            marginBottom: 6,
           }}>
-            <LionIcon size={56} color="#ffffff" />
-          </View>
-
-          <Animated.View style={{
-            opacity: titleOpacity,
-            transform: [{ translateY: titleTranslateY }],
-            alignItems: 'center',
+            EazyEnglish
+          </Text>
+          <Text style={{
+            fontSize: 16,
+            color: colors.text.secondary,
+            fontWeight: '500',
+            letterSpacing: -0.2,
           }}>
-            <Text style={{
-              fontSize: 32,
-              fontWeight: '800',
-              color: colors.text.primary,
-              letterSpacing: -1,
-              marginBottom: 6,
-            }}>
-              EazyEnglish
-            </Text>
-          </Animated.View>
-
-          <Animated.View style={{ opacity: subtitleOpacity }}>
-            <Text style={{
-              fontSize: 16,
-              color: colors.text.secondary,
-              fontWeight: '500',
-              letterSpacing: -0.2,
-            }}>
-              Ingliz tilini o'yin orqali o'rganing
-            </Text>
-          </Animated.View>
+            Ingliz tilini o'yin orqali o'rganing
+          </Text>
         </Animated.View>
 
         {/* Auth Buttons */}
         <Animated.View style={{
           gap: 12,
-          marginBottom: 32,
-          opacity: cardsOpacity,
-          transform: [{ translateY: cardsTranslateY }],
+          marginBottom: 24,
+          opacity: buttonsOpacity,
+          transform: [{ translateY: buttonsTranslateY }],
         }}>
           {/* Google Sign In */}
           <TouchableOpacity
@@ -229,22 +335,10 @@ export default function LoginScreen() {
               <ActivityIndicator color={colors.text.primary} size="small" />
             ) : (
               <>
-                {/* Google "G" Icon */}
-                <View style={{
-                  width: 24,
-                  height: 24,
-                  marginRight: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
+                <View style={{ width: 24, height: 24, marginRight: 12, alignItems: 'center', justifyContent: 'center' }}>
                   <GoogleIcon />
                 </View>
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: colors.text.primary,
-                  letterSpacing: -0.2,
-                }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text.primary, letterSpacing: -0.2 }}>
                   Google bilan davom etish
                 </Text>
               </>
@@ -290,29 +384,12 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           {/* Divider */}
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginVertical: 4,
-          }}>
-            <View style={{
-              flex: 1,
-              height: 1,
-              backgroundColor: isDark ? colors.border.primary : '#e8eaed',
-            }} />
-            <Text style={{
-              marginHorizontal: 16,
-              fontSize: 13,
-              color: colors.text.tertiary,
-              fontWeight: '500',
-            }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 2 }}>
+            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? colors.border.primary : '#e8eaed' }} />
+            <Text style={{ marginHorizontal: 16, fontSize: 13, color: colors.text.tertiary, fontWeight: '500' }}>
               yoki
             </Text>
-            <View style={{
-              flex: 1,
-              height: 1,
-              backgroundColor: isDark ? colors.border.primary : '#e8eaed',
-            }} />
+            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? colors.border.primary : '#e8eaed' }} />
           </View>
 
           {/* Guest Mode */}
@@ -324,7 +401,6 @@ export default function LoginScreen() {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: 'transparent',
               borderRadius: 16,
               paddingVertical: 16,
               paddingHorizontal: 24,
@@ -343,39 +419,6 @@ export default function LoginScreen() {
               Ro'yxatdan o'tmasdan sinash
             </Text>
           </TouchableOpacity>
-        </Animated.View>
-
-        {/* Features */}
-        <Animated.View style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          gap: 24,
-          marginBottom: 32,
-          opacity: featuresOpacity,
-        }}>
-          {features.map((feature, index) => (
-            <View key={index} style={{ alignItems: 'center', gap: 6, maxWidth: 90 }}>
-              <View style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: isDark ? colors.bg.elevated : '#f0f2f5',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-                {feature.icon}
-              </View>
-              <Text style={{
-                fontSize: 11,
-                fontWeight: '500',
-                color: colors.text.tertiary,
-                textAlign: 'center',
-                lineHeight: 14,
-              }}>
-                {feature.text}
-              </Text>
-            </View>
-          ))}
         </Animated.View>
 
         {/* Footer */}
