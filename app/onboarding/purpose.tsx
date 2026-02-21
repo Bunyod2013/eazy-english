@@ -64,22 +64,22 @@ export default function PurposeScreen() {
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 120 }}
       >
         {/* Character + Header */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, marginTop: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6, marginTop: 6 }}>
           <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
-            <Text style={{ fontSize: 30, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 8 }}>
+            <Text style={{ fontSize: 26, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 6 }}>
               Nima uchun ingliz tili{'\n'}o'rganmoqchisiz?
             </Text>
-            <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
+            <Text style={{ fontSize: 14, color: colors.text.secondary, lineHeight: 20 }}>
               Bir nechta variantni tanlashingiz mumkin
             </Text>
           </Animated.View>
           <Animated.View style={{ transform: [{ scale: charScale }, { translateY: charBounce }], marginLeft: 8 }}>
-            <Image source={IZZY} style={{ width: 80, height: 105 }} resizeMode="contain" />
+            <Image source={IZZY} style={{ width: 68, height: 90 }} resizeMode="contain" />
           </Animated.View>
         </View>
 
         {/* Purpose Grid */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 24, gap: 10 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 18, gap: 8 }}>
           {PURPOSES.map((purpose, i) => {
             const isSelected = selected.includes(purpose.id);
             const IconComponent = purpose.icon;
@@ -97,27 +97,27 @@ export default function PurposeScreen() {
                   onPress={() => toggle(purpose.id)}
                   style={{
                     backgroundColor: isSelected ? colors.green.bg : colors.bg.card,
-                    borderRadius: 20, padding: 16, borderWidth: 2, minHeight: 110,
+                    borderRadius: 16, padding: 12, borderWidth: 2, minHeight: 92,
                     borderColor: isSelected ? colors.green.primary : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
                     justifyContent: 'space-between',
                   }}
                 >
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{
-                      width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
+                      width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
                       backgroundColor: isSelected ? `${colors.green.primary}20` : isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
                     }}>
-                      <IconComponent size={24} color={purpose.iconColor} />
+                      <IconComponent size={20} color={purpose.iconColor} />
                     </View>
                     {isSelected && (
-                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: colors.green.primary, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>✓</Text>
+                      <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colors.green.primary, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>✓</Text>
                       </View>
                     )}
                   </View>
-                  <View style={{ marginTop: 12 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text.primary, letterSpacing: -0.2 }}>{purpose.label}</Text>
-                    <Text style={{ fontSize: 12, color: colors.text.tertiary, marginTop: 2 }}>{purpose.sub}</Text>
+                  <View style={{ marginTop: 8 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text.primary, letterSpacing: -0.2 }}>{purpose.label}</Text>
+                    <Text style={{ fontSize: 11, color: colors.text.tertiary, marginTop: 1 }}>{purpose.sub}</Text>
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -139,14 +139,14 @@ export default function PurposeScreen() {
           onPress={() => router.push({ pathname: '/onboarding/language', params: { purposes: selected.join(',') } })}
           style={{
             backgroundColor: selected.length > 0 ? '#ec4899' : isDark ? '#333' : '#e0e0e0',
-            borderRadius: 18, paddingVertical: 17, alignItems: 'center',
-            maxWidth: 440, alignSelf: 'center', width: '100%',
+            borderRadius: 14, paddingVertical: 14, alignItems: 'center',
+            maxWidth: 400, alignSelf: 'center', width: '100%',
             shadowColor: selected.length > 0 ? '#ec4899' : 'transparent',
-            shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12,
-            elevation: selected.length > 0 ? 6 : 0,
+            shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 10,
+            elevation: selected.length > 0 ? 4 : 0,
           }}
         >
-          <Text style={{ fontSize: 17, fontWeight: '700', color: selected.length > 0 ? '#fff' : colors.text.tertiary }}>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: selected.length > 0 ? '#fff' : colors.text.tertiary }}>
             Davom etish {selected.length > 0 ? `(${selected.length})` : ''}
           </Text>
         </TouchableOpacity>

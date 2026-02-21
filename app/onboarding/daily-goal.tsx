@@ -56,22 +56,22 @@ export default function DailyGoalScreen() {
 
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
         {/* Header + Character */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 28 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 22 }}>
           <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
-            <Text style={{ fontSize: 30, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 8 }}>
+            <Text style={{ fontSize: 26, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 6 }}>
               Kunlik maqsadingiz{'\n'}qanday bo'lsin?
             </Text>
-            <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
+            <Text style={{ fontSize: 14, color: colors.text.secondary, lineHeight: 20 }}>
               Har kuni qancha vaqt ajratasiz?
             </Text>
           </Animated.View>
           <Animated.View style={{ transform: [{ scale: charScale }, { translateY: charBounce }], marginLeft: 8 }}>
-            <Image source={HOOK} style={{ width: 55, height: 90 }} resizeMode="contain" />
+            <Image source={HOOK} style={{ width: 47, height: 76 }} resizeMode="contain" />
           </Animated.View>
         </View>
 
         {/* Goal Cards */}
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: 10 }}>
           {GOALS.map((goal, i) => {
             const isSelected = selected === goal.xp;
             const IconComponent = goal.icon;
@@ -85,37 +85,37 @@ export default function DailyGoalScreen() {
                   onPress={() => setSelected(goal.xp)}
                   style={{
                     backgroundColor: isSelected ? (isDark ? `${goal.color}15` : `${goal.color}08`) : colors.bg.card,
-                    borderRadius: 22, padding: 18, flexDirection: 'row', alignItems: 'center',
+                    borderRadius: 16, padding: 14, flexDirection: 'row', alignItems: 'center',
                     borderWidth: 2, borderColor: isSelected ? goal.color : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
                     shadowColor: isSelected ? goal.color : '#000',
-                    shadowOffset: { width: 0, height: isSelected ? 4 : 1 },
-                    shadowOpacity: isSelected ? 0.15 : 0.03, shadowRadius: isSelected ? 12 : 2,
-                    elevation: isSelected ? 4 : 1,
+                    shadowOffset: { width: 0, height: isSelected ? 3 : 1 },
+                    shadowOpacity: isSelected ? 0.12 : 0.03, shadowRadius: isSelected ? 8 : 2,
+                    elevation: isSelected ? 3 : 1,
                   }}
                 >
                   <View style={{
-                    width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 14,
+                    width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12,
                     backgroundColor: isDark ? `${goal.color}20` : `${goal.color}12`,
                   }}>
-                    <IconComponent size={28} color={goal.iconColor} />
+                    <IconComponent size={24} color={goal.iconColor} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Text style={{ fontSize: 18, fontWeight: '700', color: colors.text.primary, letterSpacing: -0.3 }}>{goal.title}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: colors.text.primary, letterSpacing: -0.3 }}>{goal.title}</Text>
                       {goal.recommended && (
-                        <View style={{ backgroundColor: goal.color, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }}>
-                          <Text style={{ fontSize: 11, fontWeight: '700', color: '#fff' }}>Tavsiya</Text>
+                        <View style={{ backgroundColor: goal.color, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 }}>
+                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>Tavsiya</Text>
                         </View>
                       )}
                     </View>
-                    <Text style={{ fontSize: 14, color: colors.text.secondary, marginTop: 2 }}>{goal.sub} — {goal.desc}</Text>
+                    <Text style={{ fontSize: 13, color: colors.text.secondary, marginTop: 1 }}>{goal.sub} — {goal.desc}</Text>
                   </View>
                   <View style={{
                     backgroundColor: isSelected ? goal.color : isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
-                    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, minWidth: 50, alignItems: 'center',
+                    paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, minWidth: 44, alignItems: 'center',
                   }}>
-                    <Text style={{ fontSize: 15, fontWeight: '800', color: isSelected ? '#fff' : colors.text.tertiary }}>{goal.xp}</Text>
-                    <Text style={{ fontSize: 10, fontWeight: '600', color: isSelected ? 'rgba(255,255,255,0.8)' : colors.text.tertiary, marginTop: -1 }}>XP</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '800', color: isSelected ? '#fff' : colors.text.tertiary }}>{goal.xp}</Text>
+                    <Text style={{ fontSize: 9, fontWeight: '600', color: isSelected ? 'rgba(255,255,255,0.8)' : colors.text.tertiary, marginTop: -1 }}>XP</Text>
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -125,15 +125,15 @@ export default function DailyGoalScreen() {
 
         {/* Info */}
         <Animated.View style={{
-          opacity: fadeAnim, marginTop: 24,
-          backgroundColor: colors.stats.streak.bg, borderRadius: 16, padding: 16,
+          opacity: fadeAnim, marginTop: 18,
+          backgroundColor: colors.stats.streak.bg, borderRadius: 12, padding: 12,
           flexDirection: 'row', alignItems: 'center',
           borderWidth: 1, borderColor: colors.stats.streak.border,
         }}>
-          <View style={{ marginRight: 12 }}>
-            <FireIcon size={24} color="#ff9600" />
+          <View style={{ marginRight: 10 }}>
+            <FireIcon size={20} color="#ff9600" />
           </View>
-          <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
+          <Text style={{ fontSize: 13, color: colors.text.secondary, flex: 1, lineHeight: 18 }}>
             Har kuni maqsadga erishsangiz, streak (ketma-ketlik) oshadi va bonus XP olasiz!
           </Text>
         </Animated.View>
@@ -145,12 +145,12 @@ export default function DailyGoalScreen() {
           activeOpacity={0.8}
           onPress={() => router.push({ pathname: '/onboarding/username', params: { language, skillLevel, dailyGoal: selected.toString(), purposes } })}
           style={{
-            backgroundColor: '#dc2626', borderRadius: 18, paddingVertical: 17, alignItems: 'center',
-            maxWidth: 440, alignSelf: 'center', width: '100%',
-            shadowColor: '#dc2626', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+            backgroundColor: '#dc2626', borderRadius: 14, paddingVertical: 14, alignItems: 'center',
+            maxWidth: 400, alignSelf: 'center', width: '100%',
+            shadowColor: '#dc2626', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 4,
           }}
         >
-          <Text style={{ fontSize: 17, fontWeight: '700', color: '#fff' }}>Davom etish</Text>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>Davom etish</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -53,21 +53,21 @@ export default function WelcomeScreen() {
   });
 
   const features = [
-    { icon: <TargetIcon size={28} color="#fff" />, bg: '#ff6b6b', title: 'Interaktiv darslar', sub: 'Interactive lessons' },
-    { icon: <TrophyIcon size={28} color="#fff" />, bg: '#fbbf24', title: "O'yin shaklidagi ta'lim", sub: 'Gamified learning' },
-    { icon: <BookIcon size={28} color="#fff" />, bg: '#1cb0f6', title: 'Progressni kuzating', sub: 'Track your progress' },
+    { icon: <TargetIcon size={22} color="#fff" />, bg: '#ff6b6b', title: 'Interaktiv darslar', sub: 'Interactive lessons' },
+    { icon: <TrophyIcon size={22} color="#fff" />, bg: '#fbbf24', title: "O'yin shaklidagi ta'lim", sub: 'Gamified learning' },
+    { icon: <BookIcon size={22} color="#fff" />, bg: '#1cb0f6', title: 'Progressni kuzating', sub: 'Track your progress' },
   ];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#2563eb' }}>
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
         {/* Hero */}
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 16 }}>
           <Animated.View style={{
             transform: [{ scale: mascotScale }, { translateY: mascotBounce }],
-            marginBottom: 20,
+            marginBottom: 16,
           }}>
-            <Image source={JAKE} style={{ width: 140, height: 165 }} resizeMode="contain" />
+            <Image source={JAKE} style={{ width: 120, height: 142 }} resizeMode="contain" />
           </Animated.View>
 
           <Animated.View style={{
@@ -75,36 +75,36 @@ export default function WelcomeScreen() {
             transform: [{ translateY: slideAnim }],
             alignItems: 'center',
           }}>
-            <Text style={{ fontSize: 42, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 8, letterSpacing: -1 }}>
+            <Text style={{ fontSize: 36, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 6, letterSpacing: -1 }}>
               EazyEnglish
             </Text>
-            <Text style={{ fontSize: 18, color: 'rgba(255,255,255,0.9)', textAlign: 'center', fontWeight: '500', marginBottom: 4 }}>
+            <Text style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', textAlign: 'center', fontWeight: '500', marginBottom: 3 }}>
               Ingliz tilini oson o'rganing
             </Text>
-            <Text style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)', textAlign: 'center', fontWeight: '400' }}>
+            <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', textAlign: 'center', fontWeight: '400' }}>
               Learn English the fun way
             </Text>
           </Animated.View>
         </View>
 
         {/* Feature Cards */}
-        <View style={{ gap: 10, marginBottom: 24 }}>
+        <View style={{ gap: 8, marginBottom: 20 }}>
           {features.map((f, i) => (
             <Animated.View key={i} style={cardStyle([cardAnim1, cardAnim2, cardAnim3][i])}>
               <View style={{
                 flexDirection: 'row', alignItems: 'center',
-                backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20,
-                padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16,
+                padding: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
               }}>
                 <View style={{
-                  width: 48, height: 48, borderRadius: 16,
-                  backgroundColor: f.bg, alignItems: 'center', justifyContent: 'center', marginRight: 14,
+                  width: 40, height: 40, borderRadius: 13,
+                  backgroundColor: f.bg, alignItems: 'center', justifyContent: 'center', marginRight: 12,
                 }}>
                   {f.icon}
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 17, fontWeight: '600', color: '#fff', letterSpacing: -0.3 }}>{f.title}</Text>
-                  <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>{f.sub}</Text>
+                  <Text style={{ fontSize: 15, fontWeight: '600', color: '#fff', letterSpacing: -0.3 }}>{f.title}</Text>
+                  <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 1 }}>{f.sub}</Text>
                 </View>
               </View>
             </Animated.View>
@@ -121,11 +121,12 @@ export default function WelcomeScreen() {
             activeOpacity={0.8}
             onPress={() => router.push('/onboarding/purpose')}
             style={{
-              backgroundColor: '#fff', borderRadius: 20, paddingVertical: 18, alignItems: 'center',
-              shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 16, elevation: 6,
+              backgroundColor: '#fff', borderRadius: 16, paddingVertical: 14, alignItems: 'center',
+              maxWidth: 400, alignSelf: 'center', width: '100%',
+              shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 6,
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: '700', color: '#2563eb', letterSpacing: -0.3 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#2563eb', letterSpacing: -0.3 }}>
               Boshlash
             </Text>
           </TouchableOpacity>

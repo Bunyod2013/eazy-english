@@ -56,22 +56,22 @@ export default function LanguageScreen() {
 
       <View style={{ flex: 1, paddingHorizontal: 24 }}>
         {/* Header + Character */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 32 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 24 }}>
           <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
-            <Text style={{ fontSize: 30, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 8 }}>
+            <Text style={{ fontSize: 26, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 6 }}>
               Qaysi tilda{'\n'}o'rganmoqchisiz?
             </Text>
-            <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
+            <Text style={{ fontSize: 14, color: colors.text.secondary, lineHeight: 20 }}>
               Tushuntirishlar shu tilda bo'ladi
             </Text>
           </Animated.View>
           <Animated.View style={{ transform: [{ scale: charScale }, { translateY: charBounce }], marginLeft: 8 }}>
-            <Image source={MUSICIANS} style={{ width: 85, height: 80 }} resizeMode="contain" />
+            <Image source={MUSICIANS} style={{ width: 72, height: 68 }} resizeMode="contain" />
           </Animated.View>
         </View>
 
         {/* Language Cards */}
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: 10 }}>
           {LANGUAGES.map((lang, i) => {
             const isSelected = selected === lang.code;
             const FlagComponent = lang.flag;
@@ -85,37 +85,37 @@ export default function LanguageScreen() {
                   onPress={() => setSelected(lang.code)}
                   style={{
                     backgroundColor: isSelected ? colors.green.bg : colors.bg.card,
-                    borderRadius: 22, padding: 20, flexDirection: 'row', alignItems: 'center',
+                    borderRadius: 16, padding: 14, flexDirection: 'row', alignItems: 'center',
                     borderWidth: 2, borderColor: isSelected ? colors.green.primary : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
                     shadowColor: isSelected ? colors.green.primary : '#000',
-                    shadowOffset: { width: 0, height: isSelected ? 4 : 2 },
-                    shadowOpacity: isSelected ? 0.15 : 0.04, shadowRadius: isSelected ? 12 : 4,
-                    elevation: isSelected ? 4 : 1,
+                    shadowOffset: { width: 0, height: isSelected ? 3 : 1 },
+                    shadowOpacity: isSelected ? 0.12 : 0.03, shadowRadius: isSelected ? 8 : 3,
+                    elevation: isSelected ? 3 : 1,
                   }}
                 >
                   <View style={{
-                    width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginRight: 16,
+                    width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12,
                     backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7', overflow: 'hidden',
                   }}>
-                    <FlagComponent size={40} />
+                    <FlagComponent size={32} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Text style={{ fontSize: 19, fontWeight: '700', color: colors.text.primary, letterSpacing: -0.3 }}>{lang.name}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: colors.text.primary, letterSpacing: -0.3 }}>{lang.name}</Text>
                       {lang.recommended && (
-                        <View style={{ backgroundColor: colors.green.primary, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }}>
-                          <Text style={{ fontSize: 11, fontWeight: '700', color: '#fff' }}>Tavsiya</Text>
+                        <View style={{ backgroundColor: colors.green.primary, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 }}>
+                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>Tavsiya</Text>
                         </View>
                       )}
                     </View>
-                    <Text style={{ fontSize: 14, color: colors.text.secondary, marginTop: 3 }}>{lang.sub}</Text>
+                    <Text style={{ fontSize: 13, color: colors.text.secondary, marginTop: 2 }}>{lang.sub}</Text>
                   </View>
                   <View style={{
-                    width: 26, height: 26, borderRadius: 13, borderWidth: 2, alignItems: 'center', justifyContent: 'center',
+                    width: 22, height: 22, borderRadius: 11, borderWidth: 2, alignItems: 'center', justifyContent: 'center',
                     borderColor: isSelected ? colors.green.primary : isDark ? 'rgba(255,255,255,0.2)' : '#d4d4d4',
                     backgroundColor: isSelected ? colors.green.primary : 'transparent',
                   }}>
-                    {isSelected && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#fff' }} />}
+                    {isSelected && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff' }} />}
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -125,15 +125,15 @@ export default function LanguageScreen() {
 
         {/* Tip */}
         <Animated.View style={{
-          opacity: fadeAnim, marginTop: 24,
-          backgroundColor: colors.blue.bg, borderRadius: 16, padding: 16,
+          opacity: fadeAnim, marginTop: 18,
+          backgroundColor: colors.blue.bg, borderRadius: 12, padding: 12,
           flexDirection: 'row', alignItems: 'center',
           borderWidth: 1, borderColor: colors.blue.border,
         }}>
-          <View style={{ marginRight: 12 }}>
-            <LightBulbIcon size={24} color="#ffc800" />
+          <View style={{ marginRight: 10 }}>
+            <LightBulbIcon size={20} color="#ffc800" />
           </View>
-          <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
+          <Text style={{ fontSize: 13, color: colors.text.secondary, flex: 1, lineHeight: 18 }}>
             O'zbekchani tanlasangiz, darslar sizga tanish tilda tushuntiriladi
           </Text>
         </Animated.View>
@@ -145,12 +145,12 @@ export default function LanguageScreen() {
           activeOpacity={0.8}
           onPress={() => router.push({ pathname: '/onboarding/skill-level', params: { language: selected, purposes } })}
           style={{
-            backgroundColor: '#d97706', borderRadius: 18, paddingVertical: 17, alignItems: 'center',
-            maxWidth: 440, alignSelf: 'center', width: '100%',
-            shadowColor: '#d97706', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+            backgroundColor: '#d97706', borderRadius: 14, paddingVertical: 14, alignItems: 'center',
+            maxWidth: 400, alignSelf: 'center', width: '100%',
+            shadowColor: '#d97706', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 4,
           }}
         >
-          <Text style={{ fontSize: 17, fontWeight: '700', color: '#fff' }}>Davom etish</Text>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>Davom etish</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

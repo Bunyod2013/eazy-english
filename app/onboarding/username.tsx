@@ -87,33 +87,33 @@ export default function UsernameScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Header + Character */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 28 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 22 }}>
             <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
-              <Text style={{ fontSize: 30, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 8 }}>
+              <Text style={{ fontSize: 26, fontWeight: '800', color: colors.text.primary, letterSpacing: -0.5, marginBottom: 6 }}>
                 Profilingizni{'\n'}yarating
               </Text>
-              <Text style={{ fontSize: 16, color: colors.text.secondary, lineHeight: 22 }}>
+              <Text style={{ fontSize: 14, color: colors.text.secondary, lineHeight: 20 }}>
                 Ismingiz va avatarni tanlang
               </Text>
             </Animated.View>
             <Animated.View style={{ transform: [{ scale: charScale }, { translateY: charBounce }], marginLeft: 8 }}>
-              <Image source={JAKE} style={{ width: 80, height: 95 }} resizeMode="contain" />
+              <Image source={JAKE} style={{ width: 68, height: 80 }} resizeMode="contain" />
             </Animated.View>
           </View>
 
           {/* Avatar Selection */}
-          <Animated.View style={{ opacity: fadeAnim, marginBottom: 28 }}>
-            <View style={{ alignItems: 'center', marginBottom: 20 }}>
+          <Animated.View style={{ opacity: fadeAnim, marginBottom: 22 }}>
+            <View style={{ alignItems: 'center', marginBottom: 14 }}>
               <View style={{
-                width: 88, height: 88, borderRadius: 30,
-                backgroundColor: colors.green.bg, borderWidth: 3, borderColor: activeAvatar.color,
-                alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-                shadowColor: activeAvatar.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4,
+                width: 72, height: 72, borderRadius: 24,
+                backgroundColor: colors.green.bg, borderWidth: 2.5, borderColor: activeAvatar.color,
+                alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+                shadowColor: activeAvatar.color, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.15, shadowRadius: 6, elevation: 3,
               }}>
-                <ActiveIcon size={48} color={activeAvatar.color} />
+                <ActiveIcon size={38} color={activeAvatar.color} />
               </View>
             </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
               {AVATARS.map((avatar) => {
                 const isActive = selectedAvatar === avatar.id;
                 const AvatarIcon = avatar.icon;
@@ -123,12 +123,12 @@ export default function UsernameScreen() {
                     activeOpacity={0.7}
                     onPress={() => setSelectedAvatar(avatar.id)}
                     style={{
-                      width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
+                      width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
                       backgroundColor: isActive ? colors.green.bg : isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f7',
                       borderWidth: 2, borderColor: isActive ? avatar.color : 'transparent',
                     }}
                   >
-                    <AvatarIcon size={28} color={avatar.color} />
+                    <AvatarIcon size={22} color={avatar.color} />
                   </TouchableOpacity>
                 );
               })}
@@ -136,12 +136,12 @@ export default function UsernameScreen() {
           </Animated.View>
 
           {/* Name Input */}
-          <Animated.View style={{ opacity: fadeAnim, marginBottom: 24 }}>
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text.secondary, marginBottom: 8, marginLeft: 4 }}>
+          <Animated.View style={{ opacity: fadeAnim, marginBottom: 18 }}>
+            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text.secondary, marginBottom: 6, marginLeft: 4 }}>
               Ismingiz
             </Text>
             <View style={{
-              backgroundColor: colors.bg.card, borderRadius: 18, borderWidth: 2, overflow: 'hidden',
+              backgroundColor: colors.bg.card, borderRadius: 14, borderWidth: 2, overflow: 'hidden',
               borderColor: username.length > 0 ? '#2563eb' : isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb',
             }}>
               <TextInput
@@ -149,21 +149,21 @@ export default function UsernameScreen() {
                 onChangeText={setUsername}
                 placeholder="Masalan: Aziz"
                 placeholderTextColor={colors.text.tertiary}
-                style={{ paddingHorizontal: 18, paddingVertical: 16, fontSize: 18, fontWeight: '500', color: colors.text.primary }}
+                style={{ paddingHorizontal: 14, paddingVertical: 13, fontSize: 16, fontWeight: '500', color: colors.text.primary }}
                 maxLength={20}
                 autoCapitalize="words"
                 autoCorrect={false}
               />
             </View>
-            <Text style={{ fontSize: 12, color: colors.text.tertiary, marginTop: 6, marginLeft: 4 }}>{username.length}/20</Text>
+            <Text style={{ fontSize: 11, color: colors.text.tertiary, marginTop: 4, marginLeft: 4 }}>{username.length}/20</Text>
           </Animated.View>
 
           {/* Settings Summary */}
           <Animated.View style={{
-            opacity: fadeAnim, backgroundColor: colors.bg.card, borderRadius: 20, padding: 20,
+            opacity: fadeAnim, backgroundColor: colors.bg.card, borderRadius: 14, padding: 14,
             borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
           }}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text.secondary, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: colors.text.secondary, marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>
               Sozlamalar
             </Text>
             {[
@@ -174,14 +174,14 @@ export default function UsernameScreen() {
               const ItemIcon = item.icon;
               return (
                 <View key={i} style={{
-                  flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
+                  flexDirection: 'row', alignItems: 'center', paddingVertical: 8,
                   borderTopWidth: i > 0 ? 1 : 0, borderTopColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
                 }}>
-                  <View style={{ marginRight: 12 }}>
-                    <ItemIcon size={20} color={item.iconColor} />
+                  <View style={{ marginRight: 10 }}>
+                    <ItemIcon size={18} color={item.iconColor} />
                   </View>
-                  <Text style={{ fontSize: 15, color: colors.text.secondary, flex: 1 }}>{item.label}</Text>
-                  <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text.primary }}>{item.value}</Text>
+                  <Text style={{ fontSize: 13, color: colors.text.secondary, flex: 1 }}>{item.label}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text.primary }}>{item.value}</Text>
                 </View>
               );
             })}
@@ -202,18 +202,18 @@ export default function UsernameScreen() {
           onPress={handleComplete}
           style={{
             backgroundColor: canContinue ? '#2563eb' : isDark ? '#333' : '#e0e0e0',
-            borderRadius: 18, paddingVertical: 17, alignItems: 'center',
+            borderRadius: 14, paddingVertical: 14, alignItems: 'center',
             flexDirection: 'row', justifyContent: 'center', gap: 8,
-            maxWidth: 440, alignSelf: 'center', width: '100%',
+            maxWidth: 400, alignSelf: 'center', width: '100%',
             shadowColor: canContinue ? '#2563eb' : 'transparent',
-            shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12,
-            elevation: canContinue ? 6 : 0,
+            shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 10,
+            elevation: canContinue ? 4 : 0,
           }}
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={{ fontSize: 17, fontWeight: '700', color: canContinue ? '#fff' : colors.text.tertiary }}>
+            <Text style={{ fontSize: 15, fontWeight: '700', color: canContinue ? '#fff' : colors.text.tertiary }}>
               Boshlaymiz!
             </Text>
           )}
