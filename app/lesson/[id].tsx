@@ -480,7 +480,8 @@ export default function LessonScreen() {
             </View>
           )}
 
-          {/* Character + Speech Bubble Row */}
+          {/* Character + Speech Bubble Row - hidden for new words */}
+          {!currentQuestion.isNewWord && (
           <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
             {/* Character */}
             <Image
@@ -539,6 +540,7 @@ export default function LessonScreen() {
               </TouchableOpacity>
             )}
           </View>
+          )}
 
           {/* Hint Card */}
           {showHint && currentQuestion.explanation && (

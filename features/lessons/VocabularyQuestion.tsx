@@ -119,187 +119,83 @@ export const VocabularyQuestion: React.FC<VocabularyQuestionProps> = ({
   };
 
   return (
-    <View>
-      {/* Vocabulary Display Card - Gamified */}
-      <View
-        style={{
-          backgroundColor: colors.bg.card,
-          borderRadius: 20,
-          padding: 32,
-          alignItems: 'center',
-          borderWidth: 2,
-          borderColor: colors.border.primary,
-          shadowColor: colors.text.primary,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 4,
-        }}
-      >
-        {/* Image/Icon - Larger like in screenshot */}
-        <View
-          style={{
-            width: 120,
-            height: 120,
-            backgroundColor: '#FFF4E6',
-            borderRadius: 60,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 24,
-            borderWidth: 4,
-            borderColor: '#FFE4B5',
-            shadowColor: '#FFA500',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 12,
-            elevation: 8,
-          }}
-        >
-          <IconComponent iconName={question.image} size={80} color="#FFA500" />
-        </View>
+    <View style={{
+      backgroundColor: colors.bg.card,
+      borderRadius: 20,
+      padding: 24,
+      alignItems: 'center',
+      borderWidth: 1.5,
+      borderColor: colors.border.primary,
+    }}>
+      {/* Icon */}
+      <IconComponent iconName={question.image} size={64} color="#FFA500" />
 
-        {/* Audio Controls Row */}
-        <View style={{ 
-          flexDirection: 'row', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          gap: 12, 
-          marginBottom: 20,
+      {/* Word */}
+      <Text style={{
+        fontSize: 36, fontWeight: 'bold', color: colors.text.primary,
+        marginTop: 16, marginBottom: 8, letterSpacing: 0.5,
+      }}>
+        {question.word || question.prompt}
+      </Text>
+
+      {/* Pronunciation */}
+      {question.pronunciation && (
+        <Text style={{
+          fontSize: 15, color: colors.text.tertiary, fontStyle: 'italic',
+          marginBottom: 8,
         }}>
-          {/* Normal Speed Audio Button */}
-          <TouchableOpacity
-            onPress={() => handlePlayAudio(false)}
-            disabled={isPlaying}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-              paddingHorizontal: 16,
-              paddingVertical: 12,
-              backgroundColor: isPlaying ? colors.green.dark : colors.green.primary,
-              borderRadius: 24,
-              borderBottomWidth: 4,
-              borderBottomColor: colors.green.dark,
-              shadowColor: colors.green.primary,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 4,
-              elevation: 4,
-            }}
-          >
-            <SoundIcon size={24} color="#ffffff" />
-            <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 14 }}>
-              Oddiy
-            </Text>
-          </TouchableOpacity>
+          {question.pronunciation}
+        </Text>
+      )}
 
-          {/* Slow Speed Audio Button */}
-          <TouchableOpacity
-            onPress={() => handlePlayAudio(true)}
-            disabled={isPlaying}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-              paddingHorizontal: 16,
-              paddingVertical: 12,
-              backgroundColor: isPlaying ? '#FFA500' : '#FFB84D',
-              borderRadius: 24,
-              borderBottomWidth: 4,
-              borderBottomColor: '#FF8C00',
-              shadowColor: '#FFA500',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 4,
-              elevation: 4,
-            }}
-          >
-            <TurtleIcon size={24} color="#ffffff" />
-            <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 14 }}>
-              Sekin
-            </Text>
-          </TouchableOpacity>
-        </View>
+      {/* Translation */}
+      {question.translation && (
+        <Text style={{
+          fontSize: 22, fontWeight: '700', color: '#2E7D32',
+          marginBottom: 12,
+        }}>
+          {question.translation}
+        </Text>
+      )}
 
-        {/* Pronunciation */}
-        {question.pronunciation && (
-          <View style={{ 
-            backgroundColor: colors.bg.secondary,
-            paddingHorizontal: 16,
-            paddingVertical: 8,
+      {/* Audio Buttons */}
+      <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
+        <TouchableOpacity
+          onPress={() => handlePlayAudio(false)}
+          disabled={isPlaying}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 6,
+            paddingHorizontal: 14, paddingVertical: 10,
+            backgroundColor: isPlaying ? colors.green.dark : colors.green.primary,
             borderRadius: 20,
-            borderWidth: 1,
-            borderColor: colors.border.primary,
-            marginBottom: 16,
-          }}>
-            <Text style={{
-              fontSize: 16,
-              color: colors.text.primary,
-              fontWeight: '600',
-              fontStyle: 'italic',
-              textAlign: 'center',
-            }}>
-              {question.pronunciation}
-            </Text>
-          </View>
-        )}
-
-        {/* Word - English */}
-        <Text
-          style={{
-            fontSize: 40,
-            fontWeight: 'bold',
-            color: colors.text.primary,
-            marginBottom: 20,
-            letterSpacing: 1,
           }}
         >
-          {question.word || question.prompt}
-        </Text>
+          <SoundIcon size={20} color="#ffffff" />
+          <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 13 }}>Oddiy</Text>
+        </TouchableOpacity>
 
-        {/* Translation - O'ZBEK TILIDA - AJRATIB KO'RSATILGAN */}
-        {question.translation && (
-          <View style={{
-            backgroundColor: '#E8F5E9',
-            paddingHorizontal: 24,
-            paddingVertical: 14,
-            borderRadius: 16,
-            borderWidth: 2,
-            borderColor: '#66BB6A',
-            marginBottom: 20,
-            minWidth: '80%',
-            alignItems: 'center',
-            shadowColor: '#4CAF50',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 3,
-          }}>
-            <Text style={{
-              fontSize: 24,
-              fontWeight: '700',
-              color: '#2E7D32',
-              textAlign: 'center',
-            }}>
-              {question.translation}
-            </Text>
-          </View>
-        )}
-
-        {/* Explanation - Smaller */}
-        <Text
+        <TouchableOpacity
+          onPress={() => handlePlayAudio(true)}
+          disabled={isPlaying}
           style={{
-            fontSize: 15,
-            color: colors.text.secondary,
-            textAlign: 'center',
-            lineHeight: 22,
-            paddingHorizontal: 16,
+            flexDirection: 'row', alignItems: 'center', gap: 6,
+            paddingHorizontal: 14, paddingVertical: 10,
+            backgroundColor: isPlaying ? '#FFA500' : '#FFB84D',
+            borderRadius: 20,
           }}
         >
-          {question.promptUz || prompt}
-        </Text>
+          <TurtleIcon size={20} color="#ffffff" />
+          <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 13 }}>Sekin</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* Explanation */}
+      <Text style={{
+        fontSize: 14, color: colors.text.secondary,
+        textAlign: 'center', lineHeight: 20,
+      }}>
+        {question.promptUz || prompt}
+      </Text>
     </View>
   );
 };
