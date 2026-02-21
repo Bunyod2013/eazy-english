@@ -38,7 +38,7 @@ export const MatchingQuestion: React.FC<MatchingQuestionProps> = ({
 
   // When all pairs matched, auto-submit
   useEffect(() => {
-    if (matchedPairs.size === pairs.length && pairs.length > 0 && !showFeedback) {
+    if (matchedPairs.size === pairs.length * 2 && pairs.length > 0 && !showFeedback) {
       const answer = mistakes === 0 ? 'perfect' : `${mistakes} mistakes`;
       setSelectedAnswer(answer);
       onAnswer(question.correctAnswer as string);

@@ -12,7 +12,7 @@ import { Question, QuestionAnswer } from '@/types';
 import { calculateLessonXP, calculateLevelFromXP } from '@/utils/xp';
 import { triggerSuccess, triggerError, triggerImpact } from '@/utils/haptics';
 import { useTheme } from '@/utils/theme';
-import { playCorrectSound, preloadSounds } from '@/utils/audio';
+import { playCorrectSound, playIncorrectSound, preloadSounds } from '@/utils/audio';
 import { LessonCompletionModal } from '@/components/shared/LessonCompletionModal';
 
 // Question Components
@@ -123,8 +123,8 @@ export default function LessonScreen() {
     if (settings.vibrationEnabled) {
       correct ? triggerSuccess() : triggerError();
     }
-    if (settings.soundEnabled && correct) {
-      playCorrectSound();
+    if (settings.soundEnabled) {
+      correct ? playCorrectSound() : playIncorrectSound();
     }
 
     // Record answer

@@ -14,22 +14,33 @@ let currentSound: Sound | null = null;
 // Sound effect assets
 const SOUND_EFFECTS = {
   correct: require('@/assets/sounds/correct.mp3'),
+  incorrect: require('@/assets/sounds/incorrect.mp3'),
 };
 
-// Pre-loaded sound for instant playback
+// Pre-loaded sounds for instant playback
 let correctSound: Sound | null = null;
+let incorrectSound: Sound | null = null;
 let soundLoading = false;
 
-/** Pre-load correct sound at app start for instant playback */
+/** Pre-load sounds at app start for instant playback */
 export const preloadSounds = async (): Promise<void> => {
-  if (soundLoading || correctSound) return;
+  if (soundLoading) return;
   soundLoading = true;
   try {
-    const { sound } = await Audio.Sound.createAsync(
-      SOUND_EFFECTS.correct,
-      { volume: 0.6 }
-    );
-    correctSound = sound;
+    if (!correctSound) {
+      const { sound } = await Audio.Sound.createAsync(
+        SOUND_EFFECTS.correct,
+        { volume: 0.6 }
+      );
+      correctSound = sound;
+    }
+    if (!incorrectSound) {
+      const { sound } = await Audio.Sound.createAsync(
+        SOUND_EFFECTS.incorrect,
+        { volume: 0.6 }
+      );
+      incorrectSound = sound;
+    }
   } catch (e) {
     console.log('[Audio] Failed to preload sounds');
   }
@@ -105,6 +116,22 @@ export const playCorrectSound = (): void => {
   } else {
     Audio.Sound.createAsync(SOUND_EFFECTS.correct, { shouldPlay: true, volume: 0.6 })
       .then(({ sound }) => { correctSound = sound; })
+      .catch(() => {});
+  }
+};
+
+/** Play incorrect/error sound - fire and forget, no await blocking */
+export const playIncorrectSound = (): void => {
+  if (incorrectSound) {
+    incorrectSound.setPositionAsync(0).then(() => {
+      incorrectSound?.playAsync();
+    }).catch(() => {
+      incorrectSound = null;
+      preloadSounds();
+    });
+  } else {
+    Audio.Sound.createAsync(SOUND_EFFECTS.incorrect, { shouldPlay: true, volume: 0.6 })
+      .then(({ sound }) => { incorrectSound = sound; })
       .catch(() => {});
   }
 };
