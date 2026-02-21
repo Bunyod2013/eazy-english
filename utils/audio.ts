@@ -11,6 +11,17 @@ import { getAudioAsset, hasAudioAsset } from './audioAssets';
 
 let currentSound: Sound | null = null;
 
+// Sound effect assets
+const SOUND_EFFECTS = {
+  click: require('@/assets/sounds/click.wav'),
+  correct: require('@/assets/sounds/correct.wav'),
+  incorrect: require('@/assets/sounds/incorrect.wav'),
+  next: require('@/assets/sounds/next.wav'),
+};
+
+// Cache for loaded sounds
+let soundCache: { [key: string]: Sound } = {};
+
 /**
  * Play audio file or text-to-speech
  * @param audioPath - Path to audio file (e.g., 'words/hello.wav')
@@ -69,49 +80,48 @@ export const stopAudio = async (): Promise<void> => {
 };
 
 /**
- * Play success sound effect
+ * Play a sound effect by key
  */
-export const playSuccessSound = async (): Promise<void> => {
+const playSoundEffect = async (key: keyof typeof SOUND_EFFECTS, volume: number = 0.6): Promise<void> => {
   try {
+    // Unload cached sound if exists
+    if (soundCache[key]) {
+      try { await soundCache[key].unloadAsync(); } catch {}
+    }
     const { sound } = await Audio.Sound.createAsync(
-      // You can add a success sound file here
-      // require('../../assets/sounds/success.mp3'),
-      { uri: 'success' },
-      { shouldPlay: true, volume: 0.5 }
+      SOUND_EFFECTS[key],
+      { shouldPlay: true, volume }
     );
-    
-    // Auto-unload after playing
+    soundCache[key] = sound;
     sound.setOnPlaybackStatusUpdate((status) => {
       if (status.isLoaded && status.didJustFinish) {
-        sound.unloadAsync();
+        sound.unloadAsync().catch(() => {});
+        delete soundCache[key];
       }
     });
   } catch (error) {
-    console.log('[Audio] Success sound not available');
+    console.log(`[Audio] ${key} sound not available`);
   }
 };
 
-/**
- * Play error sound effect
- */
+/** Play button click sound */
+export const playClickSound = async (): Promise<void> => {
+  await playSoundEffect('click', 0.5);
+};
+
+/** Play success/correct sound */
+export const playSuccessSound = async (): Promise<void> => {
+  await playSoundEffect('correct', 0.6);
+};
+
+/** Play error/incorrect sound */
 export const playErrorSound = async (): Promise<void> => {
-  try {
-    const { sound } = await Audio.Sound.createAsync(
-      // You can add an error sound file here
-      // require('../../assets/sounds/error.mp3'),
-      { uri: 'error' },
-      { shouldPlay: true, volume: 0.5 }
-    );
-    
-    // Auto-unload after playing
-    sound.setOnPlaybackStatusUpdate((status) => {
-      if (status.isLoaded && status.didJustFinish) {
-        sound.unloadAsync();
-      }
-    });
-  } catch (error) {
-    console.log('[Audio] Error sound not available');
-  }
+  await playSoundEffect('incorrect', 0.5);
+};
+
+/** Play next button sound */
+export const playNextSound = async (): Promise<void> => {
+  await playSoundEffect('next', 0.5);
 };
 
 /**

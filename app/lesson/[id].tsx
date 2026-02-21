@@ -10,8 +10,9 @@ import { useProgressStore } from '@/store/progressStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { Question, QuestionAnswer } from '@/types';
 import { calculateLessonXP, calculateLevelFromXP } from '@/utils/xp';
-import { triggerSuccess, triggerError } from '@/utils/haptics';
+import { triggerSuccess, triggerError, triggerImpact } from '@/utils/haptics';
 import { useTheme } from '@/utils/theme';
+import { playClickSound, playSuccessSound, playErrorSound, playNextSound } from '@/utils/audio';
 import { LessonCompletionModal } from '@/components/shared/LessonCompletionModal';
 
 // Question Components
@@ -121,6 +122,9 @@ export default function LessonScreen() {
     if (settings.vibrationEnabled) {
       correct ? triggerSuccess() : triggerError();
     }
+    if (settings.soundEnabled) {
+      correct ? playSuccessSound() : playErrorSound();
+    }
 
     // Record answer
     const timeTaken = (Date.now() - startTime) / 1000;
@@ -135,6 +139,7 @@ export default function LessonScreen() {
   };
 
   const handleNext = () => {
+    if (settings.soundEnabled) playNextSound();
     if (currentQuestionIndex < lesson.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer('');
@@ -711,7 +716,7 @@ export default function LessonScreen() {
 
             {/* Check Button - Large */}
             <TouchableOpacity
-              onPress={() => checkAnswer(selectedAnswer)}
+              onPress={() => { if (settings.soundEnabled) playClickSound(); checkAnswer(selectedAnswer); }}
               disabled={!selectedAnswer}
               style={{
                 flex: 1,
