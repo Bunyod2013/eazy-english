@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, Animated, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import Svg, { Path } from 'react-native-svg';
 import { authClient } from '@/lib/auth-client';
-import { LionIcon } from '@/components/icons';
+import { LionIcon, WorldIcon, BookIcon, TrophyIcon, SparkleIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 export default function LoginScreen() {
@@ -12,42 +13,95 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<'google' | 'apple' | null>(null);
 
+  // Animations
+  const logoScale = useRef(new Animated.Value(0)).current;
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const titleTranslateY = useRef(new Animated.Value(20)).current;
+  const subtitleOpacity = useRef(new Animated.Value(0)).current;
+  const cardsOpacity = useRef(new Animated.Value(0)).current;
+  const cardsTranslateY = useRef(new Animated.Value(30)).current;
+  const featuresOpacity = useRef(new Animated.Value(0)).current;
+  const footerOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      // Logo bounces in
+      Animated.spring(logoScale, {
+        toValue: 1,
+        tension: 60,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      // Title fades in
+      Animated.parallel([
+        Animated.timing(titleOpacity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(titleTranslateY, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Subtitle
+      Animated.timing(subtitleOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      // Cards slide up
+      Animated.parallel([
+        Animated.timing(cardsOpacity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.spring(cardsTranslateY, {
+          toValue: 0,
+          tension: 50,
+          friction: 10,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Features + footer
+      Animated.parallel([
+        Animated.timing(featuresOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(footerOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, []);
+
   const handleGoogleAuth = async () => {
     try {
       setIsLoading(true);
       setLoadingProvider('google');
 
-      console.log('[Auth] Starting Google sign in...');
-
-      // The expo client plugin handles the browser flow automatically:
-      // 1. Sends request to server → gets Google auth URL
-      // 2. Opens browser via expo-authorization-proxy
-      // 3. Handles callback and stores cookies
       const result = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/',
       });
 
-      console.log('[Auth] signIn.social result:', JSON.stringify(result));
-
       if (result?.error) {
         const errMsg = typeof result.error === 'string'
           ? result.error
           : result.error?.message || result.error?.code || JSON.stringify(result.error);
-        console.error('[Auth] Server error:', errMsg);
         throw new Error(errMsg);
       }
 
-      // The expo plugin handled the browser flow and stored cookies
-      // Check if we now have a valid session
       const session = await authClient.getSession();
-      console.log('[Auth] Session after sign in:', JSON.stringify(session?.data ? { user: session.data.user?.email } : null));
 
       if (session?.data) {
-        console.log('[Auth] Auth successful, navigating...');
         router.replace('/');
-      } else {
-        console.log('[Auth] No session after sign in (user may have cancelled)');
       }
     } catch (error: any) {
       console.error('[Auth] Error:', error?.message || error);
@@ -62,12 +116,11 @@ export default function LoginScreen() {
     try {
       setIsLoading(true);
       setLoadingProvider('apple');
-      
-      // TODO: Implement Apple Sign In
+
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       Alert.alert('Coming Soon', 'Apple Sign In tez orada qo\'shiladi');
-      
+
     } catch (error) {
       console.error('Apple sign in error:', error);
       Alert.alert('Xatolik', 'Apple orqali kirishda xatolik yuz berdi');
@@ -81,253 +134,293 @@ export default function LoginScreen() {
     router.replace('/onboarding/welcome');
   };
 
+  const features = [
+    { icon: <BookIcon size={18} color={colors.green.primary} />, text: 'Progress saqlanadi' },
+    { icon: <WorldIcon size={18} color={colors.blue.primary} />, text: 'Barcha qurilmalarda sync' },
+    { icon: <TrophyIcon size={18} color="#ffc800" />, text: 'Leaderboard & yutuqlar' },
+  ];
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.secondary }}>
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, padding: 20, paddingTop: 60, paddingBottom: 40 }}
-      >
-        {/* Hero Section - Apple Minimal Style */}
-        <View style={{ alignItems: 'center', marginBottom: 48 }}>
-          {/* Mascot - Apple Style Float */}
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.bg.primary : '#f8f9fb' }}>
+      <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 24 }}>
+
+        {/* Logo Section */}
+        <Animated.View style={{
+          alignItems: 'center',
+          marginBottom: 40,
+          transform: [{ scale: logoScale }],
+        }}>
+          {/* Logo Container with Glow */}
           <View style={{
-            width: 120,
-            height: 120,
+            width: 100,
+            height: 100,
+            borderRadius: 32,
             backgroundColor: colors.green.primary,
-            borderRadius: 40,
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: 24,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 12 },
-            shadowOpacity: 0.15,
-            shadowRadius: 24,
-            elevation: 8,
+            marginBottom: 20,
+            shadowColor: colors.green.primary,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.35,
+            shadowRadius: 20,
+            elevation: 12,
           }}>
-            <LionIcon size={70} color="#ffffff" />
+            <LionIcon size={56} color="#ffffff" />
           </View>
-          
-          <Text style={{ 
-            fontSize: 34, 
-            fontWeight: '700',
-            color: colors.text.primary,
-            textAlign: 'center',
-            marginBottom: 6,
-            letterSpacing: -0.5,
-          }}>
-            EazyEnglish
-          </Text>
-          <Text style={{ 
-            fontSize: 17, 
-            color: colors.text.secondary, 
-            textAlign: 'center',
-            fontWeight: '400',
-            letterSpacing: -0.2,
-          }}>
-            Learn English. Have fun.
-          </Text>
-        </View>
 
-        {/* Apple Bento Grid - Auth Cards */}
-        <View style={{ gap: 12, marginBottom: 24 }}>
-          {/* Row 1: Google Sign In - Full Width, Large */}
+          <Animated.View style={{
+            opacity: titleOpacity,
+            transform: [{ translateY: titleTranslateY }],
+            alignItems: 'center',
+          }}>
+            <Text style={{
+              fontSize: 32,
+              fontWeight: '800',
+              color: colors.text.primary,
+              letterSpacing: -1,
+              marginBottom: 6,
+            }}>
+              EazyEnglish
+            </Text>
+          </Animated.View>
+
+          <Animated.View style={{ opacity: subtitleOpacity }}>
+            <Text style={{
+              fontSize: 16,
+              color: colors.text.secondary,
+              fontWeight: '500',
+              letterSpacing: -0.2,
+            }}>
+              Ingliz tilini o'yin orqali o'rganing
+            </Text>
+          </Animated.View>
+        </Animated.View>
+
+        {/* Auth Buttons */}
+        <Animated.View style={{
+          gap: 12,
+          marginBottom: 32,
+          opacity: cardsOpacity,
+          transform: [{ translateY: cardsTranslateY }],
+        }}>
+          {/* Google Sign In */}
           <TouchableOpacity
             onPress={handleGoogleAuth}
             disabled={isLoading}
-            activeOpacity={0.7}
+            activeOpacity={0.8}
             style={{
-              backgroundColor: '#fff',
-              borderRadius: 28,
-              padding: 24,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.08,
-              shadowRadius: 12,
-              elevation: 4,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
+              borderRadius: 16,
+              paddingVertical: 16,
+              paddingHorizontal: 24,
               borderWidth: 1,
-              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+              borderColor: isDark ? colors.border.primary : '#e8eaed',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: isDark ? 0.3 : 0.06,
+              shadowRadius: 8,
+              elevation: 3,
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {loadingProvider === 'google' ? (
-                <ActivityIndicator color="#4285F4" size="small" style={{ marginRight: 16 }} />
-              ) : (
+            {loadingProvider === 'google' ? (
+              <ActivityIndicator color={colors.text.primary} size="small" />
+            ) : (
+              <>
+                {/* Google "G" Icon */}
                 <View style={{
-                  width: 48,
-                  height: 48,
-                  backgroundColor: '#4285F4',
-                  borderRadius: 14,
+                  width: 24,
+                  height: 24,
+                  marginRight: 12,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginRight: 16,
                 }}>
-                  <Text style={{ fontSize: 24, color: '#fff', fontWeight: '600' }}>G</Text>
+                  <GoogleIcon />
                 </View>
-              )}
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 19, fontWeight: '600', color: '#000', marginBottom: 3, letterSpacing: -0.3 }}>
-                  Gmail bilan kirish
+                <Text style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: colors.text.primary,
+                  letterSpacing: -0.2,
+                }}>
+                  Google bilan davom etish
                 </Text>
-                <Text style={{ fontSize: 14, color: '#8e8e93', fontWeight: '400' }}>
-                  Google account orqali
-                </Text>
-              </View>
-              <Text style={{ fontSize: 20, color: '#c7c7cc' }}>›</Text>
-            </View>
+              </>
+            )}
           </TouchableOpacity>
 
-          {/* Row 2: Apple + Guest - 2 Column Bento */}
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            {/* Apple Sign In - Left Card */}
-            <TouchableOpacity
-              onPress={handleAppleAuth}
-              disabled={isLoading}
-              activeOpacity={0.7}
-              style={{
-                flex: 1,
-                backgroundColor: '#000',
-                borderRadius: 28,
-                padding: 20,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 12,
-                elevation: 4,
-                minHeight: 140,
-                justifyContent: 'space-between',
-              }}
-            >
-              {loadingProvider === 'apple' ? (
-                <ActivityIndicator color="#ffffff" size="small" />
-              ) : (
-                <>
-                  <View style={{
-                    width: 40,
-                    height: 40,
-                    backgroundColor: '#1c1c1e',
-                    borderRadius: 12,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    <Text style={{ fontSize: 22 }}>🍎</Text>
-                  </View>
-                  <View style={{ marginTop: 12 }}>
-                    <Text style={{ fontSize: 17, fontWeight: '600', color: '#fff', marginBottom: 3, letterSpacing: -0.3 }}>
-                      Apple ID
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#8e8e93', fontWeight: '400' }}>
-                      Coming soon
-                    </Text>
-                  </View>
-                </>
-              )}
-            </TouchableOpacity>
+          {/* Apple Sign In */}
+          <TouchableOpacity
+            onPress={handleAppleAuth}
+            disabled={isLoading}
+            activeOpacity={0.8}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: isDark ? '#ffffff' : '#000000',
+              borderRadius: 16,
+              paddingVertical: 16,
+              paddingHorizontal: 24,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 3,
+            }}
+          >
+            {loadingProvider === 'apple' ? (
+              <ActivityIndicator color={isDark ? '#000' : '#fff'} size="small" />
+            ) : (
+              <>
+                <AppleIcon color={isDark ? '#000000' : '#ffffff'} />
+                <Text style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: isDark ? '#000000' : '#ffffff',
+                  letterSpacing: -0.2,
+                  marginLeft: 10,
+                }}>
+                  Apple bilan davom etish
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
 
-            {/* Guest Mode - Right Card */}
-            <TouchableOpacity
-              onPress={handleGuestMode}
-              disabled={isLoading}
-              activeOpacity={0.7}
-              style={{
-                flex: 1,
-                backgroundColor: colors.stats.lessons.bg,
-                borderRadius: 28,
-                padding: 20,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.06,
-                shadowRadius: 12,
-                elevation: 3,
-                minHeight: 140,
-                justifyContent: 'space-between',
-                borderWidth: 1,
-                borderColor: colors.stats.lessons.border,
-              }}
-            >
+          {/* Divider */}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginVertical: 4,
+          }}>
+            <View style={{
+              flex: 1,
+              height: 1,
+              backgroundColor: isDark ? colors.border.primary : '#e8eaed',
+            }} />
+            <Text style={{
+              marginHorizontal: 16,
+              fontSize: 13,
+              color: colors.text.tertiary,
+              fontWeight: '500',
+            }}>
+              yoki
+            </Text>
+            <View style={{
+              flex: 1,
+              height: 1,
+              backgroundColor: isDark ? colors.border.primary : '#e8eaed',
+            }} />
+          </View>
+
+          {/* Guest Mode */}
+          <TouchableOpacity
+            onPress={handleGuestMode}
+            disabled={isLoading}
+            activeOpacity={0.8}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'transparent',
+              borderRadius: 16,
+              paddingVertical: 16,
+              paddingHorizontal: 24,
+              borderWidth: 1.5,
+              borderColor: isDark ? colors.border.primary : '#d1d5db',
+            }}
+          >
+            <SparkleIcon size={18} color={colors.text.secondary} />
+            <Text style={{
+              fontSize: 16,
+              fontWeight: '600',
+              color: colors.text.secondary,
+              letterSpacing: -0.2,
+              marginLeft: 10,
+            }}>
+              Ro'yxatdan o'tmasdan sinash
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Features */}
+        <Animated.View style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          gap: 24,
+          marginBottom: 32,
+          opacity: featuresOpacity,
+        }}>
+          {features.map((feature, index) => (
+            <View key={index} style={{ alignItems: 'center', gap: 6, maxWidth: 90 }}>
               <View style={{
                 width: 40,
                 height: 40,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
                 borderRadius: 12,
+                backgroundColor: isDark ? colors.bg.elevated : '#f0f2f5',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <Text style={{ fontSize: 22 }}>👋</Text>
+                {feature.icon}
               </View>
-              <View style={{ marginTop: 12 }}>
-                <Text style={{ fontSize: 17, fontWeight: '600', color: colors.text.primary, marginBottom: 3, letterSpacing: -0.3 }}>
-                  Mehmon
-                </Text>
-                <Text style={{ fontSize: 13, color: colors.text.secondary, fontWeight: '400' }}>
-                  Test rejim
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Info Bento Card - Apple Style */}
-        <View style={{
-          marginTop: 20,
-          padding: 24,
-          backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f5f5f7',
-          borderRadius: 28,
-          borderWidth: 1,
-          borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-        }}>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-            <View style={{
-              width: 36,
-              height: 36,
-              backgroundColor: colors.stats.xp.bg,
-              borderRadius: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 14,
-              borderWidth: 1,
-              borderColor: colors.stats.xp.border,
-            }}>
-              <Text style={{ fontSize: 18 }}>✨</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text.primary, marginBottom: 8, letterSpacing: -0.2 }}>
-                Nega ro'yxatdan o'tish kerak?
+              <Text style={{
+                fontSize: 11,
+                fontWeight: '500',
+                color: colors.text.tertiary,
+                textAlign: 'center',
+                lineHeight: 14,
+              }}>
+                {feature.text}
               </Text>
-              <View style={{ gap: 6 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: colors.green.primary, marginRight: 8 }} />
-                  <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
-                    Progress'ni saqlash
-                  </Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: colors.green.primary, marginRight: 8 }} />
-                  <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
-                    Barcha qurilmalarda sync
-                  </Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: colors.green.primary, marginRight: 8 }} />
-                  <Text style={{ fontSize: 14, color: colors.text.secondary, flex: 1, lineHeight: 20 }}>
-                    Yutuqlar va leaderboard
-                  </Text>
-                </View>
-              </View>
             </View>
-          </View>
-        </View>
+          ))}
+        </Animated.View>
 
-        {/* Footer - Apple Style Legal */}
-        <View style={{ marginTop: 32, paddingHorizontal: 20 }}>
-          <Text style={{ fontSize: 11, color: colors.text.tertiary, textAlign: 'center', lineHeight: 16, letterSpacing: -0.1 }}>
-            Davom etish orqali siz{' '}
-            <Text style={{ fontWeight: '500' }}>Foydalanish shartlari</Text>
+        {/* Footer */}
+        <Animated.View style={{ opacity: footerOpacity, paddingHorizontal: 16 }}>
+          <Text style={{
+            fontSize: 11,
+            color: colors.text.tertiary,
+            textAlign: 'center',
+            lineHeight: 16,
+            letterSpacing: -0.1,
+          }}>
+            Davom etish orqali{' '}
+            <Text style={{ color: colors.text.secondary, fontWeight: '500' }}>
+              Foydalanish shartlari
+            </Text>
             {' '}va{' '}
-            <Text style={{ fontWeight: '500' }}>Maxfiylik siyosati</Text>
+            <Text style={{ color: colors.text.secondary, fontWeight: '500' }}>
+              Maxfiylik siyosati
+            </Text>
             ga rozilik bildirasiz
           </Text>
-        </View>
-      </ScrollView>
+        </Animated.View>
+      </View>
     </SafeAreaView>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 48 48">
+      <Path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <Path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <Path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <Path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+    </Svg>
+  );
+}
+
+function AppleIcon({ color = '#000' }: { color?: string }) {
+  return (
+    <Svg width={18} height={20} viewBox="0 0 17 20" fill="none">
+      <Path
+        d="M14.94 10.57c-.02-2.27 1.86-3.37 1.94-3.42-1.06-1.54-2.7-1.76-3.28-1.78-1.39-.14-2.73.82-3.44.82-.72 0-1.82-.81-3-.78-1.54.02-2.96.9-3.76 2.27-1.61 2.79-.41 6.92 1.15 9.19.77 1.11 1.68 2.36 2.88 2.31 1.16-.05 1.6-.74 3-.74 1.39 0 1.79.74 3 .72 1.25-.02 2.03-1.13 2.78-2.24.88-1.28 1.24-2.52 1.26-2.58-.03-.01-2.42-.93-2.44-3.68l-.09-.09zM12.62 3.57C13.26 2.8 13.7 1.74 13.57.66c-.91.04-2.03.61-2.68 1.37-.58.67-1.1 1.76-.96 2.8 1.02.08 2.06-.51 2.69-1.26z"
+        fill={color}
+      />
+    </Svg>
   );
 }
