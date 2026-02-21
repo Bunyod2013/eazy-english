@@ -88,7 +88,7 @@ export const VocabularyQuestion: React.FC<VocabularyQuestionProps> = ({
   showFeedback,
   isCorrect,
 }) => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const [isPlaying, setIsPlaying] = useState(false);
 
   React.useEffect(() => {
@@ -121,19 +121,67 @@ export const VocabularyQuestion: React.FC<VocabularyQuestionProps> = ({
   return (
     <View style={{
       backgroundColor: colors.bg.card,
-      borderRadius: 20,
+      borderRadius: 24,
       padding: 24,
       alignItems: 'center',
-      borderWidth: 1.5,
+      borderWidth: 2,
       borderColor: colors.border.primary,
+      borderBottomWidth: 5,
+      borderBottomColor: isDark ? 'rgba(255,255,255,0.15)' : '#e0e0e0',
     }}>
-      {/* Icon */}
-      <IconComponent iconName={question.image} size={64} color="#FFA500" />
+      {/* Icon in circle */}
+      <View style={{
+        width: 100, height: 100, borderRadius: 50,
+        backgroundColor: '#FFF4E6',
+        alignItems: 'center', justifyContent: 'center',
+        borderWidth: 4, borderColor: '#FFE0B2',
+        shadowColor: '#FFA500',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25, shadowRadius: 10,
+        elevation: 6,
+      }}>
+        <IconComponent iconName={question.image} size={60} color="#FFA500" />
+      </View>
+
+      {/* Audio Buttons - right below icon */}
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, marginBottom: 18 }}>
+        <TouchableOpacity
+          onPress={() => handlePlayAudio(false)}
+          disabled={isPlaying}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 6,
+            paddingHorizontal: 16, paddingVertical: 10,
+            backgroundColor: isPlaying ? colors.green.dark : colors.green.primary,
+            borderRadius: 22,
+            borderBottomWidth: 3,
+            borderBottomColor: colors.green.dark,
+          }}
+        >
+          <SoundIcon size={20} color="#ffffff" />
+          <Text style={{ color: '#ffffff', fontWeight: '800', fontSize: 13 }}>Oddiy</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => handlePlayAudio(true)}
+          disabled={isPlaying}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 6,
+            paddingHorizontal: 16, paddingVertical: 10,
+            backgroundColor: isPlaying ? '#FFA500' : '#FFB84D',
+            borderRadius: 22,
+            borderBottomWidth: 3,
+            borderBottomColor: '#FF8C00',
+          }}
+        >
+          <TurtleIcon size={20} color="#ffffff" />
+          <Text style={{ color: '#ffffff', fontWeight: '800', fontSize: 13 }}>Sekin</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Word */}
       <Text style={{
-        fontSize: 36, fontWeight: 'bold', color: colors.text.primary,
-        marginTop: 16, marginBottom: 8, letterSpacing: 0.5,
+        fontSize: 38, fontWeight: '900', color: colors.text.primary,
+        marginBottom: 6, letterSpacing: 0.5,
       }}>
         {question.word || question.prompt}
       </Text>
@@ -148,51 +196,29 @@ export const VocabularyQuestion: React.FC<VocabularyQuestionProps> = ({
         </Text>
       )}
 
-      {/* Translation */}
+      {/* Translation in green box */}
       {question.translation && (
-        <Text style={{
-          fontSize: 22, fontWeight: '700', color: '#2E7D32',
-          marginBottom: 12,
+        <View style={{
+          backgroundColor: '#E8F5E9',
+          paddingHorizontal: 24, paddingVertical: 12,
+          borderRadius: 16,
+          borderWidth: 2, borderColor: '#66BB6A',
+          marginTop: 8, marginBottom: 14,
+          minWidth: '70%', alignItems: 'center',
         }}>
-          {question.translation}
-        </Text>
+          <Text style={{
+            fontSize: 22, fontWeight: '800', color: '#2E7D32',
+            textAlign: 'center',
+          }}>
+            {question.translation}
+          </Text>
+        </View>
       )}
-
-      {/* Audio Buttons */}
-      <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
-        <TouchableOpacity
-          onPress={() => handlePlayAudio(false)}
-          disabled={isPlaying}
-          style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6,
-            paddingHorizontal: 14, paddingVertical: 10,
-            backgroundColor: isPlaying ? colors.green.dark : colors.green.primary,
-            borderRadius: 20,
-          }}
-        >
-          <SoundIcon size={20} color="#ffffff" />
-          <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 13 }}>Oddiy</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => handlePlayAudio(true)}
-          disabled={isPlaying}
-          style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6,
-            paddingHorizontal: 14, paddingVertical: 10,
-            backgroundColor: isPlaying ? '#FFA500' : '#FFB84D',
-            borderRadius: 20,
-          }}
-        >
-          <TurtleIcon size={20} color="#ffffff" />
-          <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 13 }}>Sekin</Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Explanation */}
       <Text style={{
-        fontSize: 14, color: colors.text.secondary,
-        textAlign: 'center', lineHeight: 20,
+        fontSize: 13, color: colors.text.secondary,
+        textAlign: 'center', lineHeight: 19,
       }}>
         {question.promptUz || prompt}
       </Text>
