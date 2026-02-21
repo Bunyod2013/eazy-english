@@ -122,12 +122,15 @@ export const VocabularyQuestion: React.FC<VocabularyQuestionProps> = ({
     <View style={{
       backgroundColor: colors.bg.card,
       borderRadius: 24,
-      padding: 24,
+      padding: 28,
+      paddingVertical: 32,
       alignItems: 'center',
       borderWidth: 2,
       borderColor: colors.border.primary,
       borderBottomWidth: 5,
       borderBottomColor: isDark ? 'rgba(255,255,255,0.15)' : '#e0e0e0',
+      minHeight: 380,
+      justifyContent: 'center',
     }}>
       {/* Icon in circle */}
       <View style={{
