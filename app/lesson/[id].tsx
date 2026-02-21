@@ -645,27 +645,48 @@ export default function LessonScreen() {
             </TouchableOpacity>
           </View>
         ) : currentQuestion.isNewWord ? (
-          /* New Word - just a KEYINGI button, no check needed */
-          <TouchableOpacity
-            onPress={handleNext}
-            style={{
-              backgroundColor: colors.green.primary,
-              borderRadius: 16,
-              padding: 18,
-              alignItems: 'center',
-              borderBottomWidth: 4,
-              borderBottomColor: colors.green.dark,
-              shadowColor: colors.green.primary,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 6,
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ffffff' }}>
-              KEYINGI
-            </Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            {/* Skip Button */}
+            <TouchableOpacity
+              onPress={handleNext}
+              style={{
+                backgroundColor: colors.bg.card,
+                borderRadius: 16,
+                padding: 18,
+                borderWidth: 2,
+                borderColor: colors.border.primary,
+                minWidth: 80,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text.tertiary }}>
+                O'TKAZIB
+              </Text>
+            </TouchableOpacity>
+
+            {/* Next Button for new word */}
+            <TouchableOpacity
+              onPress={handleNext}
+              style={{
+                flex: 1,
+                backgroundColor: colors.green.primary,
+                borderRadius: 16,
+                padding: 18,
+                alignItems: 'center',
+                borderBottomWidth: 4,
+                borderBottomColor: colors.green.dark,
+                shadowColor: colors.green.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 6,
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ffffff' }}>
+                KEYINGI
+              </Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <View style={{ flexDirection: 'row', gap: 12 }}>
             {/* Skip Button */}
