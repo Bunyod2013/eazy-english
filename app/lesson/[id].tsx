@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated, Image } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CheckIcon, XIcon, LionIcon, SoundIcon, LightBulbIcon, CloseIcon, TargetIcon, StarIcon } from '@/components/icons';
+import { CheckIcon, XIcon, SoundIcon, LightBulbIcon, CloseIcon, TargetIcon, StarIcon } from '@/components/icons';
 import Svg, { Path } from 'react-native-svg';
 import { useLessonStore } from '@/store/lessonStore';
 import { useUserStore } from '@/store/userStore';
@@ -28,6 +28,14 @@ import { MatchingQuestion } from '@/features/lessons/MatchingQuestion';
 import { TrueFalseQuestion } from '@/features/lessons/TrueFalseQuestion';
 import { ConversationQuestion } from '@/features/lessons/ConversationQuestion';
 import { FillBlankChoiceQuestion } from '@/features/lessons/FillBlankChoiceQuestion';
+
+const CHARACTERS = [
+  require('@/assets/characters/character5.png'), // Jake
+  require('@/assets/characters/character1.png'), // Izzy
+  require('@/assets/characters/character4.png'), // Cubby
+  require('@/assets/characters/character5.png'), // Jake
+  require('@/assets/characters/character3.png'), // Hook
+];
 
 export default function LessonScreen() {
   const router = useRouter();
@@ -98,6 +106,7 @@ export default function LessonScreen() {
 
   const currentQuestion = lesson.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex) / lesson.questions.length) * 100;
+  const bubbleText = currentQuestion.word || currentQuestion.audioText || currentQuestion.targetPhrase || null;
 
   const checkAnswer = (answer: string) => {
     const correct = Array.isArray(currentQuestion.correctAnswer)
@@ -434,141 +443,111 @@ export default function LessonScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1, padding: 16 }}
       >
-        {/* Question Header Card - compact for new word, full for others */}
-        <View style={{
-          backgroundColor: colors.stats.lessons.bg,
-          borderRadius: currentQuestion.isNewWord ? 16 : 20,
-          padding: currentQuestion.isNewWord ? 12 : 20,
-          marginBottom: currentQuestion.isNewWord ? 16 : 24,
-          borderWidth: 2,
-          borderColor: colors.stats.lessons.border,
-          shadowColor: colors.stats.lessons.text,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
-          elevation: 4,
-        }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{
-              width: currentQuestion.isNewWord ? 40 : 48,
-              height: currentQuestion.isNewWord ? 40 : 48,
-              backgroundColor: colors.stats.lessons.text,
-              borderRadius: currentQuestion.isNewWord ? 20 : 24,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 12,
-            }}>
-              <LionIcon size={currentQuestion.isNewWord ? 24 : 32} color="#ffffff" />
-            </View>
-            <View style={{ flex: 1 }}>
-              {/* NEW WORD Badge */}
-              {currentQuestion.isNewWord ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <View style={{
-                    backgroundColor: colors.stats.xp.bg,
-                    paddingHorizontal: 8,
-                    paddingVertical: 3,
-                    borderRadius: 6,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 4,
-                    borderWidth: 1,
-                    borderColor: colors.stats.xp.border,
-                  }}>
-                    <TargetIcon size={12} color={colors.stats.xp.text} />
-                    <Text style={{
-                      fontSize: 9,
-                      fontWeight: '800',
-                      color: colors.stats.xp.text,
-                      textTransform: 'uppercase',
-                      letterSpacing: 0.5,
-                    }}>
-                      YANGI SO'Z
-                    </Text>
-                  </View>
-                  <Text style={{ fontSize: 11, color: colors.text.tertiary, fontWeight: '600' }}>
-                    {currentQuestion.type.toUpperCase()}
-                  </Text>
-                </View>
-              ) : (
-                <>
-                  <Text style={{ fontSize: 12, color: colors.text.tertiary, fontWeight: '600' }}>
-                    {currentQuestion.type.toUpperCase()}
-                  </Text>
-                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.text.primary, marginTop: 2 }}>
-                    {lesson.titleUz}
-                  </Text>
-                </>
-              )}
-            </View>
-
-            {/* Sound/Help Buttons */}
-            <View style={{ flexDirection: 'row', gap: 6 }}>
-              <TouchableOpacity
-                style={{
-                  width: currentQuestion.isNewWord ? 32 : 36,
-                  height: currentQuestion.isNewWord ? 32 : 36,
-                  borderRadius: currentQuestion.isNewWord ? 16 : 18,
-                  backgroundColor: colors.bg.card,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: colors.border.primary,
-                }}
-              >
-                <SoundIcon size={currentQuestion.isNewWord ? 18 : 20} />
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                onPress={() => setShowHint(!showHint)}
-                style={{
-                  width: currentQuestion.isNewWord ? 32 : 36,
-                  height: currentQuestion.isNewWord ? 32 : 36,
-                  borderRadius: currentQuestion.isNewWord ? 16 : 18,
-                  backgroundColor: showHint ? colors.stats.xp.bg : colors.bg.card,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: showHint ? colors.stats.xp.border : colors.border.primary,
-                }}
-              >
-                <LightBulbIcon size={currentQuestion.isNewWord ? 18 : 20} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Question Text - only for non-new-word (word & translation not shown in new word header) */}
-          {!currentQuestion.isNewWord && (
-          <Text style={{ 
-            fontSize: 24, 
-            fontWeight: 'bold', 
+        {/* Duolingo-style Character + Speech Bubble */}
+        <View style={{ marginBottom: 16 }}>
+          {/* Prompt instruction */}
+          <Text style={{
+            fontSize: 22,
+            fontWeight: '800',
             color: colors.text.primary,
-            lineHeight: 32,
-            marginTop: 12,
-            marginBottom: 8,
+            marginBottom: currentQuestion.isNewWord ? 4 : 12,
+            lineHeight: 28,
           }}>
             {settings.explanationLanguage === 'uz' ? currentQuestion.promptUz : currentQuestion.prompt}
           </Text>
+
+          {/* NEW WORD Badge */}
+          {currentQuestion.isNewWord && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{
+                backgroundColor: colors.stats.xp.bg,
+                paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6,
+                flexDirection: 'row', alignItems: 'center', gap: 4,
+                borderWidth: 1, borderColor: colors.stats.xp.border,
+              }}>
+                <TargetIcon size={12} color={colors.stats.xp.text} />
+                <Text style={{
+                  fontSize: 9, fontWeight: '800', color: colors.stats.xp.text,
+                  textTransform: 'uppercase', letterSpacing: 0.5,
+                }}>
+                  YANGI SO'Z
+                </Text>
+              </View>
+            </View>
           )}
+
+          {/* Character + Speech Bubble Row */}
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+            {/* Character */}
+            <Image
+              source={CHARACTERS[currentQuestionIndex % CHARACTERS.length]}
+              style={{ width: 64, height: 76 }}
+              resizeMode="contain"
+            />
+
+            {bubbleText ? (
+              <>
+                {/* Bubble Tail */}
+                <Svg width={12} height={18} viewBox="0 0 12 18" style={{ marginLeft: 2, marginRight: -2, marginBottom: 18 }}>
+                  <Path d="M12 0 Q4 4 2 9 Q4 14 12 18" fill={isDark ? colors.bg.card : '#fff'} />
+                </Svg>
+
+                {/* Speech Bubble */}
+                <View style={{
+                  flex: 1,
+                  backgroundColor: colors.bg.card,
+                  borderRadius: 20,
+                  paddingHorizontal: 14, paddingVertical: 10,
+                  borderWidth: 1.5, borderColor: colors.border.primary,
+                  flexDirection: 'row', alignItems: 'center', gap: 10,
+                  marginBottom: 6,
+                }}>
+                  <TouchableOpacity style={{
+                    width: 34, height: 34, borderRadius: 17,
+                    backgroundColor: isDark ? 'rgba(56,189,248,0.15)' : '#dbeafe',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <SoundIcon size={20} />
+                  </TouchableOpacity>
+                  <Text style={{
+                    fontSize: 20, fontWeight: '700', color: colors.text.primary,
+                    flex: 1,
+                  }}>
+                    {bubbleText}
+                  </Text>
+                </View>
+              </>
+            ) : null}
+
+            {/* Hint Button */}
+            {currentQuestion.explanation && (
+              <TouchableOpacity
+                onPress={() => setShowHint(!showHint)}
+                style={{
+                  width: 34, height: 34, borderRadius: 17,
+                  backgroundColor: showHint ? colors.stats.xp.bg : colors.bg.card,
+                  alignItems: 'center', justifyContent: 'center',
+                  borderWidth: 1, borderColor: showHint ? colors.stats.xp.border : colors.border.primary,
+                  marginLeft: 8, marginBottom: 6,
+                }}
+              >
+                <LightBulbIcon size={18} />
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* Hint Card */}
           {showHint && currentQuestion.explanation && (
             <View style={{
               backgroundColor: colors.stats.xp.bg,
-              borderRadius: 12,
-              padding: 12,
-              marginTop: 12,
-              borderWidth: 1,
-              borderColor: colors.stats.xp.border,
+              borderRadius: 12, padding: 12, marginTop: 8,
+              borderWidth: 1, borderColor: colors.stats.xp.border,
             }}>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                 <LightBulbIcon size={20} color={colors.stats.xp.text} />
-                <Text style={{ 
-                  fontSize: 13, 
-                  color: colors.text.secondary,
-                  marginLeft: 8,
-                  flex: 1,
-                  lineHeight: 18,
+                <Text style={{
+                  fontSize: 13, color: colors.text.secondary,
+                  marginLeft: 8, flex: 1, lineHeight: 18,
                 }}>
                   {settings.explanationLanguage === 'uz' ? currentQuestion.explanationUz : currentQuestion.explanation}
                 </Text>
