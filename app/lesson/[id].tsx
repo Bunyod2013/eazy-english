@@ -106,7 +106,9 @@ export default function LessonScreen() {
 
   const currentQuestion = lesson.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex) / lesson.questions.length) * 100;
-  const bubbleText = currentQuestion.word || currentQuestion.audioText || currentQuestion.targetPhrase || null;
+  const promptText = settings.explanationLanguage === 'uz' ? currentQuestion.promptUz : currentQuestion.prompt;
+  const bubbleWord = currentQuestion.word || currentQuestion.audioText || currentQuestion.targetPhrase || null;
+  const bubbleText = bubbleWord || promptText;
 
   const checkAnswer = (answer: string) => {
     const correct = Array.isArray(currentQuestion.correctAnswer)
@@ -445,16 +447,18 @@ export default function LessonScreen() {
       >
         {/* Duolingo-style Character + Speech Bubble */}
         <View style={{ marginBottom: 16 }}>
-          {/* Prompt instruction */}
-          <Text style={{
-            fontSize: 22,
-            fontWeight: '800',
-            color: colors.text.primary,
-            marginBottom: currentQuestion.isNewWord ? 4 : 12,
-            lineHeight: 28,
-          }}>
-            {settings.explanationLanguage === 'uz' ? currentQuestion.promptUz : currentQuestion.prompt}
-          </Text>
+          {/* Prompt instruction - only when there's a separate word in the bubble */}
+          {bubbleWord && (
+            <Text style={{
+              fontSize: 22,
+              fontWeight: '800',
+              color: colors.text.primary,
+              marginBottom: currentQuestion.isNewWord ? 4 : 12,
+              lineHeight: 28,
+            }}>
+              {promptText}
+            </Text>
+          )}
 
           {/* NEW WORD Badge */}
           {currentQuestion.isNewWord && (
@@ -510,7 +514,7 @@ export default function LessonScreen() {
                     <SoundIcon size={20} />
                   </TouchableOpacity>
                   <Text style={{
-                    fontSize: 20, fontWeight: '700', color: colors.text.primary,
+                    fontSize: 22, fontWeight: '700', color: colors.text.primary,
                     flex: 1,
                   }}>
                     {bubbleText}
