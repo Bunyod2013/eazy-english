@@ -11,41 +11,43 @@ export default function IndexPage() {
   // Reactive session hook - updates when ConvexBetterAuthProvider processes OTT
   const { data: session, isPending: isSessionPending } = authClient.useSession();
 
-  // Detect if OTT is being processed (OAuth callback redirect)
-  const [hasOtt] = useState(() => {
-    if (typeof window !== "undefined") {
-      return new URLSearchParams(window.location.search).has("ott");
-    }
-    return false;
-  });
+  // Detect OTT on client side (useEffect, not useState, because window is
+  // unavailable during SSR and useState initializer won't re-run on hydration)
+  const [hasOtt, setHasOtt] = useState(true); // default true to prevent flash redirect
+  const [ottChecked, setOttChecked] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setHasOtt(params.has("ott"));
+    setOttChecked(true);
+  }, []);
 
   useEffect(() => {
     loadUser();
   }, []);
 
   useEffect(() => {
-    if (isLoading || isSessionPending) return;
+    if (isLoading || isSessionPending || !ottChecked) return;
 
     if (user) {
       router.replace("/home");
     } else if (session) {
       router.replace("/onboarding/purpose");
     } else if (!hasOtt) {
-      // Only redirect to login if NOT processing an OTT token
-      // ConvexBetterAuthProvider will process OTT and update session reactively
       router.replace("/auth/login");
     }
-  }, [user, isLoading, isSessionPending, session, hasOtt, router]);
+    // If hasOtt is true, wait for ConvexBetterAuthProvider to process OTT
+  }, [user, isLoading, isSessionPending, session, hasOtt, ottChecked, router]);
 
   // Fallback timeout: if OTT processing takes too long, redirect to login
   useEffect(() => {
-    if (hasOtt && !session && !isSessionPending) {
+    if (hasOtt && ottChecked && !session && !isSessionPending) {
       const timeout = setTimeout(() => {
         router.replace("/auth/login");
-      }, 8000);
+      }, 10000);
       return () => clearTimeout(timeout);
     }
-  }, [hasOtt, session, isSessionPending, router]);
+  }, [hasOtt, ottChecked, session, isSessionPending, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
