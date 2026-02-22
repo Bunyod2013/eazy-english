@@ -1,7 +1,6 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
-import { expo } from "@better-auth/expo";
 import { components } from "./_generated/api";
 import { query } from "./_generated/server";
 import authConfig from "./auth.config";
@@ -35,8 +34,6 @@ export const createAuth = (ctx: GenericCtx) => {
       },
     },
     plugins: [
-      // The Expo and Convex plugins are required
-      expo(),
       convex({ authConfig }),
     ],
   });
@@ -46,6 +43,6 @@ export const createAuth = (ctx: GenericCtx) => {
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
+    return authComponent.getAuthUser(ctx as any);
   },
 });

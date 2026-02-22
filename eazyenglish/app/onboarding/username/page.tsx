@@ -10,7 +10,7 @@ const AVATARS = ["🦁", "🐻", "🦊", "🐼", "🐸", "🦉", "🐱", "🐶"]
 function UsernameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const language = (searchParams.get("language") as "uz" | "en") || "uz";
+  const language = (searchParams.get("language") || "uz") as string;
   const skillLevel =
     (searchParams.get("skillLevel") as
       | "beginner"
@@ -30,7 +30,7 @@ function UsernameContent() {
     if (!canContinue) return;
     setIsLoading(true);
     try {
-      createUser(username.trim(), language, skillLevel);
+      createUser(username.trim(), language as "uz" | "en", skillLevel);
       initializeProgress(Date.now().toString());
       router.replace("/home");
     } catch (error) {
