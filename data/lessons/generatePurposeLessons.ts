@@ -358,8 +358,8 @@ export function generatePurposeLessons(
       }
     }
 
-    // 6. Conversation (every 7th lesson)
-    if (level % 7 === 0) {
+    // 6. Conversation (every 7th lesson, intermediate+ only)
+    if (level % 7 === 0 && skillLevel !== 'beginner') {
       const convWord = batchWords[0];
       questions.push(conversation(
         [`Do you know what "${convWord.word}" means?`],

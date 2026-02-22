@@ -691,22 +691,6 @@ export function generate500Lessons(): Lesson[] {
       }
     }
 
-    // Every 10th lesson: Conversation
-    if (i % 10 === 0) {
-      const convos = [
-        { d: ['Hello!', 'Hi!'], c: 'How are you?', o: ['How are you?', 'Goodbye!', 'Thank you!'] },
-        { d: ['Good morning!'], c: 'Good morning!', o: ['Good morning!', 'Good night!', 'Goodbye!'] },
-        { d: ['How are you?'], c: 'I am fine, thank you', o: ['I am fine, thank you', 'Goodbye', 'My name is'] },
-        { d: ['What is your name?'], c: 'My name is Ali', o: ['My name is Ali', 'I am fine', 'Thank you'] },
-        { d: ['Nice to meet you!'], c: 'Nice to meet you too!', o: ['Nice to meet you too!', 'Goodbye!', 'I am sorry'] },
-        { d: ['Where are you from?'], c: 'I am from Uzbekistan', o: ['I am from Uzbekistan', 'I am fine', 'My name is'] },
-        { d: ['Do you speak English?'], c: 'Yes, a little', o: ['Yes, a little', 'No, goodbye', 'Thank you'] },
-        { d: ['See you later!'], c: 'Goodbye!', o: ['Goodbye!', 'Hello!', 'Thank you!'] },
-      ];
-      const ci = Math.floor(i / 10) % convos.length;
-      qs.push(conversation(convos[ci].d, convos[ci].c, convos[ci].o));
-    }
-
     // Every 4th lesson: Fill Blank Choice
     if (i % 4 === 0) {
       const fbcs = [
