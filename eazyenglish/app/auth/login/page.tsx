@@ -27,71 +27,15 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Notice */}
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center">
-          <p className="text-sm font-semibold text-amber-800">
-            Hozircha Google va Apple orqali kirish ishlamaydi
-          </p>
-          <p className="text-xs text-amber-600 mt-1">
-            Iltimos, &quot;Ro&apos;yxatdan o&apos;tmasdan sinash&quot; tugmasini bosing
-          </p>
-        </div>
-
-        {/* Auth Cards */}
+        {/* Start Button */}
         <div className="flex flex-col gap-3 mb-6">
-          {/* Google Sign In - disabled */}
-          <div className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 opacity-50">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-[#4285F4] rounded-xl flex items-center justify-center mr-4">
-                <span className="text-2xl text-white font-semibold">G</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-lg font-semibold text-gray-900 tracking-tight">
-                  Gmail bilan kirish
-                </p>
-                <p className="text-sm text-gray-400">
-                  Tez orada ishga tushadi
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Apple Sign In - disabled */}
-          <div className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 opacity-50">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mr-4">
-                <span className="text-2xl text-white font-semibold"></span>
-              </div>
-              <div className="flex-1">
-                <p className="text-lg font-semibold text-gray-900 tracking-tight">
-                  Apple bilan kirish
-                </p>
-                <p className="text-sm text-gray-400">
-                  Tez orada ishga tushadi
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Guest Mode - primary action */}
           <button
             onClick={handleGuestMode}
-            className="w-full bg-[#58cc02] rounded-[1.75rem] p-5 shadow-md shadow-green-300/30 hover:bg-[#4db302] transition-all text-left"
+            className="w-full bg-[#58cc02] rounded-[1.75rem] p-6 shadow-md shadow-green-300/30 hover:bg-[#4db302] active:scale-[0.98] transition-all text-center"
           >
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
-                <span className="text-xl">👋</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-lg font-bold text-white tracking-tight">
-                  Ro&apos;yxatdan o&apos;tmasdan sinash
-                </p>
-                <p className="text-sm text-white/80">
-                  Hoziroq boshlang!
-                </p>
-              </div>
-              <span className="text-xl text-white/60">&rsaquo;</span>
-            </div>
+            <p className="text-xl font-bold text-white tracking-tight">
+              Boshlash
+            </p>
           </button>
         </div>
 
