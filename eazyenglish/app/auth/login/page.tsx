@@ -14,32 +14,15 @@ export default function LoginPage() {
       setIsLoading(true);
       setLoadingProvider("google");
 
-      const result = await authClient.signIn.social({
+      await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: window.location.origin + "/",
       });
-
-      if (result?.error) {
-        const errMsg =
-          typeof result.error === "string"
-            ? result.error
-            : result.error?.message ||
-              result.error?.code ||
-              JSON.stringify(result.error);
-        console.error("[Auth] Server error:", errMsg);
-        throw new Error(errMsg);
-      }
-
-      const session = await authClient.getSession();
-      if (session?.data) {
-        router.replace("/");
-      }
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Unknown error";
       console.error("[Auth] Error:", message);
       alert("Google orqali kirishda xatolik yuz berdi");
-    } finally {
       setIsLoading(false);
       setLoadingProvider(null);
     }
