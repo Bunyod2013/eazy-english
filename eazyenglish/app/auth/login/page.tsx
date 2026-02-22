@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  const handleGoogleAuth = () => {
+    const convexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
+    const callbackURL = encodeURIComponent(window.location.origin + "/");
+    window.location.href = `${convexSiteUrl}/auth/google?callbackURL=${callbackURL}`;
+  };
 
-  const handleSocialAuth = () => {
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  const handleAppleAuth = () => {
     setShowComingSoon(true);
     setTimeout(() => setShowComingSoon(false), 3000);
   };
@@ -50,7 +55,7 @@ export default function LoginPage() {
         <div className="flex flex-col gap-3 mb-6">
           {/* Google Sign In */}
           <button
-            onClick={handleSocialAuth}
+            onClick={handleGoogleAuth}
             className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
           >
             <div className="flex items-center">
@@ -71,7 +76,7 @@ export default function LoginPage() {
 
           {/* Apple Sign In */}
           <button
-            onClick={handleSocialAuth}
+            onClick={handleAppleAuth}
             className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
           >
             <div className="flex items-center">
