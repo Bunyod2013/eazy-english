@@ -1,23 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const handleGoogleAuth = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: window.location.origin + "/",
-    });
-  };
-
-  const [showComingSoon, setShowComingSoon] = useState(false);
-  const handleAppleAuth = () => {
-    setShowComingSoon(true);
-    setTimeout(() => setShowComingSoon(false), 3000);
-  };
 
   const handleGuestMode = () => {
     router.push("/onboarding/purpose");
@@ -37,29 +23,24 @@ export default function LoginPage() {
             EazyEnglish
           </h1>
           <p className="text-lg text-gray-500 text-center">
-            Learn English. Have fun.
+            Ingliz tilini o&apos;yin orqali o&apos;rganing
           </p>
         </div>
 
-        {/* Coming Soon Toast */}
-        {showComingSoon && (
-          <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center animate-[fadeIn_0.2s_ease-out]">
-            <p className="text-sm font-semibold text-amber-800">
-              Tez orada ishga tushadi!
-            </p>
-            <p className="text-xs text-amber-600 mt-1">
-              Hozircha &quot;Ro&apos;yxatdan o&apos;tmasdan sinash&quot; tugmasini bosing
-            </p>
-          </div>
-        )}
+        {/* Notice */}
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center">
+          <p className="text-sm font-semibold text-amber-800">
+            Hozircha Google va Apple orqali kirish ishlamaydi
+          </p>
+          <p className="text-xs text-amber-600 mt-1">
+            Iltimos, &quot;Ro&apos;yxatdan o&apos;tmasdan sinash&quot; tugmasini bosing
+          </p>
+        </div>
 
-        {/* Auth Cards - Bento Grid */}
+        {/* Auth Cards */}
         <div className="flex flex-col gap-3 mb-6">
-          {/* Google Sign In */}
-          <button
-            onClick={handleGoogleAuth}
-            className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
-          >
+          {/* Google Sign In - disabled */}
+          <div className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 opacity-50">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-[#4285F4] rounded-xl flex items-center justify-center mr-4">
                 <span className="text-2xl text-white font-semibold">G</span>
@@ -69,18 +50,14 @@ export default function LoginPage() {
                   Gmail bilan kirish
                 </p>
                 <p className="text-sm text-gray-400">
-                  Google account orqali
+                  Tez orada ishga tushadi
                 </p>
               </div>
-              <span className="text-xl text-gray-300">&rsaquo;</span>
             </div>
-          </button>
+          </div>
 
-          {/* Apple Sign In */}
-          <button
-            onClick={handleAppleAuth}
-            className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
-          >
+          {/* Apple Sign In - disabled */}
+          <div className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 opacity-50">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mr-4">
                 <span className="text-2xl text-white font-semibold"></span>
@@ -90,67 +67,32 @@ export default function LoginPage() {
                   Apple bilan kirish
                 </p>
                 <p className="text-sm text-gray-400">
-                  Apple ID orqali
+                  Tez orada ishga tushadi
                 </p>
-              </div>
-              <span className="text-xl text-gray-300">&rsaquo;</span>
-            </div>
-          </button>
-
-          {/* Guest Mode */}
-          <button
-            onClick={handleGuestMode}
-            className="w-full bg-green-50 rounded-[1.75rem] p-5 border border-green-100 hover:shadow-md transition-all text-left"
-          >
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-white/60 rounded-xl flex items-center justify-center mr-4">
-                <span className="text-xl">👋</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-lg font-semibold text-gray-900 tracking-tight">
-                  Ro&apos;yxatdan o&apos;tmasdan sinash
-                </p>
-                <p className="text-sm text-gray-500">
-                  Mehmon rejimida boshlash
-                </p>
-              </div>
-              <span className="text-xl text-gray-300">&rsaquo;</span>
-            </div>
-          </button>
-        </div>
-
-        {/* Info Card */}
-        <div className="mt-5 p-6 bg-gray-100 rounded-[1.75rem] border border-gray-200/50">
-          <div className="flex items-start">
-            <div className="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center mr-3.5 border border-amber-100 shrink-0">
-              <span className="text-lg">✨</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-gray-900 mb-2 tracking-tight">
-                Nega ro&apos;yxatdan o&apos;tish kerak?
-              </p>
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center">
-                  <div className="w-1 h-1 rounded-full bg-[#58cc02] mr-2 shrink-0" />
-                  <p className="text-sm text-gray-500">
-                    Progress&apos;ni saqlash / Save your progress
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-1 h-1 rounded-full bg-[#58cc02] mr-2 shrink-0" />
-                  <p className="text-sm text-gray-500">
-                    Barcha qurilmalarda sync / Sync across devices
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-1 h-1 rounded-full bg-[#58cc02] mr-2 shrink-0" />
-                  <p className="text-sm text-gray-500">
-                    Yutuqlar va leaderboard / Achievements & leaderboard
-                  </p>
-                </div>
               </div>
             </div>
           </div>
+
+          {/* Guest Mode - primary action */}
+          <button
+            onClick={handleGuestMode}
+            className="w-full bg-[#58cc02] rounded-[1.75rem] p-5 shadow-md shadow-green-300/30 hover:bg-[#4db302] transition-all text-left"
+          >
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                <span className="text-xl">👋</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-lg font-bold text-white tracking-tight">
+                  Ro&apos;yxatdan o&apos;tmasdan sinash
+                </p>
+                <p className="text-sm text-white/80">
+                  Hoziroq boshlang!
+                </p>
+              </div>
+              <span className="text-xl text-white/60">&rsaquo;</span>
+            </div>
+          </button>
         </div>
 
         {/* Footer */}
