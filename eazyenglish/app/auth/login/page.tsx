@@ -2,30 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<"google" | null>(null);
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
-  const handleGoogleAuth = async () => {
-    try {
-      setIsLoading(true);
-      setLoadingProvider("google");
-
-      await authClient.signIn.social({
-        provider: "google",
-        callbackURL: window.location.origin + "/",
-      });
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : "Unknown error";
-      console.error("[Auth] Error:", message);
-      alert("Google orqali kirishda xatolik yuz berdi");
-      setIsLoading(false);
-      setLoadingProvider(null);
-    }
+  const handleSocialAuth = () => {
+    setShowComingSoon(true);
+    setTimeout(() => setShowComingSoon(false), 3000);
   };
 
   const handleGuestMode = () => {
@@ -50,24 +34,29 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {/* Coming Soon Toast */}
+        {showComingSoon && (
+          <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center animate-[fadeIn_0.2s_ease-out]">
+            <p className="text-sm font-semibold text-amber-800">
+              Tez orada ishga tushadi!
+            </p>
+            <p className="text-xs text-amber-600 mt-1">
+              Hozircha &quot;Ro&apos;yxatdan o&apos;tmasdan sinash&quot; tugmasini bosing
+            </p>
+          </div>
+        )}
+
         {/* Auth Cards - Bento Grid */}
         <div className="flex flex-col gap-3 mb-6">
-          {/* Google Sign In - Full Width */}
+          {/* Google Sign In */}
           <button
-            onClick={handleGoogleAuth}
-            disabled={isLoading}
-            className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left disabled:opacity-60"
+            onClick={handleSocialAuth}
+            className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
           >
             <div className="flex items-center">
-              {loadingProvider === "google" ? (
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mr-4">
-                  <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : (
-                <div className="w-12 h-12 bg-[#4285F4] rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl text-white font-semibold">G</span>
-                </div>
-              )}
+              <div className="w-12 h-12 bg-[#4285F4] rounded-xl flex items-center justify-center mr-4">
+                <span className="text-2xl text-white font-semibold">G</span>
+              </div>
               <div className="flex-1">
                 <p className="text-lg font-semibold text-gray-900 tracking-tight">
                   Gmail bilan kirish
@@ -80,11 +69,31 @@ export default function LoginPage() {
             </div>
           </button>
 
+          {/* Apple Sign In */}
+          <button
+            onClick={handleSocialAuth}
+            className="w-full bg-white rounded-[1.75rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left"
+          >
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mr-4">
+                <span className="text-2xl text-white font-semibold"></span>
+              </div>
+              <div className="flex-1">
+                <p className="text-lg font-semibold text-gray-900 tracking-tight">
+                  Apple bilan kirish
+                </p>
+                <p className="text-sm text-gray-400">
+                  Apple ID orqali
+                </p>
+              </div>
+              <span className="text-xl text-gray-300">&rsaquo;</span>
+            </div>
+          </button>
+
           {/* Guest Mode */}
           <button
             onClick={handleGuestMode}
-            disabled={isLoading}
-            className="w-full bg-green-50 rounded-[1.75rem] p-5 border border-green-100 hover:shadow-md transition-all text-left disabled:opacity-60"
+            className="w-full bg-green-50 rounded-[1.75rem] p-5 border border-green-100 hover:shadow-md transition-all text-left"
           >
             <div className="flex items-center">
               <div className="w-10 h-10 bg-white/60 rounded-xl flex items-center justify-center mr-4">
@@ -92,10 +101,10 @@ export default function LoginPage() {
               </div>
               <div className="flex-1">
                 <p className="text-lg font-semibold text-gray-900 tracking-tight">
-                  Mehmon rejimi
+                  Ro&apos;yxatdan o&apos;tmasdan sinash
                 </p>
                 <p className="text-sm text-gray-500">
-                  Ro&apos;yxatdan o&apos;tmasdan sinash / Test without signing up
+                  Mehmon rejimida boshlash
                 </p>
               </div>
               <span className="text-xl text-gray-300">&rsaquo;</span>
