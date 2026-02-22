@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const handleGoogleAuth = () => {
-    const convexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
-    const callbackURL = encodeURIComponent(window.location.origin + "/");
-    window.location.href = `${convexSiteUrl}/auth/google?callbackURL=${callbackURL}`;
+  const handleGoogleAuth = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: window.location.origin + "/",
+    });
   };
 
   const [showComingSoon, setShowComingSoon] = useState(false);

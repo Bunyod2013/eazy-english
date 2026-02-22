@@ -1,5 +1,5 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
-import { convex } from "@convex-dev/better-auth/plugins";
+import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { betterAuth, type BetterAuthOptions } from "better-auth/minimal";
 import { expo } from "@better-auth/expo";
 import { components } from "./_generated/api";
@@ -35,9 +35,11 @@ export const createAuth = (ctx: GenericCtx) => {
       },
     },
     plugins: [
-      // The Expo and Convex plugins are required
       expo(),
       convex({ authConfig }),
+      // Cross-domain plugin: stores OAuth state in DB (not cookies),
+      // uses one-time tokens for session transfer after OAuth callback
+      crossDomain({ siteUrl: process.env.SITE_URL || "https://app.eazy-english.uz" }),
     ],
   });
 };
