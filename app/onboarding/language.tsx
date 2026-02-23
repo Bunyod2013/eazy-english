@@ -2,17 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated, Image, Easing } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FlagUzIcon, FlagEnIcon, FlagRuIcon } from '@/components/icons';
+import { FlagUzIcon, FlagEnIcon } from '@/components/icons';
 import { LightBulbIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
 
 const MUSICIANS = require('@/assets/characters/character2.png');
 
-type Language = 'uz' | 'ru' | 'en';
+type Language = 'uz' | 'en';
 
 const LANGUAGES = [
   { code: 'uz' as Language, name: "O'zbekcha", sub: 'Ona tilida tushuntirish', flag: FlagUzIcon, recommended: true },
-  { code: 'ru' as Language, name: 'Русский', sub: 'Объяснения на русском', flag: FlagRuIcon, recommended: false },
   { code: 'en' as Language, name: 'English', sub: 'For advanced learners', flag: FlagEnIcon, recommended: false },
 ];
 
