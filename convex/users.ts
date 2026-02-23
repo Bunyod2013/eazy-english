@@ -5,6 +5,74 @@ import { mutation, query } from "./_generated/server";
  * User Management Functions
  */
 
+// Register a guest user (no auth required)
+export const registerGuestUser = mutation({
+  args: {
+    guestId: v.string(),
+    username: v.string(),
+    preferredLanguage: v.union(v.literal("uz"), v.literal("en")),
+    skillLevel: v.union(
+      v.literal("beginner"),
+      v.literal("elementary"),
+      v.literal("intermediate"),
+      v.literal("advanced")
+    ),
+    dailyGoal: v.number(),
+    avatar: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Check if this guest already exists
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", `guest_${args.guestId}`))
+      .first();
+
+    if (existing) return { success: true, userId: existing.userId };
+
+    const now = Date.now();
+    const userId = `guest_${args.guestId}`;
+
+    await ctx.db.insert("users", {
+      userId,
+      email: `${userId}@guest.local`,
+      username: args.username,
+      avatar: args.avatar,
+      preferredLanguage: args.preferredLanguage,
+      skillLevel: args.skillLevel,
+      totalXP: 0,
+      currentLevel: 1,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastActiveDate: new Date().toISOString().split("T")[0],
+      dailyGoal: args.dailyGoal,
+      soundEnabled: true,
+      vibrationEnabled: true,
+      notificationsEnabled: true,
+      theme: "auto",
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Initialize progress
+    await ctx.db.insert("userProgress", {
+      userId,
+      completedLessons: [],
+      totalLessonsCompleted: 0,
+      totalXPEarned: 0,
+      xpByCategory: {
+        vocabulary: 0,
+        grammar: 0,
+        listening: 0,
+        speaking: 0,
+        reading: 0,
+      },
+      lastUpdated: now,
+    });
+
+    return { success: true, userId };
+  },
+});
+
 // Get current user profile
 export const getCurrentUser = query({
   args: {},

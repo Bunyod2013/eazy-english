@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Animated, ActivityIndicator, Image, Easing } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { useUserStore } from '@/store/userStore';
 import { useProgressStore } from '@/store/progressStore';
 import { LionIcon, StarIcon, DiamondIcon, TrophyIcon, SparkleIcon, HeartIcon, CatIcon, TurtleIcon, WorldIcon, TargetIcon } from '@/components/icons';
@@ -34,6 +36,7 @@ export default function UsernameScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const { createUser } = useUserStore();
   const { initializeProgress } = useProgressStore();
+  const registerGuestUser = useMutation(api.users.registerGuestUser);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const charScale = useRef(new Animated.Value(0)).current;
   const charBounce = useRef(new Animated.Value(0)).current;
@@ -56,8 +59,25 @@ export default function UsernameScreen() {
     if (!username.trim()) return;
     setIsLoading(true);
     try {
+      const guestId = Date.now().toString();
       await createUser(username.trim(), language, skillLevel, purposes);
-      await initializeProgress(Date.now().toString());
+      await initializeProgress(guestId);
+
+      // Register guest user in Convex DB for admin tracking
+      try {
+        await registerGuestUser({
+          guestId,
+          username: username.trim(),
+          preferredLanguage: language as 'uz' | 'en',
+          skillLevel: skillLevel as 'beginner' | 'elementary' | 'intermediate' | 'advanced',
+          dailyGoal,
+          avatar: selectedAvatar,
+        });
+      } catch (e) {
+        // Don't block user flow if Convex registration fails
+        console.warn('Guest registration to Convex failed:', e);
+      }
+
       router.replace('/(tabs)/home');
     } catch (error) {
       console.error('Error creating user:', error);
