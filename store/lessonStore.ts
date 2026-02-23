@@ -19,7 +19,7 @@ interface LessonState {
   currentSession: LessonSession | null;
   
   // Actions
-  loadLessons: (purposes?: LearningPurpose[], skillLevel?: SkillLevel) => void;
+  loadLessons: (purposes?: LearningPurpose[], skillLevel?: SkillLevel, language?: 'uz' | 'en') => void;
   getLessonById: (id: string) => Lesson | undefined;
   startLesson: (lessonId: string) => void;
   answerQuestion: (answer: QuestionAnswer) => void;
@@ -32,11 +32,11 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   lessons: [],
   currentSession: null,
   
-  loadLessons: (purposes, skillLevel) => {
+  loadLessons: (purposes, skillLevel, language) => {
     let lessonsToUse: Lesson[] = allLessons;
 
     if (LESSON_MODE === 'purpose' && purposes && purposes.length > 0 && skillLevel) {
-      lessonsToUse = generatePurposeLessons(purposes, skillLevel);
+      lessonsToUse = generatePurposeLessons(purposes, skillLevel, language || 'uz');
     } else if (LESSON_MODE === '500plus' || (LESSON_MODE === 'purpose' && (!purposes || purposes.length === 0))) {
       lessonsToUse = LESSONS_500_PLUS; // Fallback
     } else if (LESSON_MODE === 'duolingo') {

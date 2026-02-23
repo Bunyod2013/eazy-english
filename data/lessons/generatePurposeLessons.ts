@@ -34,6 +34,7 @@ const PURPOSE_WORD_MAP: Record<LearningPurpose, PurposeWord[]> = {
 // TAUGHT WORDS TRACKER (per generation)
 // ==========================================
 let taughtWords: Set<string>;
+let isEnglishMode: boolean = false;
 
 function teach(word: string) {
   taughtWords.add(word.toLowerCase());
@@ -83,7 +84,9 @@ function vocab(word: string, translation: string, emoji: string, explanation: st
     audioSlow: `words-slow/${word.toLowerCase().replace(/ /g, '_')}.wav`,
     audioText: word,
     prompt: word,
-    promptUz: `"${word}" - ${translation}. ${explanation}`,
+    promptUz: isEnglishMode
+      ? `"${word}" means "${translation}". ${explanation}`
+      : `"${word}" - ${translation}. ${explanation}`,
     correctAnswer: word,
     pronunciation: '',
     isNewWord: true,
@@ -104,7 +107,7 @@ function matching(pairs: [string, string][]) {
   return {
     type: 'matching',
     prompt: 'Match the pairs',
-    promptUz: 'Juftliklarni toping',
+    promptUz: isEnglishMode ? 'Match the pairs' : 'Juftliklarni toping',
     correctAnswer: 'matched',
     pairs: pairs.map(([en, uz]) => ({ en, uz })),
   };
@@ -125,7 +128,7 @@ function conversation(dialogue: string[], correctResponse: string, options: stri
   return {
     type: 'conversation',
     prompt: 'Choose the best response',
-    promptUz: 'Eng mos javobni tanlang',
+    promptUz: isEnglishMode ? 'Choose the best response' : 'Eng mos javobni tanlang',
     dialogue,
     correctAnswer: correctResponse,
     options,
@@ -154,7 +157,7 @@ function wordBank(promptUz: string, correctAnswer: string, allTaughtWords: strin
 
   return {
     type: 'word_bank',
-    prompt: 'Build this sentence:',
+    prompt: isEnglishMode ? 'Build the Uzbek word:' : 'Build this sentence:',
     promptUz,
     correctAnswer: correctAnswer.toLowerCase(),
     wordBank: shuffled,
@@ -165,8 +168,8 @@ function wordBank(promptUz: string, correctAnswer: string, allTaughtWords: strin
 function speaking(phrase: string, translation: string) {
   return {
     type: 'speaking',
-    prompt: 'Repeat after Falstaff',
-    promptUz: 'Takrorlang',
+    prompt: isEnglishMode ? 'Repeat the Uzbek phrase' : 'Repeat after Falstaff',
+    promptUz: isEnglishMode ? 'Repeat the Uzbek phrase' : 'Takrorlang',
     correctAnswer: phrase,
     targetPhrase: phrase,
     audio: `phrases/${phrase.toLowerCase().replace(/ /g, '_')}.wav`,
@@ -176,15 +179,21 @@ function speaking(phrase: string, translation: string) {
 }
 
 function imageChoice(word: string, translation: string, emoji: string, distractors: PurposeWord[]) {
+  const mappedDistractors = distractors.slice(0, 3).map(d => ({
+    word: isEnglishMode ? d.translation : d.word,
+    translation: isEnglishMode ? d.word : d.translation,
+    emoji: d.emoji,
+  }));
+
   const options = [
     { word, translation, emoji },
-    ...distractors.slice(0, 3).map(d => ({ word: d.word, translation: d.translation, emoji: d.emoji })),
+    ...mappedDistractors,
   ].sort(() => Math.random() - 0.5);
 
   return {
     type: 'image_choice',
     prompt: 'Select the correct image',
-    promptUz: 'To\'g\'ri rasmni tanlang',
+    promptUz: isEnglishMode ? 'Select the correct image' : 'To\'g\'ri rasmni tanlang',
     word,
     translation,
     correctAnswer: translation,
@@ -199,7 +208,7 @@ function listeningDiscrimination(word: string, translation: string, distractorWo
   return {
     type: 'listening_discrimination',
     prompt: 'What did you hear?',
-    promptUz: 'Nima eshitdingiz?',
+    promptUz: isEnglishMode ? 'What did you hear?' : 'Nima eshitdingiz?',
     correctAnswer: word,
     distractorWord,
     audio: `words/${word.toLowerCase().replace(/ /g, '_')}.wav`,
@@ -234,10 +243,12 @@ function getRandomDistractors(currentWord: PurposeWord, allWords: PurposeWord[],
 // ==========================================
 export function generatePurposeLessons(
   purposes: LearningPurpose[],
-  skillLevel: SkillLevel
+  skillLevel: SkillLevel,
+  language: 'uz' | 'en' = 'uz'
 ): Lesson[] {
-  // Reset taught words for this generation
+  // Reset taught words and set language mode
   taughtWords = new Set<string>();
+  isEnglishMode = language === 'en';
 
   const lessons: Lesson[] = [];
 
@@ -292,29 +303,56 @@ export function generatePurposeLessons(
 
     // 1. Vocabulary questions for each new word (3-5)
     for (const pw of batchWords) {
-      questions.push(vocab(pw.word, pw.translation, pw.emoji, pw.explanation));
-      taughtWordsList.push(pw.word.toLowerCase());
+      if (isEnglishMode) {
+        // English speaker learning Uzbek: show Uzbek word, English translation
+        const enExplanation = `A common ${getCategoryTitle(pw.category).toLowerCase()} word`;
+        questions.push(vocab(pw.translation, pw.word, pw.emoji, enExplanation));
+        taughtWordsList.push(pw.translation.toLowerCase());
+      } else {
+        questions.push(vocab(pw.word, pw.translation, pw.emoji, pw.explanation));
+        taughtWordsList.push(pw.word.toLowerCase());
+      }
     }
 
     // 2. Multiple choice questions (1-2)
     const mcWord1 = batchWords[0];
     const distractors1 = getRandomDistractors(mcWord1, wordSequence);
-    questions.push(mc(
-      `"${mcWord1.translation}" inglizcha nima?`,
-      `"${mcWord1.translation}" so'zini inglizcha tanlang`,
-      mcWord1.word,
-      [mcWord1.word, ...distractors1.map(d => d.word)].sort(() => Math.random() - 0.5)
-    ));
+    if (isEnglishMode) {
+      // "What does 'Salom' mean?" → answer: Hello
+      questions.push(mc(
+        `What does "${mcWord1.translation}" mean?`,
+        `What does "${mcWord1.translation}" mean?`,
+        mcWord1.word,
+        [mcWord1.word, ...distractors1.map(d => d.word)].sort(() => Math.random() - 0.5)
+      ));
+    } else {
+      questions.push(mc(
+        `"${mcWord1.translation}" inglizcha nima?`,
+        `"${mcWord1.translation}" so'zini inglizcha tanlang`,
+        mcWord1.word,
+        [mcWord1.word, ...distractors1.map(d => d.word)].sort(() => Math.random() - 0.5)
+      ));
+    }
 
     if (batchWords.length >= 3) {
       const mcWord2 = batchWords[2];
       const distractors2 = getRandomDistractors(mcWord2, wordSequence);
-      questions.push(mc(
-        `"${mcWord2.word}" o'zbekcha nima?`,
-        `"${mcWord2.word}" so'zini o'zbekcha tanlang`,
-        mcWord2.translation,
-        [mcWord2.translation, ...distractors2.map(d => d.translation)].sort(() => Math.random() - 0.5)
-      ));
+      if (isEnglishMode) {
+        // "How do you say 'Hello' in Uzbek?" → answer: Salom
+        questions.push(mc(
+          `How do you say "${mcWord2.word}" in Uzbek?`,
+          `How do you say "${mcWord2.word}" in Uzbek?`,
+          mcWord2.translation,
+          [mcWord2.translation, ...distractors2.map(d => d.translation)].sort(() => Math.random() - 0.5)
+        ));
+      } else {
+        questions.push(mc(
+          `"${mcWord2.word}" o'zbekcha nima?`,
+          `"${mcWord2.word}" so'zini o'zbekcha tanlang`,
+          mcWord2.translation,
+          [mcWord2.translation, ...distractors2.map(d => d.translation)].sort(() => Math.random() - 0.5)
+        ));
+      }
     }
 
     // 3. Matching (every 3rd lesson)
@@ -329,12 +367,21 @@ export function generatePurposeLessons(
     if (level % 4 === 0 && batchWords.length >= 2) {
       const fbWord = batchWords[1];
       const fbDistractors = getRandomDistractors(fbWord, wordSequence, 3);
-      questions.push(fillBlankChoice(
-        `The ___ is important.`,
-        `${fbWord.translation} muhim.`,
-        fbWord.word.toLowerCase(),
-        [fbWord.word.toLowerCase(), ...fbDistractors.map(d => d.word.toLowerCase())].sort(() => Math.random() - 0.5)
-      ));
+      if (isEnglishMode) {
+        questions.push(fillBlankChoice(
+          `The Uzbek word for "${fbWord.word}" is ___.`,
+          `The Uzbek word for "${fbWord.word}" is ___.`,
+          fbWord.translation.toLowerCase(),
+          [fbWord.translation.toLowerCase(), ...fbDistractors.map(d => d.translation.toLowerCase())].sort(() => Math.random() - 0.5)
+        ));
+      } else {
+        questions.push(fillBlankChoice(
+          `The ___ is important.`,
+          `${fbWord.translation} muhim.`,
+          fbWord.word.toLowerCase(),
+          [fbWord.word.toLowerCase(), ...fbDistractors.map(d => d.word.toLowerCase())].sort(() => Math.random() - 0.5)
+        ));
+      }
     }
 
     // 5. True/False (every 5th lesson)
@@ -342,52 +389,95 @@ export function generatePurposeLessons(
       const tfWord = batchWords[0];
       const isTrue = Math.random() > 0.5;
       if (isTrue) {
-        questions.push(trueFalse(
-          `"${tfWord.word}" means "${tfWord.translation}"`,
-          `"${tfWord.word}" - "${tfWord.translation}" degani`,
-          true
-        ));
+        if (isEnglishMode) {
+          questions.push(trueFalse(
+            `"${tfWord.translation}" means "${tfWord.word}"`,
+            `"${tfWord.translation}" means "${tfWord.word}"`,
+            true
+          ));
+        } else {
+          questions.push(trueFalse(
+            `"${tfWord.word}" means "${tfWord.translation}"`,
+            `"${tfWord.word}" - "${tfWord.translation}" degani`,
+            true
+          ));
+        }
       } else {
         const wrongWord = getRandomDistractors(tfWord, wordSequence, 1)[0];
-        const wrongTranslation = wrongWord ? wrongWord.translation : 'noto\'g\'ri';
-        questions.push(trueFalse(
-          `"${tfWord.word}" means "${wrongTranslation}"`,
-          `"${tfWord.word}" - "${wrongTranslation}" degani`,
-          false
-        ));
+        if (isEnglishMode) {
+          const wrongEn = wrongWord ? wrongWord.word : 'incorrect';
+          questions.push(trueFalse(
+            `"${tfWord.translation}" means "${wrongEn}"`,
+            `"${tfWord.translation}" means "${wrongEn}"`,
+            false
+          ));
+        } else {
+          const wrongTranslation = wrongWord ? wrongWord.translation : 'noto\'g\'ri';
+          questions.push(trueFalse(
+            `"${tfWord.word}" means "${wrongTranslation}"`,
+            `"${tfWord.word}" - "${wrongTranslation}" degani`,
+            false
+          ));
+        }
       }
     }
 
     // 6. Conversation (every 7th lesson, intermediate+ only)
     if (level % 7 === 0 && skillLevel !== 'beginner') {
       const convWord = batchWords[0];
-      questions.push(conversation(
-        [`Do you know what "${convWord.word}" means?`],
-        `Yes, it means "${convWord.translation}"`,
-        [
+      if (isEnglishMode) {
+        questions.push(conversation(
+          [`Do you know what "${convWord.translation}" means?`],
+          `Yes, it means "${convWord.word}"`,
+          [
+            `Yes, it means "${convWord.word}"`,
+            `No, I don't know`,
+            `Maybe "${getRandomDistractors(convWord, wordSequence, 1)[0]?.word || 'something'}"`,
+          ]
+        ));
+      } else {
+        questions.push(conversation(
+          [`Do you know what "${convWord.word}" means?`],
           `Yes, it means "${convWord.translation}"`,
-          `No, I don't know`,
-          `Maybe "${getRandomDistractors(convWord, wordSequence, 1)[0]?.translation || 'something'}"`,
-        ]
-      ));
+          [
+            `Yes, it means "${convWord.translation}"`,
+            `No, I don't know`,
+            `Maybe "${getRandomDistractors(convWord, wordSequence, 1)[0]?.translation || 'something'}"`,
+          ]
+        ));
+      }
     }
 
     // 7. Speaking (every 8th lesson)
     if (level % 8 === 0) {
       const spWord = batchWords[0];
-      questions.push(speaking(spWord.word, spWord.translation));
+      if (isEnglishMode) {
+        questions.push(speaking(spWord.translation, spWord.word));
+      } else {
+        questions.push(speaking(spWord.word, spWord.translation));
+      }
     }
 
     // 8. Word bank (when 6+ words taught, every 6th lesson)
     if (level % 6 === 0 && taughtWordsList.length >= 6) {
       const wbWord = batchWords[0];
-      const wb = wordBank(
-        `${wbWord.translation}`,
-        wbWord.word.toLowerCase(),
-        taughtWordsList.slice(-15),
-        `"${wbWord.word}" so'zini toping`
-      );
-      if (wb) questions.push(wb);
+      if (isEnglishMode) {
+        const wb = wordBank(
+          `${wbWord.word}`,
+          wbWord.translation.toLowerCase(),
+          taughtWordsList.slice(-15),
+          `Build the Uzbek word for "${wbWord.word}"`
+        );
+        if (wb) questions.push(wb);
+      } else {
+        const wb = wordBank(
+          `${wbWord.translation}`,
+          wbWord.word.toLowerCase(),
+          taughtWordsList.slice(-15),
+          `"${wbWord.word}" so'zini toping`
+        );
+        if (wb) questions.push(wb);
+      }
     }
 
     // 9. Image choice (every 3rd lesson, offset from matching)
@@ -395,7 +485,11 @@ export function generatePurposeLessons(
       const icWord = batchWords[batchWords.length - 1];
       const icDistractors = getRandomDistractors(icWord, wordSequence, 3);
       if (icDistractors.length >= 3) {
-        questions.push(imageChoice(icWord.word, icWord.translation, icWord.emoji, icDistractors));
+        if (isEnglishMode) {
+          questions.push(imageChoice(icWord.translation, icWord.word, icWord.emoji, icDistractors));
+        } else {
+          questions.push(imageChoice(icWord.word, icWord.translation, icWord.emoji, icDistractors));
+        }
       }
     }
 
@@ -403,21 +497,38 @@ export function generatePurposeLessons(
     if (level % 5 === 2 && batchWords.length >= 2) {
       const ldWord = batchWords[0];
       const ldDistractor = batchWords[1];
-      questions.push(listeningDiscrimination(ldWord.word, ldWord.translation, ldDistractor.word));
+      if (isEnglishMode) {
+        questions.push(listeningDiscrimination(ldWord.translation, ldWord.word, ldDistractor.translation));
+      } else {
+        questions.push(listeningDiscrimination(ldWord.word, ldWord.translation, ldDistractor.word));
+      }
     }
 
     // Determine lesson category and title
     const primaryCategory = batchWords[0].category;
     const categoryTitle = getCategoryTitle(primaryCategory);
-    const wordsPreview = batchWords.slice(0, 3).map(w => w.word).join(', ');
 
-    lessons.push(createLesson(
-      level,
-      `${categoryTitle}: ${wordsPreview}...`,
-      `${getCategoryTitleUz(primaryCategory)}: ${batchWords.slice(0, 3).map(w => w.translation).join(', ')}...`,
-      mapToLessonCategory(primaryCategory),
-      questions
-    ));
+    if (isEnglishMode) {
+      // English mode: show Uzbek words in title (what they're learning)
+      const uzWordsPreview = batchWords.slice(0, 3).map(w => w.translation).join(', ');
+      const enWordsPreview = batchWords.slice(0, 3).map(w => w.word).join(', ');
+      lessons.push(createLesson(
+        level,
+        `${categoryTitle}: ${uzWordsPreview}...`,
+        `${getCategoryTitleUz(primaryCategory)}: ${enWordsPreview}...`,
+        mapToLessonCategory(primaryCategory),
+        questions
+      ));
+    } else {
+      const wordsPreview = batchWords.slice(0, 3).map(w => w.word).join(', ');
+      lessons.push(createLesson(
+        level,
+        `${categoryTitle}: ${wordsPreview}...`,
+        `${getCategoryTitleUz(primaryCategory)}: ${batchWords.slice(0, 3).map(w => w.translation).join(', ')}...`,
+        mapToLessonCategory(primaryCategory),
+        questions
+      ));
+    }
   }
 
   // Add review lessons after every 20 regular lessons
@@ -445,29 +556,56 @@ export function generatePurposeLessons(
     for (let j = 0; j < 3 && j < shuffledReview.length; j++) {
       const w = shuffledReview[j];
       const dist = getRandomDistractors(w, wordSequence);
-      questions.push(mc(
-        `"${w.translation}" inglizcha nima?`,
-        `"${w.translation}" so'zini tanlang`,
-        w.word,
-        [w.word, ...dist.map(d => d.word)].sort(() => Math.random() - 0.5)
-      ));
+      if (isEnglishMode) {
+        questions.push(mc(
+          `What does "${w.translation}" mean?`,
+          `What does "${w.translation}" mean?`,
+          w.word,
+          [w.word, ...dist.map(d => d.word)].sort(() => Math.random() - 0.5)
+        ));
+      } else {
+        questions.push(mc(
+          `"${w.translation}" inglizcha nima?`,
+          `"${w.translation}" so'zini tanlang`,
+          w.word,
+          [w.word, ...dist.map(d => d.word)].sort(() => Math.random() - 0.5)
+        ));
+      }
     }
 
     // True/false review
     const tfReview = shuffledReview[4] || shuffledReview[0];
-    questions.push(trueFalse(
-      `"${tfReview.word}" means "${tfReview.translation}"`,
-      `"${tfReview.word}" - "${tfReview.translation}" degani`,
-      true
-    ));
+    if (isEnglishMode) {
+      questions.push(trueFalse(
+        `"${tfReview.translation}" means "${tfReview.word}"`,
+        `"${tfReview.translation}" means "${tfReview.word}"`,
+        true
+      ));
+    } else {
+      questions.push(trueFalse(
+        `"${tfReview.word}" means "${tfReview.translation}"`,
+        `"${tfReview.word}" - "${tfReview.translation}" degani`,
+        true
+      ));
+    }
 
-    reviewLessons.push(createLesson(
-      reviewLevel,
-      `Review: Lessons ${i - 19}-${i}`,
-      `Takrorlash: ${i - 19}-${i} darslar`,
-      'vocabulary',
-      questions
-    ));
+    if (isEnglishMode) {
+      reviewLessons.push(createLesson(
+        reviewLevel,
+        `Review: Lessons ${i - 19}-${i}`,
+        `Review: Lessons ${i - 19}-${i}`,
+        'vocabulary',
+        questions
+      ));
+    } else {
+      reviewLessons.push(createLesson(
+        reviewLevel,
+        `Review: Lessons ${i - 19}-${i}`,
+        `Takrorlash: ${i - 19}-${i} darslar`,
+        'vocabulary',
+        questions
+      ));
+    }
   }
 
   return [...lessons, ...reviewLessons];
