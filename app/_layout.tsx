@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Platform, Text, View } from 'react-native';
-import { ConvexReactClient } from 'convex/react';
+import { ConvexReactClient, useMutation } from 'convex/react';
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
+import { api } from '@/convex/_generated/api';
 import { authClient } from '@/lib/auth-client';
 import { useUserStore } from '@/store/userStore';
 import { useProgressStore } from '@/store/progressStore';
@@ -13,6 +14,29 @@ import { useLessonStore } from '@/store/lessonStore';
 import { Loader } from '@/components/ui';
 import { useTheme } from '@/utils/theme';
 import '../global.css';
+
+// Syncs existing local guest users to Convex DB
+function GuestSync() {
+  const user = useUserStore((s) => s.user);
+  const registerGuestUser = useMutation(api.users.registerGuestUser);
+  const synced = useRef(false);
+
+  useEffect(() => {
+    if (!user || synced.current) return;
+    synced.current = true;
+
+    registerGuestUser({
+      guestId: user.id,
+      username: user.username,
+      preferredLanguage: user.preferredLanguage,
+      skillLevel: user.skillLevel,
+      dailyGoal: user.dailyGoal || 50,
+      avatar: undefined,
+    }).catch(() => {});
+  }, [user]);
+
+  return null;
+}
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 if (!convexUrl) {
@@ -99,6 +123,7 @@ export default function RootLayout() {
 
   return (
     <ConvexBetterAuthProvider client={convex} authClient={authClient}>
+      <GuestSync />
       <SafeAreaProvider>
         <StatusBar style={isDark ? 'light' : 'dark'} />
         <Stack
