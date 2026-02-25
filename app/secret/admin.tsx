@@ -26,8 +26,9 @@ export default function AdminPage() {
   const stats = useQuery(api.admin.getDetailedStats, isLoggedIn ? {} : "skip");
   const dailyActiveData = useQuery(api.admin.getDailyActiveUsers, isLoggedIn ? {} : "skip");
   const topUsers = useQuery(api.admin.getTopUsers, isLoggedIn ? {} : "skip");
+  const pageAnalytics = useQuery(api.admin.getPageAnalytics, isLoggedIn ? {} : "skip");
 
-  console.log('[Admin] isLoggedIn:', isLoggedIn, 'stats:', stats, 'daily:', dailyActiveData, 'top:', topUsers);
+  console.log('[Admin] isLoggedIn:', isLoggedIn, 'stats:', stats, 'daily:', dailyActiveData, 'top:', topUsers, 'pages:', pageAnalytics);
 
   const handleLogin = () => {
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
@@ -109,7 +110,7 @@ export default function AdminPage() {
     );
   }
 
-  const isLoading = !stats || !dailyActiveData || !topUsers;
+  const isLoading = !stats || !dailyActiveData || !topUsers || !pageAnalytics;
 
   return (
     <ScrollView
@@ -406,7 +407,95 @@ export default function AdminPage() {
             )}
           </View>
 
-          {/* Section 5: Engagement */}
+          {/* Section 5: Page Analytics */}
+          <SectionHeader title="Sahifa tahlili" colors={colors} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+            <StatCard
+              half
+              label="Jami ko'rishlar"
+              value={pageAnalytics.totalPageViews}
+              colors={colors}
+              accent={colors.stats.lessons}
+            />
+            <StatCard
+              half
+              label="Bugungi ko'rishlar"
+              value={pageAnalytics.todayPageViews}
+              colors={colors}
+              accent={colors.stats.accuracy}
+            />
+            <StatCard
+              half
+              label="Jami sessionlar"
+              value={pageAnalytics.totalSessions}
+              colors={colors}
+              accent={colors.stats.xp}
+            />
+          </View>
+
+          {/* Page views by path */}
+          <View style={{
+            backgroundColor: colors.bg.card,
+            borderRadius: 16,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: colors.border.primary,
+          }}>
+            <Text style={{ color: colors.text.primary, fontSize: 16, fontWeight: '700', marginBottom: 16 }}>
+              Sahifalar bo'yicha
+            </Text>
+            {pageAnalytics.pages.length === 0 ? (
+              <Text style={{ color: colors.text.tertiary, fontSize: 14, textAlign: 'center', paddingVertical: 12 }}>
+                Hali ma'lumot yo'q
+              </Text>
+            ) : (
+              pageAnalytics.pages.map((page) => {
+                const maxViews = Math.max(...pageAnalytics.pages.map((p) => p.totalViews), 1);
+                const barWidth = (page.totalViews / maxViews) * 100;
+                return (
+                  <View key={page.path} style={{ marginBottom: 14 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
+                      <Text style={{ color: colors.text.primary, fontSize: 13, fontWeight: '600', flex: 1 }}>
+                        {friendlyPageName(page.path)}
+                      </Text>
+                      <Text style={{ color: colors.text.secondary, fontSize: 12 }}>
+                        {page.totalViews} ko'rish
+                      </Text>
+                    </View>
+                    <View style={{
+                      height: 8,
+                      backgroundColor: colors.border.primary,
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                      marginBottom: 4,
+                    }}>
+                      <View style={{
+                        height: '100%',
+                        width: `${barWidth}%`,
+                        backgroundColor: colors.blue.primary,
+                        borderRadius: 4,
+                      }} />
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                      <Text style={{ color: colors.text.tertiary, fontSize: 11 }}>
+                        {page.uniqueUsers} foydalanuvchi
+                      </Text>
+                      <Text style={{ color: colors.text.tertiary, fontSize: 11 }}>
+                        O'rtacha {formatTime(page.avgDuration)}
+                      </Text>
+                      {page.todayViews > 0 && (
+                        <Text style={{ color: colors.green.primary, fontSize: 11 }}>
+                          Bugun: {page.todayViews}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                );
+              })
+            )}
+          </View>
+
+          {/* Section 6: Engagement */}
           <SectionHeader title="Faollik" colors={colors} />
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
             <StatCard
@@ -546,6 +635,24 @@ function DailyActiveChart({
       </View>
     </View>
   );
+}
+
+function friendlyPageName(path: string): string {
+  const names: Record<string, string> = {
+    '/': 'Bosh sahifa',
+    '/(tabs)/home': 'Asosiy',
+    '/(tabs)/lessons': 'Darslar',
+    '/(tabs)/practice': 'Mashq',
+    '/(tabs)/profile': 'Profil',
+    '/(tabs)/leaderboard': 'Reyting',
+    '/lesson/[id]': 'Dars (batafsil)',
+    '/onboarding': 'Onboarding',
+    '/onboarding/welcome': 'Xush kelibsiz',
+    '/onboarding/skill-level': 'Daraja tanlash',
+    '/onboarding/daily-goal': 'Kunlik maqsad',
+    '/secret/admin': 'Admin panel',
+  };
+  return names[path] || path;
 }
 
 function formatTime(seconds: number): string {

@@ -1,5 +1,69 @@
 import { query } from "./_generated/server";
 
+// Page analytics — aggregated by path
+export const getPageAnalytics = query({
+  args: {},
+  handler: async (ctx) => {
+    const pageViews = await ctx.db.query("pageViews").collect();
+
+    const today = new Date().toISOString().split("T")[0];
+    const todayStart = new Date(today).getTime();
+
+    // Normalize paths: /lesson/anything → /lesson/[id]
+    const normalizePath = (path: string) => {
+      if (path.match(/^\/lesson\/.+/)) return "/lesson/[id]";
+      return path;
+    };
+
+    // Aggregate by normalized path
+    const byPath: Record<
+      string,
+      { totalViews: number; uniqueUsers: Set<string>; totalDuration: number; todayViews: number }
+    > = {};
+
+    const allSessions = new Set<string>();
+    let todayTotal = 0;
+
+    for (const pv of pageViews) {
+      const normalized = normalizePath(pv.path);
+
+      if (!byPath[normalized]) {
+        byPath[normalized] = { totalViews: 0, uniqueUsers: new Set(), totalDuration: 0, todayViews: 0 };
+      }
+
+      const entry = byPath[normalized];
+      entry.totalViews++;
+      entry.uniqueUsers.add(pv.userId);
+      entry.totalDuration += pv.duration;
+
+      if (pv.enteredAt >= todayStart) {
+        entry.todayViews++;
+        todayTotal++;
+      }
+
+      allSessions.add(pv.sessionId);
+    }
+
+    // Convert to serializable array
+    const pages = Object.entries(byPath)
+      .map(([path, data]) => ({
+        path,
+        totalViews: data.totalViews,
+        uniqueUsers: data.uniqueUsers.size,
+        avgDuration: data.totalViews > 0 ? Math.round(data.totalDuration / data.totalViews) : 0,
+        todayViews: data.todayViews,
+      }))
+      .sort((a, b) => b.totalViews - a.totalViews);
+
+    return {
+      totalPageViews: pageViews.length,
+      todayPageViews: todayTotal,
+      totalSessions: allSessions.size,
+      pages,
+    };
+  },
+});
+
 // Admin stats - aggregate counts across all users
 export const getStats = query({
   args: {},

@@ -155,6 +155,18 @@ const schema = defineSchema({
     .index("by_totalXP", ["totalXP"])
     .index("by_weeklyXP", ["weeklyXP"])
     .index("by_monthlyXP", ["monthlyXP"]),
+
+  // Page view tracking
+  pageViews: defineTable({
+    userId: v.string(),
+    path: v.string(),
+    enteredAt: v.number(),
+    duration: v.number(),
+    sessionId: v.string(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_path", ["path"])
+    .index("by_enteredAt", ["enteredAt"]),
 });
 
 export default schema;

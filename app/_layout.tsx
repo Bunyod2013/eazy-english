@@ -13,7 +13,14 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { useLessonStore } from '@/store/lessonStore';
 import { Loader } from '@/components/ui';
 import { useTheme } from '@/utils/theme';
+import { usePageTracking } from '@/hooks/usePageTracking';
 import '../global.css';
+
+// Tracks page views to Convex
+function PageTracker() {
+  usePageTracking();
+  return null;
+}
 
 // Syncs existing local guest users to Convex DB
 function GuestSync() {
@@ -124,6 +131,7 @@ export default function RootLayout() {
   return (
     <ConvexBetterAuthProvider client={convex} authClient={authClient as AuthClient}>
       <GuestSync />
+      <PageTracker />
       <SafeAreaProvider>
         <StatusBar style={isDark ? 'light' : 'dark'} />
         <Stack
