@@ -23,9 +23,9 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const stats = useQuery(api.admin.getDetailedStats);
-  const dailyActiveData = useQuery(api.admin.getDailyActiveUsers);
-  const topUsers = useQuery(api.admin.getTopUsers);
+  const stats = useQuery(api.admin.getDetailedStats, isLoggedIn ? {} : "skip");
+  const dailyActiveData = useQuery(api.admin.getDailyActiveUsers, isLoggedIn ? {} : "skip");
+  const topUsers = useQuery(api.admin.getTopUsers, isLoggedIn ? {} : "skip");
 
   const handleLogin = () => {
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
