@@ -110,7 +110,7 @@ export default function AdminPage() {
     );
   }
 
-  const isLoading = !stats || !dailyActiveData || !topUsers || !pageAnalytics;
+  const isLoading = !stats || !dailyActiveData || !topUsers;
 
   return (
     <ScrollView
@@ -409,91 +409,102 @@ export default function AdminPage() {
 
           {/* Section 5: Page Analytics */}
           <SectionHeader title="Sahifa tahlili" colors={colors} />
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-            <StatCard
-              half
-              label="Jami ko'rishlar"
-              value={pageAnalytics.totalPageViews}
-              colors={colors}
-              accent={colors.stats.lessons}
-            />
-            <StatCard
-              half
-              label="Bugungi ko'rishlar"
-              value={pageAnalytics.todayPageViews}
-              colors={colors}
-              accent={colors.stats.accuracy}
-            />
-            <StatCard
-              half
-              label="Jami sessionlar"
-              value={pageAnalytics.totalSessions}
-              colors={colors}
-              accent={colors.stats.xp}
-            />
-          </View>
-
-          {/* Page views by path */}
-          <View style={{
-            backgroundColor: colors.bg.card,
-            borderRadius: 16,
-            padding: 16,
-            borderWidth: 1,
-            borderColor: colors.border.primary,
-          }}>
-            <Text style={{ color: colors.text.primary, fontSize: 16, fontWeight: '700', marginBottom: 16 }}>
-              Sahifalar bo'yicha
-            </Text>
-            {pageAnalytics.pages.length === 0 ? (
-              <Text style={{ color: colors.text.tertiary, fontSize: 14, textAlign: 'center', paddingVertical: 12 }}>
-                Hali ma'lumot yo'q
+          {!pageAnalytics ? (
+            <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+              <ActivityIndicator color={colors.green.primary} size="small" />
+              <Text style={{ color: colors.text.tertiary, fontSize: 13, marginTop: 8 }}>
+                Sahifa ma'lumotlari yuklanmoqda...
               </Text>
-            ) : (
-              pageAnalytics.pages.map((page) => {
-                const maxViews = Math.max(...pageAnalytics.pages.map((p) => p.totalViews), 1);
-                const barWidth = (page.totalViews / maxViews) * 100;
-                return (
-                  <View key={page.path} style={{ marginBottom: 14 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
-                      <Text style={{ color: colors.text.primary, fontSize: 13, fontWeight: '600', flex: 1 }}>
-                        {friendlyPageName(page.path)}
-                      </Text>
-                      <Text style={{ color: colors.text.secondary, fontSize: 12 }}>
-                        {page.totalViews} ko'rish
-                      </Text>
-                    </View>
-                    <View style={{
-                      height: 8,
-                      backgroundColor: colors.border.primary,
-                      borderRadius: 4,
-                      overflow: 'hidden',
-                      marginBottom: 4,
-                    }}>
-                      <View style={{
-                        height: '100%',
-                        width: `${barWidth}%`,
-                        backgroundColor: colors.blue.primary,
-                        borderRadius: 4,
-                      }} />
-                    </View>
-                    <View style={{ flexDirection: 'row', gap: 12 }}>
-                      <Text style={{ color: colors.text.tertiary, fontSize: 11 }}>
-                        {page.uniqueUsers} foydalanuvchi
-                      </Text>
-                      <Text style={{ color: colors.text.tertiary, fontSize: 11 }}>
-                        O'rtacha {formatTime(page.avgDuration)}
-                      </Text>
-                      {page.todayViews > 0 && (
-                        <Text style={{ color: colors.green.primary, fontSize: 11 }}>
-                          Bugun: {page.todayViews}
-                        </Text>
-                      )}
-                    </View>
-                  </View>
-                );
-              })
-            )}
-          </View>
+            </View>
+          ) : (
+            <>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                <StatCard
+                  half
+                  label="Jami ko'rishlar"
+                  value={pageAnalytics.totalPageViews}
+                  colors={colors}
+                  accent={colors.stats.lessons}
+                />
+                <StatCard
+                  half
+                  label="Bugungi ko'rishlar"
+                  value={pageAnalytics.todayPageViews}
+                  colors={colors}
+                  accent={colors.stats.accuracy}
+                />
+                <StatCard
+                  half
+                  label="Jami sessionlar"
+                  value={pageAnalytics.totalSessions}
+                  colors={colors}
+                  accent={colors.stats.xp}
+                />
+              </View>
+
+              {/* Page views by path */}
+              <View style={{
+                backgroundColor: colors.bg.card,
+                borderRadius: 16,
+                padding: 16,
+                borderWidth: 1,
+                borderColor: colors.border.primary,
+              }}>
+                <Text style={{ color: colors.text.primary, fontSize: 16, fontWeight: '700', marginBottom: 16 }}>
+                  Sahifalar bo'yicha
+                </Text>
+                {pageAnalytics.pages.length === 0 ? (
+                  <Text style={{ color: colors.text.tertiary, fontSize: 14, textAlign: 'center', paddingVertical: 12 }}>
+                    Hali ma'lumot yo'q
+                  </Text>
+                ) : (
+                  pageAnalytics.pages.map((page) => {
+                    const maxViews = Math.max(...pageAnalytics.pages.map((p) => p.totalViews), 1);
+                    const barWidth = (page.totalViews / maxViews) * 100;
+                    return (
+                      <View key={page.path} style={{ marginBottom: 14 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
+                          <Text style={{ color: colors.text.primary, fontSize: 13, fontWeight: '600', flex: 1 }}>
+                            {friendlyPageName(page.path)}
+                          </Text>
+                          <Text style={{ color: colors.text.secondary, fontSize: 12 }}>
+                            {page.totalViews} ko'rish
+                          </Text>
+                        </View>
+                        <View style={{
+                          height: 8,
+                          backgroundColor: colors.border.primary,
+                          borderRadius: 4,
+                          overflow: 'hidden',
+                          marginBottom: 4,
+                        }}>
+                          <View style={{
+                            height: '100%',
+                            width: `${barWidth}%`,
+                            backgroundColor: colors.blue.primary,
+                            borderRadius: 4,
+                          }} />
+                        </View>
+                        <View style={{ flexDirection: 'row', gap: 12 }}>
+                          <Text style={{ color: colors.text.tertiary, fontSize: 11 }}>
+                            {page.uniqueUsers} foydalanuvchi
+                          </Text>
+                          <Text style={{ color: colors.text.tertiary, fontSize: 11 }}>
+                            O'rtacha {formatTime(page.avgDuration)}
+                          </Text>
+                          {page.todayViews > 0 && (
+                            <Text style={{ color: colors.green.primary, fontSize: 11 }}>
+                              Bugun: {page.todayViews}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    );
+                  })
+                )}
+              </View>
+            </>
+          )}
 
           {/* Section 6: Engagement */}
           <SectionHeader title="Faollik" colors={colors} />
