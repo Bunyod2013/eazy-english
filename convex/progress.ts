@@ -21,9 +21,10 @@ export const getUserProgress = query({
   },
 });
 
-// Complete a lesson
+// Complete a lesson (supports both auth and guest users)
 export const completeLesson = mutation({
   args: {
+    guestId: v.optional(v.string()),
     lessonId: v.string(),
     timeTaken: v.number(),
     accuracy: v.number(),
@@ -32,18 +33,39 @@ export const completeLesson = mutation({
     correctAnswers: v.number(),
     incorrectAnswers: v.number(),
     heartsLost: v.number(),
+    category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const userId = await ctx.auth.getUserIdentity().then((id) => id?.subject ?? null);
+    // Try auth first, fall back to guestId
+    const authId = await ctx.auth.getUserIdentity().then((id) => id?.subject ?? null);
+    const userId = authId || (args.guestId ? `guest_${args.guestId}` : null);
     if (!userId) throw new Error("Not authenticated");
 
     // Get progress
-    const progress = await ctx.db
+    let progress = await ctx.db
       .query("userProgress")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .first();
 
-    if (!progress) throw new Error("Progress not found");
+    // Auto-create progress if not found
+    if (!progress) {
+      const progressId = await ctx.db.insert("userProgress", {
+        userId,
+        completedLessons: [],
+        totalLessonsCompleted: 0,
+        totalXPEarned: 0,
+        xpByCategory: {
+          vocabulary: 0,
+          grammar: 0,
+          listening: 0,
+          speaking: 0,
+          reading: 0,
+        },
+        lastUpdated: Date.now(),
+      });
+      progress = await ctx.db.get(progressId);
+    }
+    if (!progress) throw new Error("Failed to create progress");
 
     // Check if lesson already completed
     const existingCompletion = await ctx.db
@@ -78,14 +100,38 @@ export const completeLesson = mutation({
       ? [...progress.completedLessons, args.lessonId]
       : progress.completedLessons;
 
+    // Update xpByCategory if category provided
+    const validCategories = ["vocabulary", "grammar", "listening", "speaking", "reading"] as const;
+    const category = args.category && validCategories.includes(args.category as any)
+      ? args.category as typeof validCategories[number]
+      : null;
+    const updatedXpByCategory = category
+      ? { ...progress.xpByCategory, [category]: progress.xpByCategory[category] + args.xpEarned }
+      : progress.xpByCategory;
+
     await ctx.db.patch(progress._id, {
       completedLessons: newCompletedLessons,
       totalLessonsCompleted: isNewLesson
         ? progress.totalLessonsCompleted + 1
         : progress.totalLessonsCompleted,
       totalXPEarned: progress.totalXPEarned + args.xpEarned,
+      xpByCategory: updatedXpByCategory,
       lastUpdated: Date.now(),
     });
+
+    // Update user totalXP
+    const userRecord = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+    if (userRecord) {
+      const newTotalXP = userRecord.totalXP + args.xpEarned;
+      await ctx.db.patch(userRecord._id, {
+        totalXP: newTotalXP,
+        currentLevel: Math.floor(newTotalXP / 100) + 1,
+        updatedAt: Date.now(),
+      });
+    }
 
     // Update streak
     const today = new Date().toISOString().split("T")[0];

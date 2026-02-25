@@ -4,6 +4,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CheckIcon, XIcon, SoundIcon, LightBulbIcon, CloseIcon, TargetIcon, StarIcon } from '@/components/icons';
 import Svg, { Path } from 'react-native-svg';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { useLessonStore } from '@/store/lessonStore';
 import { useUserStore } from '@/store/userStore';
 import { useProgressStore } from '@/store/progressStore';
@@ -45,7 +47,8 @@ export default function LessonScreen() {
 
   const { lessons, getLessonById, startLesson, currentSession, answerQuestion, completeSession } = useLessonStore();
   const { user, addXP } = useUserStore();
-  const { completeLesson } = useProgressStore();
+  const { completeLesson: completeLessonLocal } = useProgressStore();
+  const completeLessonConvex = useMutation(api.progress.completeLesson);
   const { settings } = useSettingsStore();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -168,8 +171,29 @@ export default function LessonScreen() {
     
     const xpEarned = calculateLessonXP(lesson.xpReward, accuracy, totalTime);
 
-    // Save progress
-    await completeLesson({
+    const incorrectAnswers = session.answers.length - correctAnswers;
+    const heartsLost = session.answers.filter(a => !a.isCorrect).length;
+
+    // Save to Convex (server)
+    try {
+      await completeLessonConvex({
+        guestId: user.id,
+        lessonId: lesson.id,
+        timeTaken: totalTime,
+        accuracy,
+        xpEarned,
+        totalQuestions: session.answers.length,
+        correctAnswers,
+        incorrectAnswers,
+        heartsLost,
+        category: lesson.category || undefined,
+      });
+    } catch (err) {
+      console.warn('Convex completeLesson failed:', err);
+    }
+
+    // Save to local store (cache)
+    await completeLessonLocal({
       lessonId: lesson.id,
       completedAt: new Date().toISOString(),
       xpEarned,
@@ -182,7 +206,7 @@ export default function LessonScreen() {
     const levelAfter = calculateLevelFromXP(user.totalXP + xpEarned);
     const isLevelUp = levelAfter > levelBefore;
 
-    // Add XP
+    // Add XP (local)
     await addXP(xpEarned);
 
     // Show gamified completion modal
