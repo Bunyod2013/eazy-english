@@ -56,14 +56,14 @@ export const getDetailedStats = query({
 
     // Time spent (sum of timeTaken from all lesson completions)
     const totalTimeSpent = lessonCompletions.reduce(
-      (sum, lc) => sum + lc.timeTaken,
+      (sum, lc) => sum + (lc.timeTaken ?? 0),
       0
     );
 
     // Average accuracy
     const avgAccuracy =
       lessonCompletions.length > 0
-        ? lessonCompletions.reduce((sum, lc) => sum + lc.accuracy, 0) /
+        ? lessonCompletions.reduce((sum, lc) => sum + (lc.accuracy ?? 0), 0) /
           lessonCompletions.length
         : 0;
 
@@ -82,45 +82,53 @@ export const getDetailedStats = query({
       reading: 0,
     };
     for (const p of progress) {
-      xpByCategory.vocabulary += p.xpByCategory.vocabulary;
-      xpByCategory.grammar += p.xpByCategory.grammar;
-      xpByCategory.listening += p.xpByCategory.listening;
-      xpByCategory.speaking += p.xpByCategory.speaking;
-      xpByCategory.reading += p.xpByCategory.reading;
+      const cat = p.xpByCategory;
+      if (cat) {
+        xpByCategory.vocabulary += cat.vocabulary ?? 0;
+        xpByCategory.grammar += cat.grammar ?? 0;
+        xpByCategory.listening += cat.listening ?? 0;
+        xpByCategory.speaking += cat.speaking ?? 0;
+        xpByCategory.reading += cat.reading ?? 0;
+      }
     }
 
     // Users by skill level
-    const usersBySkillLevel = {
+    const usersBySkillLevel: Record<string, number> = {
       beginner: 0,
       elementary: 0,
       intermediate: 0,
       advanced: 0,
     };
     for (const u of users) {
-      usersBySkillLevel[u.skillLevel]++;
+      const level = u.skillLevel ?? "beginner";
+      usersBySkillLevel[level] = (usersBySkillLevel[level] ?? 0) + 1;
     }
 
     // Users by language
-    const usersByLanguage = { uz: 0, en: 0 };
+    const usersByLanguage: Record<string, number> = { uz: 0, en: 0 };
     for (const u of users) {
-      usersByLanguage[u.preferredLanguage]++;
+      const lang = u.preferredLanguage ?? "uz";
+      usersByLanguage[lang] = (usersByLanguage[lang] ?? 0) + 1;
     }
 
     // New users today
     const todayStart = new Date(today).getTime();
-    const newUsersToday = users.filter((u) => u.createdAt >= todayStart).length;
+    const newUsersToday = users.filter(
+      (u) => (u.createdAt ?? 0) >= todayStart
+    ).length;
 
     // New users this week
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const newUsersThisWeek = users.filter(
-      (u) => u.createdAt >= weekAgo.getTime()
+      (u) => (u.createdAt ?? 0) >= weekAgo.getTime()
     ).length;
 
     // Average streak
     const avgStreak =
       users.length > 0
-        ? users.reduce((sum, u) => sum + u.currentStreak, 0) / users.length
+        ? users.reduce((sum, u) => sum + (u.currentStreak ?? 0), 0) /
+          users.length
         : 0;
 
     // Engagement rate (DAU / total)

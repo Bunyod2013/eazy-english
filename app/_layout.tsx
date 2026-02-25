@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Platform, Text, View } from 'react-native';
 import { ConvexReactClient, useMutation } from 'convex/react';
-import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
+import { ConvexBetterAuthProvider, type AuthClient } from '@convex-dev/better-auth/react';
 import { api } from '@/convex/_generated/api';
 import { authClient } from '@/lib/auth-client';
 import { useUserStore } from '@/store/userStore';
@@ -122,7 +122,7 @@ export default function RootLayout() {
   }
 
   return (
-    <ConvexBetterAuthProvider client={convex} authClient={authClient}>
+    <ConvexBetterAuthProvider client={convex} authClient={authClient as AuthClient}>
       <GuestSync />
       <SafeAreaProvider>
         <StatusBar style={isDark ? 'light' : 'dark'} />
