@@ -27,6 +27,8 @@ export default function AdminPage() {
   const dailyActiveData = useQuery(api.admin.getDailyActiveUsers, isLoggedIn ? {} : "skip");
   const topUsers = useQuery(api.admin.getTopUsers, isLoggedIn ? {} : "skip");
 
+  console.log('[Admin] isLoggedIn:', isLoggedIn, 'stats:', stats, 'daily:', dailyActiveData, 'top:', topUsers);
+
   const handleLogin = () => {
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setIsLoggedIn(true);
@@ -125,7 +127,15 @@ export default function AdminPage() {
       </View>
 
       {isLoading ? (
-        <ActivityIndicator color={colors.green.primary} size="large" style={{ marginTop: 40 }} />
+        <View style={{ alignItems: 'center', marginTop: 40 }}>
+          <ActivityIndicator color={colors.green.primary} size="large" />
+          <Text style={{ color: colors.text.secondary, fontSize: 14, marginTop: 16 }}>
+            Ma'lumotlar yuklanmoqda...
+          </Text>
+          <Text style={{ color: colors.text.tertiary, fontSize: 12, marginTop: 8 }}>
+            stats: {stats ? 'OK' : 'loading'} | daily: {dailyActiveData ? 'OK' : 'loading'} | top: {topUsers ? 'OK' : 'loading'}
+          </Text>
+        </View>
       ) : (
         <View style={{ gap: 24 }}>
 
