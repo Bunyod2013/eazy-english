@@ -15,7 +15,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen
         name="home"
-        options={{ title: 'Learn' }}
+        options={{ title: "O'rganish" }}
       />
       <Tabs.Screen
         name="plans"
@@ -27,11 +27,11 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="profile"
-        options={{ title: 'Profile' }}
+        options={{ title: 'Profil' }}
       />
       <Tabs.Screen
         name="settings"
-        options={{ title: 'More' }}
+        options={{ title: "Ko'proq" }}
       />
     </Tabs>
   );

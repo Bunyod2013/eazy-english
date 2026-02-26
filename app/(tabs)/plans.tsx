@@ -21,6 +21,7 @@ export default function PlansScreen() {
   const { colors } = useTheme();
   const [inputText, setInputText] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [activeTab, setActiveTab] = useState<'plans' | 'history'>('plans');
 
   const planHistory = useQuery(api.plans.getPlanHistory, user ? { guestId: user.id } : "skip");
   const createPlanMutation = useMutation(api.plans.createPlan);
@@ -62,145 +63,200 @@ export default function PlansScreen() {
     }
   };
 
-  // Active: isActive AND not completed AND not expired
   const activePlans = planHistory?.filter(p => p.isActive && !p.allCompleted && !p.isExpired) ?? [];
-  // History: completed or expired (regardless of isActive flag)
   const historyPlans = planHistory?.filter(p => p.allCompleted || p.isExpired || !p.isActive) ?? [];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <View style={{ padding: 16, paddingTop: 24, alignItems: 'center' }}>
+        <TargetIcon size={48} color={colors.green.primary} />
+        <Text style={{ fontSize: 28, fontWeight: 'bold', color: colors.text.primary, marginTop: 12 }}>
+          Rejalar
+        </Text>
+        <Text style={{ fontSize: 14, color: colors.text.secondary, marginTop: 4 }}>
+          Kunlik va haftalik maqsadlaringiz
+        </Text>
+      </View>
 
-        {/* Header */}
-        <View style={{ padding: 16, paddingTop: 24, alignItems: 'center' }}>
-          <TargetIcon size={48} color={colors.green.primary} />
-          <Text style={{ fontSize: 28, fontWeight: 'bold', color: colors.text.primary, marginTop: 12 }}>
-            Rejalar
-          </Text>
-          <Text style={{ fontSize: 14, color: colors.text.secondary, marginTop: 4 }}>
-            Kunlik va haftalik maqsadlaringiz
-          </Text>
-        </View>
-
-        {/* Create Plan Input */}
-        <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-          <View style={{
-            backgroundColor: colors.bg.card || colors.bg.secondary,
-            borderRadius: 16,
-            padding: 16,
-            borderWidth: 1,
-            borderColor: colors.border.primary,
-          }}>
-            <Text style={{ fontSize: 15, fontWeight: 'bold', color: colors.text.primary, marginBottom: 10 }}>
-              Yangi reja yozing
+      {/* Tab Toggle */}
+      <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: colors.bg.card || colors.bg.secondary,
+          borderRadius: 16,
+          padding: 4,
+          borderWidth: 1,
+          borderColor: colors.border.primary,
+        }}>
+          <TouchableOpacity
+            onPress={() => setActiveTab('plans')}
+            style={{
+              flex: 1,
+              backgroundColor: activeTab === 'plans' ? colors.green.primary : 'transparent',
+              paddingVertical: 10,
+              borderRadius: 12,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{
+              color: activeTab === 'plans' ? '#ffffff' : colors.text.secondary,
+              fontSize: 14,
+              fontWeight: '600',
+            }}>
+              Rejalar
             </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setActiveTab('history')}
+            style={{
+              flex: 1,
+              backgroundColor: activeTab === 'history' ? colors.green.primary : 'transparent',
+              paddingVertical: 10,
+              borderRadius: 12,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{
+              color: activeTab === 'history' ? '#ffffff' : colors.text.secondary,
+              fontSize: 14,
+              fontWeight: '600',
+            }}>
+              Tarix {historyPlans.length > 0 ? `(${historyPlans.length})` : ''}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-            <TextInput
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder="Masalan: Bugun 20 ta so'z va 5 ta dars"
-              placeholderTextColor={colors.text.tertiary || colors.text.secondary}
-              style={{
-                backgroundColor: colors.bg.primary,
-                borderRadius: 12,
-                paddingHorizontal: 14,
-                paddingVertical: 12,
-                fontSize: 15,
-                color: colors.text.primary,
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {activeTab === 'plans' ? (
+          <>
+            {/* Create Plan Input */}
+            <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+              <View style={{
+                backgroundColor: colors.bg.card || colors.bg.secondary,
+                borderRadius: 16,
+                padding: 16,
                 borderWidth: 1,
                 borderColor: colors.border.primary,
-                marginBottom: 10,
-              }}
-              returnKeyType="done"
-              onSubmitEditing={hasGoal ? handleCreate : undefined}
-            />
-
-            {/* Parsed preview */}
-            {parsed && hasGoal && (
-              <View style={{
-                backgroundColor: colors.green.bg || 'rgba(34,197,94,0.08)',
-                borderRadius: 10,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                marginBottom: 10,
-                flexDirection: 'row',
-                alignItems: 'center',
               }}>
-                <CheckIcon size={16} color="#22c55e" />
-                <Text style={{ fontSize: 13, color: colors.text.secondary, marginLeft: 8 }}>
-                  {parsed.type === 'weekly' ? 'Haftalik' : 'Kunlik'}
-                  {parsed.wordsGoal > 0 ? ` · ${parsed.wordsGoal} so'z` : ''}
-                  {parsed.lessonsGoal > 0 ? ` · ${parsed.lessonsGoal} dars` : ''}
+                <Text style={{ fontSize: 15, fontWeight: 'bold', color: colors.text.primary, marginBottom: 10 }}>
+                  Yangi reja yozing
+                </Text>
+
+                <TextInput
+                  value={inputText}
+                  onChangeText={setInputText}
+                  placeholder="Masalan: Bugun 20 ta so'z va 5 ta dars"
+                  placeholderTextColor={colors.text.tertiary || colors.text.secondary}
+                  style={{
+                    backgroundColor: colors.bg.primary,
+                    borderRadius: 12,
+                    paddingHorizontal: 14,
+                    paddingVertical: 12,
+                    fontSize: 15,
+                    color: colors.text.primary,
+                    borderWidth: 1,
+                    borderColor: colors.border.primary,
+                    marginBottom: 10,
+                  }}
+                  returnKeyType="done"
+                  onSubmitEditing={hasGoal ? handleCreate : undefined}
+                />
+
+                {parsed && hasGoal && (
+                  <View style={{
+                    backgroundColor: colors.green.bg || 'rgba(34,197,94,0.08)',
+                    borderRadius: 10,
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    marginBottom: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                    <CheckIcon size={16} color="#22c55e" />
+                    <Text style={{ fontSize: 13, color: colors.text.secondary, marginLeft: 8 }}>
+                      {parsed.type === 'weekly' ? 'Haftalik' : 'Kunlik'}
+                      {parsed.wordsGoal > 0 ? ` · ${parsed.wordsGoal} so'z` : ''}
+                      {parsed.lessonsGoal > 0 ? ` · ${parsed.lessonsGoal} dars` : ''}
+                    </Text>
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  onPress={handleCreate}
+                  disabled={!hasGoal || isCreating}
+                  style={{
+                    backgroundColor: hasGoal ? (colors.green.primary || '#58cc02') : colors.border.primary,
+                    borderRadius: 12,
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                    opacity: hasGoal && !isCreating ? 1 : 0.5,
+                    borderBottomWidth: hasGoal ? 3 : 0,
+                    borderBottomColor: colors.green.dark || '#58a700',
+                  }}
+                >
+                  {isCreating ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: 'bold' }}>Yaratish</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Active Plans */}
+            {!planHistory ? (
+              <View style={{ alignItems: 'center', paddingVertical: 24 }}>
+                <ActivityIndicator size="small" color={colors.green.primary} />
+              </View>
+            ) : activePlans.length > 0 ? (
+              <View style={{ paddingHorizontal: 16, paddingBottom: 32 }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text.primary, marginBottom: 10 }}>
+                  Faol rejalar
+                </Text>
+                <View style={{ gap: 10 }}>
+                  {activePlans.map((plan) => (
+                    <PlanCard
+                      key={plan._id}
+                      plan={plan}
+                      colors={colors}
+                      isActive
+                      onDelete={() => handleDelete(plan._id)}
+                    />
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <View style={{ alignItems: 'center', paddingVertical: 32 }}>
+                <Text style={{ fontSize: 14, color: colors.text.secondary }}>
+                  Hali faol rejalar yo'q
                 </Text>
               </View>
             )}
-
-            <TouchableOpacity
-              onPress={handleCreate}
-              disabled={!hasGoal || isCreating}
-              style={{
-                backgroundColor: hasGoal ? (colors.green.primary || '#58cc02') : colors.border.primary,
-                borderRadius: 12,
-                paddingVertical: 12,
-                alignItems: 'center',
-                opacity: hasGoal && !isCreating ? 1 : 0.5,
-                borderBottomWidth: hasGoal ? 3 : 0,
-                borderBottomColor: colors.green.dark || '#58a700',
-              }}
-            >
-              {isCreating ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Text style={{ color: '#fff', fontSize: 15, fontWeight: 'bold' }}>Yaratish</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Active Plans */}
-        {activePlans.length > 0 && (
-          <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text.primary, marginBottom: 10 }}>
-              Faol rejalar
-            </Text>
-            <View style={{ gap: 10 }}>
-              {activePlans.map((plan) => (
-                <PlanCard
-                  key={plan._id}
-                  plan={plan}
-                  colors={colors}
-                  isActive
-                  onDelete={() => handleDelete(plan._id)}
-                />
-              ))}
+          </>
+        ) : (
+          /* History Tab */
+          !planHistory ? (
+            <View style={{ alignItems: 'center', paddingVertical: 24 }}>
+              <ActivityIndicator size="small" color={colors.green.primary} />
             </View>
-          </View>
+          ) : historyPlans.length > 0 ? (
+            <View style={{ paddingHorizontal: 16, paddingBottom: 32 }}>
+              <View style={{ gap: 10 }}>
+                {historyPlans.map((plan) => (
+                  <PlanCard key={plan._id} plan={plan} colors={colors} />
+                ))}
+              </View>
+            </View>
+          ) : (
+            <View style={{ alignItems: 'center', paddingVertical: 32 }}>
+              <Text style={{ fontSize: 14, color: colors.text.secondary }}>
+                Hali tugatilgan rejalar yo'q
+              </Text>
+            </View>
+          )
         )}
-
-        {/* History */}
-        {!planHistory ? (
-          <View style={{ alignItems: 'center', paddingVertical: 24 }}>
-            <ActivityIndicator size="small" color={colors.green.primary} />
-          </View>
-        ) : historyPlans.length > 0 ? (
-          <View style={{ paddingHorizontal: 16, paddingBottom: 32 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text.primary, marginBottom: 10 }}>
-              Tarix
-            </Text>
-            <View style={{ gap: 10 }}>
-              {historyPlans.map((plan) => (
-                <PlanCard key={plan._id} plan={plan} colors={colors} />
-              ))}
-            </View>
-          </View>
-        ) : activePlans.length === 0 ? (
-          <View style={{ alignItems: 'center', paddingVertical: 32 }}>
-            <Text style={{ fontSize: 14, color: colors.text.secondary }}>
-              Hali rejalar yo'q
-            </Text>
-          </View>
-        ) : null}
-
       </ScrollView>
     </SafeAreaView>
   );
