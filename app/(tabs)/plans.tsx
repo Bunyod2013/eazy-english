@@ -62,8 +62,10 @@ export default function PlansScreen() {
     }
   };
 
-  const activePlan = planHistory?.find(p => p.isActive);
-  const pastPlans = planHistory?.filter(p => !p.isActive) ?? [];
+  // Active: isActive AND not completed AND not expired
+  const activePlans = planHistory?.filter(p => p.isActive && !p.allCompleted && !p.isExpired) ?? [];
+  // History: completed or expired (regardless of isActive flag)
+  const historyPlans = planHistory?.filter(p => p.allCompleted || p.isExpired || !p.isActive) ?? [];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.primary }}>
@@ -155,38 +157,43 @@ export default function PlansScreen() {
           </View>
         </View>
 
-        {/* Active Plan */}
-        {activePlan && (
+        {/* Active Plans */}
+        {activePlans.length > 0 && (
           <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text.primary, marginBottom: 10 }}>
-              Faol reja
+              Faol rejalar
             </Text>
-            <PlanCard
-              plan={activePlan}
-              colors={colors}
-              isActive
-              onDelete={() => handleDelete(activePlan._id)}
-            />
+            <View style={{ gap: 10 }}>
+              {activePlans.map((plan) => (
+                <PlanCard
+                  key={plan._id}
+                  plan={plan}
+                  colors={colors}
+                  isActive
+                  onDelete={() => handleDelete(plan._id)}
+                />
+              ))}
+            </View>
           </View>
         )}
 
-        {/* Plan History */}
+        {/* History */}
         {!planHistory ? (
           <View style={{ alignItems: 'center', paddingVertical: 24 }}>
             <ActivityIndicator size="small" color={colors.green.primary} />
           </View>
-        ) : pastPlans.length > 0 ? (
+        ) : historyPlans.length > 0 ? (
           <View style={{ paddingHorizontal: 16, paddingBottom: 32 }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text.primary, marginBottom: 10 }}>
               Tarix
             </Text>
             <View style={{ gap: 10 }}>
-              {pastPlans.map((plan) => (
+              {historyPlans.map((plan) => (
                 <PlanCard key={plan._id} plan={plan} colors={colors} />
               ))}
             </View>
           </View>
-        ) : !activePlan ? (
+        ) : activePlans.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: 32 }}>
             <Text style={{ fontSize: 14, color: colors.text.secondary }}>
               Hali rejalar yo'q

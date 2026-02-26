@@ -18,19 +18,7 @@ export const createPlan = mutation({
     const userId = authId || (args.guestId ? `guest_${args.guestId}` : null);
     if (!userId) throw new Error("Not authenticated");
 
-    // Deactivate any existing active plans
-    const activePlans = await ctx.db
-      .query("plans")
-      .withIndex("by_userId_active", (q) =>
-        q.eq("userId", userId).eq("isActive", true)
-      )
-      .collect();
-
-    for (const plan of activePlans) {
-      await ctx.db.patch(plan._id, { isActive: false });
-    }
-
-    // Create new plan
+    // Create new plan (multiple plans can be active simultaneously)
     const planId = await ctx.db.insert("plans", {
       userId,
       type: args.type,
