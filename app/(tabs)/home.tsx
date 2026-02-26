@@ -9,6 +9,7 @@ import { useLessonStore } from '@/store/lessonStore';
 import { getStreakStatus } from '@/utils/date';
 import { LionIcon, FireIcon, DiamondIcon, TargetIcon, BookIcon } from '@/components/icons';
 import { useTheme } from '@/utils/theme';
+import { PlanWidget } from '@/components/shared/PlanWidget';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -206,6 +207,9 @@ export default function HomeScreen() {
         </View>
       </View>
 
+
+      {/* Active Plans Mini Widget */}
+      <PlanWidget />
 
       {/* Lesson Path - Duolingo Style */}
       {lessons.length > 0 ? (
