@@ -3,10 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useIsDesktop } from '@/utils/useIsDesktop';
 import { useTheme } from '@/utils/theme';
-import { HomeIcon, TrophyIcon, PeopleIcon, SettingsIcon } from '@/components/icons';
+import { HomeIcon, TrophyIcon, PeopleIcon, SettingsIcon, TargetIcon } from '@/components/icons';
 
 const TAB_ICONS: Record<string, React.FC<{ size: number; color: string }>> = {
   home: HomeIcon,
+  plans: TargetIcon,
   leaderboard: TrophyIcon,
   profile: PeopleIcon,
   settings: SettingsIcon,

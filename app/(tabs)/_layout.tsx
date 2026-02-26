@@ -18,6 +18,10 @@ export default function TabLayout() {
         options={{ title: 'Learn' }}
       />
       <Tabs.Screen
+        name="plans"
+        options={{ title: 'Rejalar' }}
+      />
+      <Tabs.Screen
         name="leaderboard"
         options={{ title: 'Reyting' }}
       />

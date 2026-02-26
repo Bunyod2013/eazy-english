@@ -69,6 +69,99 @@ export const deletePlan = mutation({
   },
 });
 
+// Get all plans (active + past) for history
+export const getPlanHistory = query({
+  args: {
+    guestId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const authId = await ctx.auth
+      .getUserIdentity()
+      .then((id) => id?.subject ?? null);
+    const userId = authId || (args.guestId ? `guest_${args.guestId}` : null);
+    if (!userId) return [];
+
+    const plans = await ctx.db
+      .query("plans")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    // Sort by createdAt descending (newest first)
+    plans.sort((a, b) => b.createdAt - a.createdAt);
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // For each plan, compute progress
+    const completions = await ctx.db
+      .query("lessonCompletions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    const allWords = await ctx.db
+      .query("vocabulary")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    return plans.map((plan) => {
+      const startTs = new Date(plan.startDate).getTime();
+      const endTs = new Date(plan.endDate + "T23:59:59.999Z").getTime();
+      const isExpired = today > plan.endDate;
+
+      const completionsInRange = completions.filter(
+        (c) => c.completedAt >= startTs && c.completedAt <= endTs
+      );
+      const uniqueLessonIds = new Set(completionsInRange.map((c) => c.lessonId));
+      const currentLessons = uniqueLessonIds.size;
+
+      const wordsInRange = allWords.filter(
+        (w) =>
+          w.learned === true &&
+          w.learnedAt !== undefined &&
+          w.learnedAt >= startTs &&
+          w.learnedAt <= endTs
+      );
+      const currentWords = wordsInRange.length;
+
+      const wordsProgress =
+        plan.wordsGoal > 0 ? Math.min(currentWords / plan.wordsGoal, 1) : 1;
+      const lessonsProgress =
+        plan.lessonsGoal > 0 ? Math.min(currentLessons / plan.lessonsGoal, 1) : 1;
+      const totalGoals =
+        (plan.wordsGoal > 0 ? 1 : 0) + (plan.lessonsGoal > 0 ? 1 : 0);
+      const progressPercent =
+        totalGoals > 0
+          ? Math.round(
+              ((wordsProgress * (plan.wordsGoal > 0 ? 1 : 0) +
+                lessonsProgress * (plan.lessonsGoal > 0 ? 1 : 0)) /
+                totalGoals) *
+                100
+            )
+          : 100;
+
+      const allCompleted =
+        (plan.wordsGoal === 0 || currentWords >= plan.wordsGoal) &&
+        (plan.lessonsGoal === 0 || currentLessons >= plan.lessonsGoal);
+
+      return {
+        _id: plan._id,
+        type: plan.type,
+        wordsGoal: plan.wordsGoal,
+        lessonsGoal: plan.lessonsGoal,
+        originalText: plan.originalText,
+        startDate: plan.startDate,
+        endDate: plan.endDate,
+        isActive: plan.isActive,
+        createdAt: plan.createdAt,
+        currentWords,
+        currentLessons,
+        progressPercent,
+        allCompleted,
+        isExpired,
+      };
+    });
+  },
+});
+
 export const getActivePlan = query({
   args: {
     guestId: v.optional(v.string()),

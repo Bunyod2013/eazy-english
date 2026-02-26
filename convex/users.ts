@@ -247,3 +247,21 @@ export const addXP = mutation({
     };
   },
 });
+
+// Get all real users for leaderboard, sorted by totalXP
+export const getLeaderboardUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+
+    return users
+      .map((u) => ({
+        userId: u.userId,
+        username: u.username,
+        avatar: u.avatar,
+        totalXP: u.totalXP,
+        currentStreak: u.currentStreak,
+      }))
+      .sort((a, b) => b.totalXP - a.totalXP);
+  },
+});
