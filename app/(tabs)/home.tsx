@@ -208,17 +208,17 @@ export default function HomeScreen() {
       </View>
 
 
-      {/* Active Plans Mini Widget */}
-      <PlanWidget />
-
       {/* Lesson Path - Duolingo Style */}
       {lessons.length > 0 ? (
-        <DuolingoLessonPath
-          lessons={lessons}
-          completedLessons={completedLessonsIds}
-          currentXP={user.totalXP}
-          onLessonPress={(lessonId) => router.push(`/lesson/${lessonId}`)}
-        />
+        <View style={{ flex: 1, position: 'relative' }}>
+          <PlanWidget />
+          <DuolingoLessonPath
+            lessons={lessons}
+            completedLessons={completedLessonsIds}
+            currentXP={user.totalXP}
+            onLessonPress={(lessonId) => router.push(`/lesson/${lessonId}`)}
+          />
+        </View>
       ) : (
         <View className="flex-1 items-center justify-center p-6">
           <LionIcon size={64} />

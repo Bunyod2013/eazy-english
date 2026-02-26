@@ -8,8 +8,8 @@ import { TargetIcon } from '@/components/icons';
 
 function MiniBar({ progress, color, bgColor }: { progress: number; color: string; bgColor: string }) {
   return (
-    <View style={{ height: 6, borderRadius: 3, backgroundColor: bgColor, overflow: 'hidden', flex: 1 }}>
-      <View style={{ height: '100%', width: `${Math.min(progress * 100, 100)}%`, backgroundColor: color, borderRadius: 3 }} />
+    <View style={{ height: 4, borderRadius: 2, backgroundColor: bgColor, overflow: 'hidden' }}>
+      <View style={{ height: '100%', width: `${Math.min(progress * 100, 100)}%`, backgroundColor: color, borderRadius: 2 }} />
     </View>
   );
 }
@@ -26,67 +26,76 @@ export function PlanWidget() {
 
   if (activePlans.length === 0) return null;
 
+  // Show only the first active plan in compact form
+  const plan = activePlans[0];
+  const allDone = plan.progressPercent >= 100;
+
   return (
-    <View style={{ paddingHorizontal: 16, marginBottom: 12 }}>
-      <View style={{
-        backgroundColor: colors.bg.card || colors.bg.secondary,
-        borderRadius: 12,
-        padding: 12,
-        borderWidth: 1,
-        borderColor: colors.border.primary,
-        gap: 8,
-      }}>
-        {activePlans.map((plan) => {
-          const allDone = plan.progressPercent >= 100;
-
-          return (
-            <View key={plan._id}>
-              {/* Plan header row */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <TargetIcon size={14} color={allDone ? '#22c55e' : colors.green.primary} />
-                  <Text style={{ fontSize: 12, fontWeight: 'bold', color: colors.text.primary, marginLeft: 5 }}>
-                    {plan.type === 'weekly' ? 'Haftalik' : 'Kunlik'}
-                  </Text>
-                </View>
-                <Text style={{ fontSize: 11, fontWeight: 'bold', color: allDone ? '#22c55e' : colors.text.secondary }}>
-                  {plan.progressPercent}%
-                </Text>
-              </View>
-
-              {/* Progress rows */}
-              <View style={{ gap: 5 }}>
-                {plan.wordsGoal > 0 && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 11, color: colors.text.secondary, width: 42 }}>So'zlar</Text>
-                    <MiniBar
-                      progress={plan.currentWords / plan.wordsGoal}
-                      color={plan.currentWords >= plan.wordsGoal ? '#22c55e' : '#a855f7'}
-                      bgColor={colors.border.primary}
-                    />
-                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: plan.currentWords >= plan.wordsGoal ? '#22c55e' : '#a855f7', width: 36, textAlign: 'right' }}>
-                      {plan.currentWords}/{plan.wordsGoal}
-                    </Text>
-                  </View>
-                )}
-                {plan.lessonsGoal > 0 && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 11, color: colors.text.secondary, width: 42 }}>Darslar</Text>
-                    <MiniBar
-                      progress={plan.currentLessons / plan.lessonsGoal}
-                      color={plan.currentLessons >= plan.lessonsGoal ? '#22c55e' : '#3b82f6'}
-                      bgColor={colors.border.primary}
-                    />
-                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: plan.currentLessons >= plan.lessonsGoal ? '#22c55e' : '#3b82f6', width: 36, textAlign: 'right' }}>
-                      {plan.currentLessons}/{plan.lessonsGoal}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-          );
-        })}
+    <View style={{
+      position: 'absolute',
+      top: 8,
+      left: 12,
+      zIndex: 10,
+      width: 120,
+      backgroundColor: colors.bg.card || colors.bg.secondary,
+      borderRadius: 12,
+      padding: 10,
+      borderWidth: 1,
+      borderColor: allDone ? '#22c55e' : colors.border.primary,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 4,
+    }}>
+      {/* Header */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <TargetIcon size={12} color={allDone ? '#22c55e' : colors.green.primary} />
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: allDone ? '#22c55e' : colors.text.secondary }}>
+          {plan.progressPercent}%
+        </Text>
       </View>
+
+      {/* Progress bars */}
+      <View style={{ gap: 5 }}>
+        {plan.wordsGoal > 0 && (
+          <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
+              <Text style={{ fontSize: 9, color: colors.text.secondary }}>So'z</Text>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: plan.currentWords >= plan.wordsGoal ? '#22c55e' : '#a855f7' }}>
+                {plan.currentWords}/{plan.wordsGoal}
+              </Text>
+            </View>
+            <MiniBar
+              progress={plan.currentWords / plan.wordsGoal}
+              color={plan.currentWords >= plan.wordsGoal ? '#22c55e' : '#a855f7'}
+              bgColor={colors.border.primary}
+            />
+          </View>
+        )}
+        {plan.lessonsGoal > 0 && (
+          <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
+              <Text style={{ fontSize: 9, color: colors.text.secondary }}>Dars</Text>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: plan.currentLessons >= plan.lessonsGoal ? '#22c55e' : '#3b82f6' }}>
+                {plan.currentLessons}/{plan.lessonsGoal}
+              </Text>
+            </View>
+            <MiniBar
+              progress={plan.currentLessons / plan.lessonsGoal}
+              color={plan.currentLessons >= plan.lessonsGoal ? '#22c55e' : '#3b82f6'}
+              bgColor={colors.border.primary}
+            />
+          </View>
+        )}
+      </View>
+
+      {/* Extra plans indicator */}
+      {activePlans.length > 1 && (
+        <Text style={{ fontSize: 8, color: colors.text.tertiary || colors.text.secondary, textAlign: 'center', marginTop: 4 }}>
+          +{activePlans.length - 1} reja
+        </Text>
+      )}
     </View>
   );
 }
