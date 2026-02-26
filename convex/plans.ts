@@ -101,14 +101,10 @@ export const getPlanHistory = query({
       const uniqueLessonIds = new Set(completionsInRange.map((c) => c.lessonId));
       const currentLessons = uniqueLessonIds.size;
 
-      const wordsInRange = allWords.filter(
-        (w) =>
-          w.learned === true &&
-          w.learnedAt !== undefined &&
-          w.learnedAt >= startTs &&
-          w.learnedAt <= endTs
-      );
-      const currentWords = wordsInRange.length;
+      // Count words from completed lessons in date range
+      const currentWords = allWords.filter(
+        (w) => uniqueLessonIds.has(w.lessonId)
+      ).length;
 
       const wordsProgress =
         plan.wordsGoal > 0 ? Math.min(currentWords / plan.wordsGoal, 1) : 1;
@@ -191,20 +187,15 @@ export const getActivePlan = query({
     const uniqueLessonIds = new Set(completionsInRange.map((c) => c.lessonId));
     const currentLessons = uniqueLessonIds.size;
 
-    // Count words learned in date range
+    // Count words from completed lessons in date range
     const allWords = await ctx.db
       .query("vocabulary")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
 
-    const wordsInRange = allWords.filter(
-      (w) =>
-        w.learned === true &&
-        w.learnedAt !== undefined &&
-        w.learnedAt >= startTs &&
-        w.learnedAt <= endTs
-    );
-    const currentWords = wordsInRange.length;
+    const currentWords = allWords.filter(
+      (w) => uniqueLessonIds.has(w.lessonId)
+    ).length;
 
     // Calculate overall progress
     const wordsProgress =
