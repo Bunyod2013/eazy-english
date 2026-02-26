@@ -85,11 +85,6 @@ export const getPlanHistory = query({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
 
-    const allWords = await ctx.db
-      .query("vocabulary")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .collect();
-
     return plans.map((plan) => {
       const startTs = new Date(plan.startDate).getTime();
       const endTs = new Date(plan.endDate + "T23:59:59.999Z").getTime();
@@ -98,13 +93,22 @@ export const getPlanHistory = query({
       const completionsInRange = completions.filter(
         (c) => c.completedAt >= startTs && c.completedAt <= endTs
       );
-      const uniqueLessonIds = new Set(completionsInRange.map((c) => c.lessonId));
-      const currentLessons = uniqueLessonIds.size;
 
-      // Count words from completed lessons in date range
-      const currentWords = allWords.filter(
-        (w) => uniqueLessonIds.has(w.lessonId)
-      ).length;
+      // Unique lessons completed in date range
+      const seenLessons = new Set<string>();
+      const uniqueCompletions: typeof completionsInRange = [];
+      for (const c of completionsInRange) {
+        if (!seenLessons.has(c.lessonId)) {
+          seenLessons.add(c.lessonId);
+          uniqueCompletions.push(c);
+        }
+      }
+      const currentLessons = uniqueCompletions.length;
+
+      // Words = sum of totalQuestions from each unique completed lesson
+      const currentWords = uniqueCompletions.reduce(
+        (sum, c) => sum + c.totalQuestions, 0
+      );
 
       const wordsProgress =
         plan.wordsGoal > 0 ? Math.min(currentWords / plan.wordsGoal, 1) : 1;
@@ -183,19 +187,21 @@ export const getActivePlan = query({
       (c) => c.completedAt >= startTs && c.completedAt <= endTs
     );
 
-    // Count unique lessons
-    const uniqueLessonIds = new Set(completionsInRange.map((c) => c.lessonId));
-    const currentLessons = uniqueLessonIds.size;
+    // Unique lessons completed in date range
+    const seenLessons = new Set<string>();
+    const uniqueCompletions: typeof completionsInRange = [];
+    for (const c of completionsInRange) {
+      if (!seenLessons.has(c.lessonId)) {
+        seenLessons.add(c.lessonId);
+        uniqueCompletions.push(c);
+      }
+    }
+    const currentLessons = uniqueCompletions.length;
 
-    // Count words from completed lessons in date range
-    const allWords = await ctx.db
-      .query("vocabulary")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .collect();
-
-    const currentWords = allWords.filter(
-      (w) => uniqueLessonIds.has(w.lessonId)
-    ).length;
+    // Words = sum of totalQuestions from each unique completed lesson
+    const currentWords = uniqueCompletions.reduce(
+      (sum, c) => sum + c.totalQuestions, 0
+    );
 
     // Calculate overall progress
     const wordsProgress =
