@@ -156,6 +156,21 @@ const schema = defineSchema({
     .index("by_weeklyXP", ["weeklyXP"])
     .index("by_monthlyXP", ["monthlyXP"]),
 
+  // Daily/weekly plans
+  plans: defineTable({
+    userId: v.string(),
+    type: v.union(v.literal("daily"), v.literal("weekly")),
+    wordsGoal: v.number(),
+    lessonsGoal: v.number(),
+    originalText: v.string(),
+    startDate: v.string(),   // YYYY-MM-DD
+    endDate: v.string(),     // daily = same day, weekly = +6
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_active", ["userId", "isActive"]),
+
   // Page view tracking
   pageViews: defineTable({
     userId: v.string(),

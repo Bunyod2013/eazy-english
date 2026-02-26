@@ -13,6 +13,7 @@ import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as leaderboard from "../leaderboard.js";
 import type * as pageViews from "../pageViews.js";
+import type * as plans from "../plans.js";
 import type * as progress from "../progress.js";
 import type * as users from "../users.js";
 import type * as vocabulary from "../vocabulary.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   leaderboard: typeof leaderboard;
   pageViews: typeof pageViews;
+  plans: typeof plans;
   progress: typeof progress;
   users: typeof users;
   vocabulary: typeof vocabulary;
