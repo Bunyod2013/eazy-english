@@ -724,6 +724,185 @@ export const DUOLINGO_STYLE_LESSONS: Lesson[] = [
       },
     ],
   },
+
+  // LESSON 6: Introductions — My name is...
+  {
+    id: 'duo-lesson-6',
+    title: 'Introductions',
+    titleUz: 'Tanishish',
+    description: 'Learn to introduce yourself in English',
+    descriptionUz: 'O\'zingizni ingliz tilida tanishtiring',
+    level: 6,
+    requiredXP: 280,
+    xpReward: 60,
+    category: 'greetings',
+    isLocked: true,
+    questions: [
+      // 1. Teach "I"
+      {
+        id: 'duo-6-q1',
+        type: 'vocabulary',
+        prompt: 'I',
+        promptUz: '"I" - men degani. O\'zingiz haqida gapirganingizda ishlatiladi.',
+        correctAnswer: 'I',
+        word: 'I',
+        translation: 'Men',
+        isNewWord: true,
+        pronunciation: '/aɪ/',
+        examples: [
+          { en: 'I am a student.', uz: 'Men o\'quvchiman.' },
+          { en: 'I love English.', uz: 'Men ingliz tilini yaxshi ko\'raman.' },
+        ],
+        explanation: 'Used when talking about yourself',
+        explanationUz: 'O\'zingiz haqida gapirganingizda ishlatiladi',
+      },
+      // 2. Teach "My"
+      {
+        id: 'duo-6-q2',
+        type: 'vocabulary',
+        prompt: 'My',
+        promptUz: '"My" - mening degani. Biror narsa sizga tegishli ekanini bildiradi.',
+        correctAnswer: 'My',
+        word: 'My',
+        translation: 'Mening',
+        isNewWord: true,
+        pronunciation: '/maɪ/',
+        examples: [
+          { en: 'My name is Ali.', uz: 'Mening ismim Ali.' },
+          { en: 'My friend is kind.', uz: 'Mening do\'stim mehribon.' },
+        ],
+        explanation: 'Shows that something belongs to you',
+        explanationUz: 'Biror narsa sizga tegishli ekanini bildiradi',
+      },
+      // 3. Teach "name"
+      {
+        id: 'duo-6-q3',
+        type: 'vocabulary',
+        prompt: 'name',
+        promptUz: '"name" - ism degani.',
+        correctAnswer: 'name',
+        word: 'name',
+        translation: 'ism',
+        isNewWord: true,
+        pronunciation: '/neɪm/',
+        audio: 'words/name.wav',
+        audioSlow: 'words-slow/name.wav',
+        audioText: 'name',
+        examples: [
+          { en: 'My name is Sara.', uz: 'Mening ismim Sara.' },
+          { en: 'What is your name?', uz: 'Sizning ismingiz nima?' },
+        ],
+        explanation: 'The word you are called by',
+        explanationUz: 'Sizni chaqiradigan so\'z — ismingiz',
+      },
+      // 4. Teach "is"
+      {
+        id: 'duo-6-q4',
+        type: 'vocabulary',
+        prompt: 'is',
+        promptUz: '"is" - bu, hisoblanadi degani. He/She/It bilan ishlatiladi.',
+        correctAnswer: 'is',
+        word: 'is',
+        translation: '— (bu/hisoblanadi)',
+        isNewWord: true,
+        pronunciation: '/ɪz/',
+        examples: [
+          { en: 'My name is Bunyod.', uz: 'Mening ismim Bunyod.' },
+          { en: 'He is a teacher.', uz: 'U o\'qituvchi.' },
+        ],
+        explanation: 'Part of "to be" — used with he, she, it, and names',
+        explanationUz: '"To be" fe\'lining bir shakli — he, she, it va ismlar bilan ishlatiladi',
+      },
+      // 5. Teach "am"
+      {
+        id: 'duo-6-q5',
+        type: 'vocabulary',
+        prompt: 'am',
+        promptUz: '"am" - "I" bilan ishlatiladigan "to be" fe\'li.',
+        correctAnswer: 'am',
+        word: 'am',
+        translation: '— (I am = menman)',
+        isNewWord: true,
+        pronunciation: '/æm/',
+        examples: [
+          { en: 'I am happy.', uz: 'Men xursandman.' },
+          { en: 'I am a student.', uz: 'Men o\'quvchiman.' },
+        ],
+        explanation: '"To be" verb used only with "I"',
+        explanationUz: 'Faqat "I" (men) bilan ishlatiladigan fe\'l',
+      },
+      // 6. Multiple choice — "My" nimani bildiradi?
+      {
+        id: 'duo-6-q6',
+        type: 'multiple_choice',
+        prompt: 'What does "My" mean?',
+        promptUz: '"My" so\'zi qanday ma\'no bildiradi?',
+        correctAnswer: 'Mening',
+        options: ['Men', 'Mening', 'U', 'Siz'],
+      },
+      // 7. Multiple choice — "I am" to'g'ri yoki "I is"?
+      {
+        id: 'duo-6-q7',
+        type: 'multiple_choice',
+        prompt: 'Which is correct?',
+        promptUz: 'Qaysi to\'g\'ri?',
+        correctAnswer: 'I am happy',
+        options: ['I am happy', 'I is happy', 'My am happy', 'I are happy'],
+        hintsUz: ['"I" bilan faqat "am" ishlatiladi'],
+      },
+      // 8. Word Bank — "My name is Bunyod"
+      {
+        id: 'duo-6-q8',
+        type: 'word_bank',
+        prompt: 'Build the sentence: "Mening ismim Bunyod"',
+        promptUz: 'Jumla tuzing: "Mening ismim Bunyod"',
+        correctAnswer: 'My name is Bunyod',
+        audioText: 'My name is Bunyod',
+        wordBank: ['My', 'name', 'is', 'Bunyod', 'I', 'am'],
+        hintsUz: ['My bilan boshlanadi'],
+      },
+      // 9. Word Bank — "I am happy"
+      {
+        id: 'duo-6-q9',
+        type: 'word_bank',
+        prompt: 'Build the sentence: "Men xursandman"',
+        promptUz: 'Jumla tuzing: "Men xursandman"',
+        correctAnswer: 'I am happy',
+        audioText: 'I am happy',
+        wordBank: ['I', 'am', 'happy', 'My', 'is', 'name'],
+        hintsUz: ['I bilan boshlanadi, keyin am'],
+      },
+      // 10. Word Bank — "My name is Ali"
+      {
+        id: 'duo-6-q10',
+        type: 'word_bank',
+        prompt: 'Build the sentence: "Mening ismim Ali"',
+        promptUz: 'Jumla tuzing: "Mening ismim Ali"',
+        correctAnswer: 'My name is Ali',
+        audioText: 'My name is Ali',
+        wordBank: ['My', 'name', 'is', 'Ali', 'I', 'am', 'Hello'],
+        hintsUz: ['My name is... — oddiy tanishtirish gapi'],
+      },
+      // 11. Translation — "My name is..." tarjimasi
+      {
+        id: 'duo-6-q11',
+        type: 'translation',
+        prompt: 'Translate: "Mening ismim Sara"',
+        promptUz: '"Mening ismim Sara" ni inglizcha yozing',
+        correctAnswer: 'My name is Sara',
+        hintsUz: ['My name is ... — formula shu'],
+      },
+      // 12. Multiple Choice — yakuniy takrorlash
+      {
+        id: 'duo-6-q12',
+        type: 'multiple_choice',
+        prompt: 'How do you introduce yourself in English?',
+        promptUz: 'O\'zingizni ingliz tilida qanday tanishtirasiz?',
+        correctAnswer: 'My name is ...',
+        options: ['My name is ...', 'I name is ...', 'Name my is ...', 'Is my name ...'],
+      },
+    ],
+  },
 ];
 
 // Helper to get Duolingo-style lessons
